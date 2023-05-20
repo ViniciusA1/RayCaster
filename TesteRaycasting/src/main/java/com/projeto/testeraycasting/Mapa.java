@@ -51,10 +51,15 @@ public class Mapa {
     public int getValor(int linha, int coluna) {
         return grid[linha][coluna];
     }
+
+    public String getNomeMapa() {
+        return nomeMapa;
+    }
     
     public void setValor(int linha, int coluna, int valor) {
         grid[linha][coluna] = valor;
     }
+    
     
     @Deprecated
     public void carregaMapa(String nomeMapa) {
