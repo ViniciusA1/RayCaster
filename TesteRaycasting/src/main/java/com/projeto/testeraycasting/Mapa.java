@@ -1,7 +1,10 @@
 package com.projeto.testeraycasting;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Scanner;
 
 /**
@@ -9,16 +12,35 @@ import java.util.Scanner;
  * @author vinicius
  */
 public class Mapa {
+    private String nomeMapa;
     private int[][] grid;
     private int limite;
     
+    @Deprecated
     public Mapa() {
+        nomeMapa = "";
         grid = null;
         limite = 0;
     }
 
+    @Deprecated
     public Mapa(int[][] grid, int limite) {
+        nomeMapa = "";
         this.grid = grid;
+        this.limite = limite;
+    }
+    
+    @Deprecated
+    public Mapa(String nomeMapa, int[][] grid, int limite) {
+        this.nomeMapa = nomeMapa;
+        this.grid = grid;
+        this.limite = limite;
+    }
+    
+    
+    public Mapa(String nomeMapa, int limite){
+        this.nomeMapa = nomeMapa;
+        this.grid = new int[limite][limite];
         this.limite = limite;
     }
 
@@ -34,8 +56,9 @@ public class Mapa {
         grid[linha][coluna] = valor;
     }
     
+    @Deprecated
     public void carregaMapa(String nomeMapa) {
-        File arquivoMapa = new File(nomeMapa);
+        File arquivoMapa = new File("maps" + File.pathSeparator + nomeMapa);
         Scanner leitor;
         
         try {
@@ -56,7 +79,52 @@ public class Mapa {
         leitor.close();
     }
     
+    public void carregaMapa() {
+        File arquivoMapa = new File("maps" + File.pathSeparator + nomeMapa);
+        Scanner leitor;
+        
+        try {
+            leitor = new Scanner(arquivoMapa);
+        } catch(FileNotFoundException erro) {
+            System.err.println("Erro! " + erro.getMessage());
+            return;
+        }
+        
+        limite = leitor.nextInt();
+        grid = new int[limite][limite];
+        
+        for(int i = 0, j; i < limite; i++) {
+            for(j = 0; j < limite; j++)
+                grid[i][j] = leitor.nextInt();
+        }
+        
+        leitor.close();
+    }
+    
+    /**
+     * Metodo para salvar o mapa no arquivo
+     * @author BrunoZara
+     * @throws java.io.IOException
+     */
+    public void salvaMapa() throws IOException{
+        FileWriter out = new FileWriter("maps" + File.pathSeparator + nomeMapa);
+        BufferedWriter buffout = new BufferedWriter(out);
+        buffout.write(this.limite);
+        buffout.newLine();
+        buffout.flush();
+        for(int i = 0; i < this.limite; i++){
+            for(int j = 0; j < this.limite; j++){
+                buffout.write(grid[i][j]);
+                buffout.newLine();
+                buffout.flush();
+            }
+        }
+        buffout.close();
+        out.close();
+    }
+    
     public void liberaMapa() {
+        nomeMapa = "";
         grid = null;
         limite = 0;
     }
