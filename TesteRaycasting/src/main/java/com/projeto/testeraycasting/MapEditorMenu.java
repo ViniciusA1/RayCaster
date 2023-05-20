@@ -55,6 +55,7 @@ public class MapEditorMenu {
         painel.add(linha1);
         painel.add(linha2);
         ni.add(painel);
+        ni.setLocation(700, 400);
         ni.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ni.setVisible(true);
     }
