@@ -45,6 +45,16 @@ public class MapEditorMenu {
             inicial.setVisible(false);
             criarMapa(inicial);
         });
+        b2 = new JButton("Editar Mapa");
+        b2.addActionListener((ActionEvent e) ->{
+            //editor de mapa
+            naoImplementadoPopUp();
+        });
+        
+        b3 = new JButton("Apagar mapa");
+        b3.addActionListener((ActionEvent e) -> {
+            //Mapa map = 
+        });
         
         painel.add(b1);
         inicial.add(painel);

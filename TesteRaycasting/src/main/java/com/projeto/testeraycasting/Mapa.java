@@ -11,7 +11,7 @@ import java.util.Scanner;
  *
  * @author vinicius
  */
-public class Mapa {
+public class Mapa implements Guardar{
     private String nomeMapa;
     private int[][] grid;
     private int limite;
@@ -84,7 +84,8 @@ public class Mapa {
         leitor.close();
     }
     
-    public void carregaMapa() {
+    @Override
+    public void carregar() {
         File arquivoMapa = new File("maps" + File.pathSeparator + nomeMapa);
         Scanner leitor;
         
@@ -111,7 +112,8 @@ public class Mapa {
      * @author BrunoZara
      * @throws java.io.IOException
      */
-    public void salvaMapa() throws IOException{
+    @Override
+    public void salvar() throws IOException{
         FileWriter out = new FileWriter("maps" + File.pathSeparator + nomeMapa);
         BufferedWriter buffout = new BufferedWriter(out);
         buffout.write(this.limite);
@@ -126,6 +128,14 @@ public class Mapa {
         }
         buffout.close();
         out.close();
+    }
+    
+    @Override
+    public  void excluir(){
+        File arquivoMapa = new File("maps" + File.pathSeparator + nomeMapa);
+         if(arquivoMapa.exists()){
+             arquivoMapa.delete();
+         }
     }
     
     public void liberaMapa() {
