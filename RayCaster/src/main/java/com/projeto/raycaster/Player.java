@@ -15,7 +15,7 @@ import javax.sound.sampled.Clip;
 public class Player extends Entidade {
     private double angulo;
     private double pitch;
-    private double taxa;
+    private double taxaPitch;
     private Inventario<Item> mochila;
     private Item itemAtual;
     private Clip clip;
@@ -24,7 +24,7 @@ public class Player extends Entidade {
         super(vidaMaxima, x, y, velocidade, fov);
         angulo = 0;
         pitch = 0;
-        taxa = 2;
+        taxaPitch = 1;
         mochila = new Inventario<>();
     }
     
@@ -40,10 +40,10 @@ public class Player extends Entidade {
         double dx = sinal * super.getVelocidade() * Math.cos(angulo + anguloRelativo);
         double dy = sinal * super.getVelocidade() * Math.sin(angulo + anguloRelativo);
         
-        pitch += taxa;
+        pitch += taxaPitch;
         
         if(pitch >= 32 || pitch <= -32) {
-            taxa *= -1;
+            taxaPitch *= -1;
         }
         
         if(!checaColisao(mapaAtual, dx + super.getX(), dy + super.getY()))

@@ -1,5 +1,6 @@
 package com.projeto.raycaster;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -25,7 +26,6 @@ import javax.swing.Timer;
  * @author vinic
  */
 public class Engine extends JPanel implements ActionListener {
-
     private final int SCREENWIDTH;
     private final int SCREENHEIGHT;
     private final Timer gameTimer;
@@ -34,10 +34,12 @@ public class Engine extends JPanel implements ActionListener {
     private KeyInput keyHandler;
     private MouseInput mouseHandler;
     private BufferedImage[] textura;
+    private HUD hudJogador;
 
     public Engine(int width, int height) {
         this.SCREENWIDTH = width;
         this.SCREENHEIGHT = height;
+        setLayout(null);
 
         configInicial();
 
@@ -68,6 +70,11 @@ public class Engine extends JPanel implements ActionListener {
         jogador.adicionaItem(shotgun);
         jogador.adicionaItem(faca);
         jogador.sacaItem(0);
+        
+        hudJogador = new HUD(jogador);
+        hudJogador.setSize(SCREENWIDTH, 100);
+        hudJogador.setLocation(0, SCREENHEIGHT - 100);
+        this.add(hudJogador);
 
         keyHandler = new KeyInput();
         keyHandler.adicionaKey(KeyEvent.VK_W, () -> jogador.move(0, 1, mapaAtual));
@@ -85,7 +92,7 @@ public class Engine extends JPanel implements ActionListener {
     private void carregaTexturas() {
         /*try {
             textura = new BufferedImage[1];
-            textura[0] = ImageIO.read(new File("machine-gun.png"));
+            textura[0] = ImageIO.read(new File("modelos/hud/HUD.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }*/
@@ -152,13 +159,10 @@ public class Engine extends JPanel implements ActionListener {
         
         BufferedImage imagem = jogador.getFrameAtual();
         
-        g.drawImage(imagem, SCREENWIDTH / 2 + cameraOffsetX, SCREENHEIGHT / 2 + cameraOffsetY, SCREENWIDTH / 2, SCREENHEIGHT / 2, this);
-        
-        //g.drawImage(jogador.getFrameAtual(), cameraOffsetX, SCREENHEIGHT - 500 + cameraOffsetY, 
-          //      SCREENWIDTH, 600, this);
-        
-        g.setColor(Color.BLUE);
-        g.fillRect(0, SCREENHEIGHT - 100, SCREENWIDTH, 100);
+        g.drawImage(imagem, SCREENWIDTH / 2 + cameraOffsetX, SCREENHEIGHT / 2 + cameraOffsetY,
+                SCREENWIDTH / 2, SCREENHEIGHT / 2, this);
+       
+        desenhaHUD(g);
     }
     
     private double calculaDistancia(double anguloRaio, int[] corLocal) {
@@ -217,6 +221,10 @@ public class Engine extends JPanel implements ActionListener {
 
         return(corLocal[0] == 1 ? (distanciaX - deltaX) : (distanciaY - deltaY));
     }
+    
+    private void desenhaHUD(Graphics g) {
+        hudJogador.repaint();
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -226,6 +234,5 @@ public class Engine extends JPanel implements ActionListener {
 
     private void update() {
         keyHandler.executaMetodo();
-        //mouseHandler.centralizaCursor();
     }
 }
