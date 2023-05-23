@@ -25,7 +25,7 @@ public class Player extends Entidade {
         super(vidaMaxima, x, y, velocidade, fov);
         angulo = 0;
         pitch = 0;
-        taxaPitch = 1;
+        taxaPitch = 0.5;
         mochila = new Inventario<>();
     }
     
@@ -43,7 +43,7 @@ public class Player extends Entidade {
         
         pitch += taxaPitch;
         
-        if(pitch >= 32 || pitch <= -32) {
+        if(pitch >= 16 || pitch <= -16) {
             taxaPitch *= -1;
         }
         
@@ -63,7 +63,7 @@ public class Player extends Entidade {
         mochila.guardaObjeto(novoItem);
     }
 
-    public void sacaItem(int index) {
+    public void sacaItem(int index, HUD hudJogador) {
         if(clip == null) {
             try {
                 clip = AudioSystem.getClip();
@@ -71,6 +71,7 @@ public class Player extends Entidade {
                 clip.open(audioInputStream);
             
                 itemAtual = mochila.getObjeto(index);
+                hudJogador.atualizaItem();
 
                 clip.start();
             } catch (Exception e) {
@@ -87,6 +88,9 @@ public class Player extends Entidade {
     }
     
     public int getQtdConsumivel() {
+        if(itemAtual == null) 
+            return -1;
+        
         return itemAtual.getAtributoConsumivel();
     }
     

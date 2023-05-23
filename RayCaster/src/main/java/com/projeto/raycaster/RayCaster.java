@@ -18,7 +18,7 @@ public class RayCaster {
         Engine game = new Engine(800, 600);
         
         janela.add(game);
-        //janela.setLocationRelativeTo();
+        janela.setLocationRelativeTo(null);
         janela.setVisible(true);
     }
 }

@@ -97,6 +97,10 @@ public class HUD extends JPanel {
         return sprite.get(index);
     }
     
+    public void atualizaItem() {
+        textoMunicao.setText(Integer.toString(jogador.getQtdConsumivel()));
+    }
+    
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
