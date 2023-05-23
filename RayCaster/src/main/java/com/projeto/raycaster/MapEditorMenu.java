@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.EventListener;
+import javax.swing.AbstractListModel;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -19,6 +20,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.PlainDocument;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.ListModel;
 
 /**
  *
@@ -53,10 +57,16 @@ public class MapEditorMenu {
         
         b3 = new JButton("Apagar mapa");
         b3.addActionListener((ActionEvent e) -> {
-            //Mapa map = 
+            excluiMapa(inicial);
         });
         
+        painel.add(Box.createVerticalGlue());
         painel.add(b1);
+        painel.add(Box.createVerticalGlue());
+        painel.add(b2);
+        painel.add(Box.createVerticalGlue());
+        painel.add(b3);
+        painel.add(Box.createVerticalGlue());
         inicial.add(painel);
         inicial.setVisible(true);
     }
@@ -167,7 +177,42 @@ public class MapEditorMenu {
         return false;
     }
     
+    public static void excluiMapa(JFrame f){
+        JList<Mapa> listaMapa = new JList<>(new ListData(mapas));
+        JFrame exclui = new JFrame("Excluir Mapa");
+        JPanel linha1, linha2, linha3;
+        linha1 = new JPanel();
+        linha1.setLayout(new BoxLayout(linha1, BoxLayout.X_AXIS));
+        linha1.add(new JLabel("Selecione o mapa a ser excluido"));
+        exclui.setSize(200, 300);
+        JPanel painelEx = new JPanel();
+        painelEx.setLayout(new BoxLayout(painelEx, BoxLayout.Y_AXIS));
+        painelEx.add(new JScrollPane(listaMapa));
+        exclui.add(painelEx);
+        exclui.setVisible(true);
+    }
+    
     private static void naoImplementadoPopUp(){
         JOptionPane.showMessageDialog(null, "Essa opção ainda não foi implementada");
+    }
+}
+
+
+
+class ListData extends AbstractListModel {
+    ArrayList<Mapa> mapas;
+
+    public ListData(ArrayList<Mapa> mapas) {
+        this.mapas = mapas;
+    }
+
+    @Override
+    public int getSize() {
+      return mapas.size();
+    }
+
+    @Override
+    public Object getElementAt(int index) {
+      return index + " - " + mapas.get(index).getNomeMapa() + " - " + mapas.get(index).getLimite();
     }
 }
