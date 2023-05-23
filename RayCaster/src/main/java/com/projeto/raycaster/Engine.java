@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -61,9 +62,9 @@ public class Engine extends JPanel implements ActionListener {
 
         mouseHandler = new MouseInput(jogador, 0.001);
         
-        Item pistola = new ArmaLonga("pistol.txt", 100, 100, 1);
-        Item ak47 = new ArmaLonga("ak47.txt", 300, 300, 0.5);
-        Item shotgun = new ArmaLonga("shotgun.txt", 50, 50, 2);
+        Item pistola = new ArmaLonga("pistol.txt", 100, 100, 1000);
+        Item ak47 = new ArmaLonga("ak47.txt", 300, 300, 500);
+        Item shotgun = new ArmaLonga("shotgun.txt", 50, 50, 2000);
         Item faca = new ArmaCurta("knife.txt", 50, 2);
         jogador.adicionaItem(pistola);
         jogador.adicionaItem(ak47);
@@ -157,12 +158,10 @@ public class Engine extends JPanel implements ActionListener {
             g.drawLine(i, fimParede, i, SCREENHEIGHT);
         }
         
-        BufferedImage imagem = jogador.getFrameAtual();
-        
-        g.drawImage(imagem, SCREENWIDTH / 2 + cameraOffsetX, SCREENHEIGHT / 2 + cameraOffsetY,
+        g.drawImage(jogador.getFrameAtual().getImage(), SCREENWIDTH / 2 + cameraOffsetX, SCREENHEIGHT / 2 + cameraOffsetY,
                 SCREENWIDTH / 2, SCREENHEIGHT / 2, this);
        
-        desenhaHUD(g);
+        desenhaHUD();
     }
     
     private double calculaDistancia(double anguloRaio, int[] corLocal) {
@@ -222,7 +221,7 @@ public class Engine extends JPanel implements ActionListener {
         return(corLocal[0] == 1 ? (distanciaX - deltaX) : (distanciaY - deltaY));
     }
     
-    private void desenhaHUD(Graphics g) {
+    private void desenhaHUD() {
         hudJogador.repaint();
     }
 

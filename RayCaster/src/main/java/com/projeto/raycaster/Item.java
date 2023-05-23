@@ -8,17 +8,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 /**
  *
  * @author vinic
  */
 public abstract class Item {
-    private List<BufferedImage> sprite;
+    private List<ImageIcon> sprite;
     private static final String PATH = "modelos/itens/";
-    private double cooldown;
+    private long cooldown;
 
-    public Item(String nome, double cooldown) {
+    public Item(String nome, long cooldown) {
         sprite = new ArrayList<>();
         this.cooldown = cooldown;
         carregaSprites(nome);
@@ -37,20 +38,18 @@ public abstract class Item {
         while(leitor.hasNext()) {
             String nomeImagem = leitor.nextLine();
             
-            try {
-                BufferedImage imagem = ImageIO.read(new File(PATH + nomeImagem));
-                sprite.add(imagem);
-            } catch (IOException ex) {
-                return;
-            }
+            ImageIcon imagem = new ImageIcon(PATH + nomeImagem);
+            sprite.add(imagem);
         }
         
         leitor.close();
     }
     
-    public BufferedImage getSprite() {
+    public ImageIcon getSprite() {
         return sprite.get(0);
     }
     
-    public abstract void usar();
+    public abstract void usar(int coordX, int coordY);
+    
+    public abstract int getAtributoConsumivel();
 }

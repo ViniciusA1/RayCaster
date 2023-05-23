@@ -23,6 +23,7 @@ public class MouseInput extends MouseAdapter {
     
     @Override
     public void mouseClicked(MouseEvent e) {
+        jogador.usaItem(e.getX(), e.getY());
         mouseMoved(e);
     }
     

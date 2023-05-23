@@ -5,6 +5,7 @@ import java.io.File;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.swing.ImageIcon;
 
 
 
@@ -70,7 +71,7 @@ public class Player extends Entidade {
                 clip.open(audioInputStream);
             
                 itemAtual = mochila.getObjeto(index);
-                // Reproduz o som
+
                 clip.start();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -81,7 +82,15 @@ public class Player extends Entidade {
         }
     }
     
-    public BufferedImage getFrameAtual() {
+    public void usaItem(int posX, int posY) {
+        itemAtual.usar(posX, posY);
+    }
+    
+    public int getQtdConsumivel() {
+        return itemAtual.getAtributoConsumivel();
+    }
+    
+    public ImageIcon getFrameAtual() {
         return itemAtual.getSprite();
     }
 }

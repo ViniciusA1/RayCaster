@@ -5,18 +5,22 @@ package com.projeto.raycaster;
  * @author vinic
  */
 public class ArmaLonga extends Item {
-    private int municaoMaxima;
+    private final int municaoMaxima;
     private int municaoAtual;
 
-    public ArmaLonga(String nome, int municaoMaxima, int municaoAtual, double cooldown) {
+    public ArmaLonga(String nome, int municaoMaxima, int municaoAtual, long cooldown) {
         super(nome, cooldown);
         this.municaoMaxima = municaoMaxima;
         this.municaoAtual = municaoAtual;
     }
     
+    @Override
+    public int getAtributoConsumivel() {
+        return municaoAtual;
+    }
     
-    
-    public void usar() {
+    @Override
+    public void usar(int x, int y) {
         
     }
 }

@@ -9,7 +9,7 @@ public class ArmaCurta extends Item {
     private int durabilidadeAtual;
     private static final int taxaQuebra = 1;
 
-    public ArmaCurta(String nome, int durabilidadeMaxima, double cooldown) {
+    public ArmaCurta(String nome, int durabilidadeMaxima, long cooldown) {
         super(nome, cooldown);
         this.durabilidadeMaxima = durabilidadeMaxima;
         this.durabilidadeAtual = durabilidadeMaxima;
@@ -18,8 +18,9 @@ public class ArmaCurta extends Item {
     public int getDurabilidadeMaxima() {
         return durabilidadeMaxima;
     }
-
-    public int getDurabilidadeAtual() {
+    
+    @Override
+    public int getAtributoConsumivel() {
         return durabilidadeAtual;
     }
 
@@ -28,7 +29,7 @@ public class ArmaCurta extends Item {
     }
     
     @Override
-    public void usar() {
+    public void usar(int x, int y) {
         
     }
     
