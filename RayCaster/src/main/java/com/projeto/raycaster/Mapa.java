@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -42,6 +44,11 @@ public class Mapa implements Guardar {
         this.nomeMapa = nomeMapa;
         this.grid = new int[limite][limite];
         this.limite = limite;
+        for(int i = 0; i< limite; i++){
+            for(int j = 0; j<limite; j++){
+                grid[i][j] = 0;
+            }
+        }
     }
 
     public int getLimite() {
@@ -61,27 +68,28 @@ public class Mapa implements Guardar {
     }
     
     
-    @Deprecated
-    public void carregaMapa(String nomeMapa) {
-        File arquivoMapa = new File("maps" + File.pathSeparator + nomeMapa);
+    
+    public static Mapa carregaMapa(String nomeMapa) {
+        File arquivoMapa = new File("maps" + File.separator + nomeMapa);
         Scanner leitor;
         
         try {
             leitor = new Scanner(arquivoMapa);
         } catch(FileNotFoundException erro) {
             System.err.println("Erro! " + erro.getMessage());
-            return;
+            return null;
         }
         
-        limite = leitor.nextInt();
-        grid = new int[limite][limite];
+        int limite = leitor.nextInt();
+        Mapa aux = new Mapa(nomeMapa, limite);
         
         for(int i = 0, j; i < limite; i++) {
             for(j = 0; j < limite; j++)
-                grid[i][j] = leitor.nextInt();
+                aux.setValor(i, j, leitor.nextInt());
         }
         
         leitor.close();
+        return aux;
     }
     
     @Override
@@ -114,20 +122,28 @@ public class Mapa implements Guardar {
      */
     @Override
     public void salvar() throws IOException{
-        FileWriter out = new FileWriter("maps" + File.pathSeparator + nomeMapa);
+        FileWriter out;
+        String[] nomeMapaTXT = nomeMapa.split(".txt");
+        File aux = new File("maps" + File.separator + nomeMapaTXT[0] +".txt");
+        if (!aux.exists()){
+            aux.createNewFile();
+        }
+        out = new FileWriter(aux);
         BufferedWriter buffout = new BufferedWriter(out);
-        buffout.write(this.limite);
+        buffout.write(Integer.toString(limite));
         buffout.newLine();
         buffout.flush();
         for(int i = 0; i < this.limite; i++){
             for(int j = 0; j < this.limite; j++){
-                buffout.write(grid[i][j]);
-                buffout.newLine();
-                buffout.flush();
+                buffout.write(Integer.toString(grid[i][j]));
+                buffout.write(" ");
             }
+            buffout.newLine();
+            buffout.flush();
         }
+        
         buffout.close();
-        out.close();
+        out.close();       
     }
     
     @Override
@@ -137,6 +153,39 @@ public class Mapa implements Guardar {
              arquivoMapa.delete();
          }
     }
+    
+    public static ArrayList<Mapa> carregarMapList(){
+        File arquivoMapa = new File("maps");
+        Scanner leitor;
+        ArrayList<Mapa> mapas = new ArrayList<>();
+        
+        
+        File[] arquivoMapas = arquivoMapa.listFiles();
+        for(File aux: arquivoMapas){
+            if(!aux.isDirectory()){
+                try {
+                    leitor = new Scanner(aux);
+                } catch(FileNotFoundException erro) {
+                    System.err.println("Erro! " + erro.getMessage());
+                    continue;
+                }
+                int tamanho = leitor.nextInt();
+                Mapa mapaCarregado = new Mapa(aux.getName(), tamanho);
+
+                for(int i = 0, j; i < tamanho; i++) {
+                    for(j = 0; j < tamanho; j++)
+                        mapaCarregado.setValor(i, j, leitor.nextInt());
+                }
+                mapas.add(mapaCarregado);
+                leitor.close();
+            }
+        }
+        
+        
+        return mapas;
+    } 
+    
+    
     
     public void liberaMapa() {
         nomeMapa = "";
