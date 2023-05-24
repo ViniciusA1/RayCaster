@@ -15,38 +15,32 @@ import javax.swing.ImageIcon;
  * @author vinic
  */
 public abstract class Item {
-    private List<ImageIcon> sprite;
-    private static final String PATH = "modelos/itens/";
+    private String nome;
     private long cooldown;
+    private ImageIcon sprite;
+    private final static String PATH = "modelos" + File.separator + "itens" + File.separator; 
 
     public Item(String nome, long cooldown) {
-        sprite = new ArrayList<>();
+        sprite = new ImageIcon();
+        this.nome = nome;
         this.cooldown = cooldown;
         carregaSprites(nome);
     }
     
     private void carregaSprites(String nomeArquivo) {
-        File arquivo = new File(PATH + nomeArquivo);
-        Scanner leitor;
-        
-        try {
-            leitor = new Scanner(arquivo);
-        } catch(FileNotFoundException erro) {
-            return;
-        }
-        
-        while(leitor.hasNext()) {
-            String nomeImagem = leitor.nextLine();
-            
-            ImageIcon imagem = new ImageIcon(PATH + nomeImagem);
-            sprite.add(imagem);
-        }
-        
-        leitor.close();
+        sprite = new ImageIcon(PATH + nomeArquivo + ".png");
+    }
+    
+    public long getCooldown() {
+        return cooldown;
+    }
+    
+    public String getNome() {
+        return nome;
     }
     
     public ImageIcon getSprite() {
-        return sprite.get(0);
+        return sprite;
     }
     
     public abstract void usar(int coordX, int coordY);

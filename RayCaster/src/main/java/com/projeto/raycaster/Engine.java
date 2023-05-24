@@ -1,5 +1,6 @@
 package com.projeto.raycaster;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -31,10 +32,6 @@ public class Engine extends JPanel implements ActionListener {
     private KeyInput keyHandler;
     private MouseInput mouseHandler;
     private int[][] textura;
-    private HUD hudJogador;
-    
-    double dirX = -1.0, dirY = 0.0;
-    double planeX = 0.0, planeY = 0.66;
 
     public Engine(int width, int height) {
         this.SCREENWIDTH = width;
@@ -61,19 +58,29 @@ public class Engine extends JPanel implements ActionListener {
 
         mouseHandler = new MouseInput(jogador, 0.001);
 
-        Item pistola = new ArmaLonga("pistol.txt", 100, 100, 1000);
+        Item pistola = new ArmaLonga("pistol", 100, 100, 1000);
         Item ak47 = new ArmaLonga("ak47.txt", 300, 300, 500);
         Item shotgun = new ArmaLonga("shotgun.txt", 50, 50, 2000);
         Item faca = new ArmaCurta("knife.txt", 70, 2);
+        
         jogador.adicionaItem(pistola);
         jogador.adicionaItem(ak47);
         jogador.adicionaItem(shotgun);
         jogador.adicionaItem(faca);
 
-        hudJogador = new HUD(jogador);
+        HUD hudJogador = new HUD(jogador);
         hudJogador.setSize(SCREENWIDTH, 100);
         hudJogador.setLocation(0, SCREENHEIGHT - 100);
         this.add(hudJogador);
+        
+        AnimacaoPlayer painelAnimacao = new AnimacaoPlayer(jogador);
+        painelAnimacao.setSize(SCREENWIDTH / 2, SCREENHEIGHT / 2);
+        painelAnimacao.setLocation(SCREENWIDTH / 2, SCREENHEIGHT / 2);
+        this.add(painelAnimacao);
+        
+        jogador.setPainelAnimacao(painelAnimacao);
+        jogador.setHUD(hudJogador);
+        
         jogador.sacaItem(0, hudJogador);
 
         keyHandler = new KeyInput();
@@ -81,6 +88,7 @@ public class Engine extends JPanel implements ActionListener {
         keyHandler.adicionaKey(KeyEvent.VK_A, () -> jogador.move(-Math.PI / 2, 1, mapaAtual));
         keyHandler.adicionaKey(KeyEvent.VK_S, () -> jogador.move(0, -1, mapaAtual));
         keyHandler.adicionaKey(KeyEvent.VK_D, () -> jogador.move(Math.PI / 2, 1, mapaAtual));
+        keyHandler.adicionaKey(KeyEvent.VK_R, () -> jogador.recarregaItem());
         keyHandler.adicionaKey(KeyEvent.VK_1, () -> jogador.sacaItem(0, hudJogador));
         keyHandler.adicionaKey(KeyEvent.VK_2, () -> jogador.sacaItem(1, hudJogador));
         keyHandler.adicionaKey(KeyEvent.VK_3, () -> jogador.sacaItem(2, hudJogador));
@@ -159,10 +167,10 @@ public class Engine extends JPanel implements ActionListener {
             g.drawLine(i, fimParede, i, SCREENHEIGHT);
         }
         
-        g.drawImage(jogador.getFrameAtual().getImage(), SCREENWIDTH / 2 + (int) jogador.getPitch(), SCREENHEIGHT / 2 + (int) jogador.getPitch(),
-                SCREENWIDTH / 2, SCREENHEIGHT / 2, this);
+        //g.drawImage(jogador.getFrameAtual().getImage(), SCREENWIDTH / 2 + (int) jogador.getPitch(), SCREENHEIGHT / 2 + (int) jogador.getPitch(),
+                //SCREENWIDTH / 2, SCREENHEIGHT / 2, this);
        
-        desenhaHUD();
+        jogador.desenhaComponentes();
     }
     
     private double calculaDistancia(double anguloRaio, int[] corLocal) {
@@ -341,10 +349,6 @@ public class Engine extends JPanel implements ActionListener {
     private void calculaDistancia(double anguloRaio, int[] corLocal, int[][] frameBuffer, int x) {
 
     }*/
-
-    private void desenhaHUD() {
-        hudJogador.repaint();
-    }
 
     @Override
     public void actionPerformed(ActionEvent e) {

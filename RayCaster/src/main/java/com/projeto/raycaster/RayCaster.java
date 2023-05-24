@@ -1,5 +1,6 @@
 package com.projeto.raycaster;
 
+import java.awt.BorderLayout;
 import javax.swing.JFrame;
 
 /**

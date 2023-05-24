@@ -19,6 +19,9 @@ public class Player extends Entidade {
     private double taxaPitch;
     private Inventario<Item> mochila;
     private Item itemAtual;
+    private AnimacaoPlayer painelAnimacao;
+    private HUD hudJogador;
+    private int estadoAtual;
     private Clip clip;
     
     public Player(double vidaMaxima, double x, double y, double velocidade, int fov) {
@@ -27,6 +30,15 @@ public class Player extends Entidade {
         pitch = 0;
         taxaPitch = 0.5;
         mochila = new Inventario<>();
+        estadoAtual = 0;
+    }
+    
+    public void setPainelAnimacao(AnimacaoPlayer novoPainel) {
+        painelAnimacao = novoPainel;
+    }
+    
+    public void setHUD(HUD hudJogador) {
+        this.hudJogador = hudJogador;
     }
     
     public double getAngulo() {
@@ -72,6 +84,7 @@ public class Player extends Entidade {
             
                 itemAtual = mochila.getObjeto(index);
                 hudJogador.atualizaItem();
+                painelAnimacao.trocaItem(itemAtual);
 
                 clip.start();
             } catch (Exception e) {
@@ -87,6 +100,10 @@ public class Player extends Entidade {
         itemAtual.usar(posX, posY);
     }
     
+    public void recarregaItem() {
+        
+    }
+    
     public int getQtdConsumivel() {
         if(itemAtual == null) 
             return -1;
@@ -96,5 +113,10 @@ public class Player extends Entidade {
     
     public ImageIcon getFrameAtual() {
         return itemAtual.getSprite();
+    }
+    
+    public void desenhaComponentes() {
+        hudJogador.repaint();
+        painelAnimacao.repaint();
     }
 }
