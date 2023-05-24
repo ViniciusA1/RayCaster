@@ -1,13 +1,8 @@
 package com.projeto.raycaster;
 
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Scanner;
-import javax.imageio.ImageIO;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.ImageIcon;
 
 /**
@@ -17,18 +12,19 @@ import javax.swing.ImageIcon;
 public abstract class Item {
     private String nome;
     private long cooldown;
-    private ImageIcon sprite;
-    private final static String PATH = "modelos" + File.separator + "itens" + File.separator; 
+    private Map<Estado, Animacao> mapaAnimacao;
 
     public Item(String nome, long cooldown) {
-        sprite = new ImageIcon();
+        mapaAnimacao = new HashMap<>();
         this.nome = nome;
         this.cooldown = cooldown;
-        carregaSprites(nome);
+        carregaSprites();
     }
     
-    private void carregaSprites(String nomeArquivo) {
-        sprite = new ImageIcon(PATH + nomeArquivo + ".png");
+    private void carregaSprites() {
+        mapaAnimacao.put(Estado.OCIOSO, new Animacao(nome, Estado.OCIOSO));
+        mapaAnimacao.put(Estado.ATIRANDO, new Animacao(nome, Estado.ATIRANDO));
+        mapaAnimacao.put(Estado.RECARREGANDO, new Animacao(nome, Estado.RECARREGANDO));
     }
     
     public long getCooldown() {
@@ -39,8 +35,12 @@ public abstract class Item {
         return nome;
     }
     
-    public ImageIcon getSprite() {
-        return sprite;
+    public ImageIcon getSprite(Estado estadoAtual) {
+        return mapaAnimacao.get(estadoAtual).getSprite();
+    }
+    
+    public Animacao getAnimacao(Estado estadoAnimacao) {
+        return mapaAnimacao.get(estadoAnimacao);
     }
     
     public abstract void usar(int coordX, int coordY);

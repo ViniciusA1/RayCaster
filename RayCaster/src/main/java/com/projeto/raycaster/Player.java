@@ -21,7 +21,7 @@ public class Player extends Entidade {
     private Item itemAtual;
     private AnimacaoPlayer painelAnimacao;
     private HUD hudJogador;
-    private int estadoAtual;
+    private Estado estadoAtual;
     private Clip clip;
     
     public Player(double vidaMaxima, double x, double y, double velocidade, int fov) {
@@ -30,7 +30,7 @@ public class Player extends Entidade {
         pitch = 0;
         taxaPitch = 0.5;
         mochila = new Inventario<>();
-        estadoAtual = 0;
+        estadoAtual = Estado.OCIOSO;
     }
     
     public void setPainelAnimacao(AnimacaoPlayer novoPainel) {
@@ -41,12 +41,20 @@ public class Player extends Entidade {
         this.hudJogador = hudJogador;
     }
     
+    public void setEstado(Estado novoEstado) {
+        estadoAtual = novoEstado;
+    }
+    
     public double getAngulo() {
         return angulo;
     }
     
     public double getPitch() {
         return pitch;
+    }
+    
+    public Item getItemAtual() {
+        return itemAtual;
     }
     
     public void move(double anguloRelativo, int sinal, Mapa mapaAtual) {
@@ -76,32 +84,42 @@ public class Player extends Entidade {
     }
 
     public void sacaItem(int index, HUD hudJogador) {
-        if(clip == null) {
-            try {
-                clip = AudioSystem.getClip();
-                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("sons/holster.wav"));
-                clip.open(audioInputStream);
+        if(estadoAtual != Estado.OCIOSO)
+            return;
+        
+        try {
+            clip = AudioSystem.getClip();
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("sons/holster.wav"));
+            clip.open(audioInputStream);
             
-                itemAtual = mochila.getObjeto(index);
-                hudJogador.atualizaItem();
-                painelAnimacao.trocaItem(itemAtual);
+            itemAtual = mochila.getObjeto(index);
+            hudJogador.atualizaItem();
+            painelAnimacao.trocaItem(itemAtual);
 
-                clip.start();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else if(!clip.isRunning()) {
+            clip.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        if(!clip.isRunning()) {
             clip.close();
             clip = null;
         }
     }
     
     public void usaItem(int posX, int posY) {
+        if(estadoAtual != Estado.OCIOSO)
+            return;
+        
         itemAtual.usar(posX, posY);
+        estadoAtual = Estado.ATIRANDO;
+        
+        painelAnimacao.setAnimacao(itemAtual.getAnimacao(estadoAtual));
     }
     
     public void recarregaItem() {
-        
+        estadoAtual = Estado.RECARREGANDO;
+        painelAnimacao.setAnimacao(itemAtual.getAnimacao(estadoAtual));
     }
     
     public int getQtdConsumivel() {
@@ -109,10 +127,6 @@ public class Player extends Entidade {
             return -1;
         
         return itemAtual.getAtributoConsumivel();
-    }
-    
-    public ImageIcon getFrameAtual() {
-        return itemAtual.getSprite();
     }
     
     public void desenhaComponentes() {
