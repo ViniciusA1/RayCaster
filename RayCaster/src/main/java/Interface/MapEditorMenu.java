@@ -5,6 +5,8 @@
 package Interface;
 import com.projeto.raycaster.Mapa;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -23,6 +25,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.PlainDocument;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 
 /**
  *
@@ -32,51 +35,81 @@ public class MapEditorMenu {
     private static ArrayList<Mapa> mapas;
     private static Mapa mapaSelecionado = null;
     
-    public static void inicia(){
+    public static void inicia(JFrame f){
         mapas = Mapa.carregarMapList();
         SwingUtilities.invokeLater(() -> {
-            mapEditorOp();
+            mapEditorOp(f);
         });
         
     }
     
-    private static void mapEditorOp(){
+    private static void mapEditorOp(JFrame f){
         JFrame inicial = new JFrame("Editor de mapa");
-        inicial.setSize(200, 300);
+        
+        inicial.setSize(200, 200);
         inicial.setLocationRelativeTo(null);
-        JPanel painel = new JPanel();
+        JPanel painel = new JPanel(), linha1 = new JPanel(), linha2 = new JPanel(), linha3 = new JPanel(), linha4 = new JPanel();
+        painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
         JButton b1, b2, b3, b4;
         b1 = new JButton("Criar Novo Mapa");
         b1.addActionListener((ActionEvent e) -> {
             inicial.setVisible(false);
             criarMapa(inicial);
         });
+        linha1.setLayout(new BoxLayout(linha1, BoxLayout.X_AXIS));
+        linha1.add(Box.createVerticalGlue());
+        linha1.add(b1);
+        linha1.add(Box.createVerticalGlue());
+        
         b2 = new JButton("Editar Mapa");
         b2.addActionListener((ActionEvent e) ->{
             //editor de mapa
             naoImplementadoPopUp();
         });
+        linha2.setLayout(new BoxLayout(linha2, BoxLayout.X_AXIS));
+        linha2.add(Box.createVerticalGlue());
+        linha2.add(b2);
+        linha2.add(Box.createVerticalGlue());
         
         b3 = new JButton("Apagar mapa");
         b3.addActionListener((ActionEvent e) -> {
+            inicial.setVisible(false);
             excluiMapa(inicial);
         });
+        linha3.setLayout(new BoxLayout(linha3, BoxLayout.X_AXIS));
+        linha3.add(Box.createVerticalGlue());
+        linha3.add(b3);
+        linha3.add(Box.createVerticalGlue());
         
-        painel.add(Box.createVerticalGlue());
-        painel.add(b1);
-        painel.add(Box.createVerticalGlue());
-        painel.add(b2);
-        painel.add(Box.createVerticalGlue());
-        painel.add(b3);
-        painel.add(Box.createVerticalGlue());
+        b4 = new JButton("Voltar");
+        b4.addActionListener((ActionEvent e) ->{
+            System.exit(0);//Temporario
+        });
+        linha4.setLayout(new BoxLayout(linha4, BoxLayout.X_AXIS));
+        linha4.add(Box.createVerticalGlue());
+        linha4.add(b4);
+        linha4.add(Box.createVerticalGlue());
+        
+        painel.add(Box.createVerticalStrut(10));
+        painel.add(linha1);
+        painel.add(Box.createVerticalStrut(10));
+        painel.add(linha2);
+        painel.add(Box.createVerticalStrut(10));
+        painel.add(linha3);
+        painel.add(Box.createVerticalStrut(20));
+        painel.add(linha4);
+        painel.add(Box.createVerticalStrut(10));
         inicial.add(painel);
-        inicial.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        inicial.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        inicial.addWindowListener(new event(f));
         inicial.setVisible(true);
     }
     
     
     private static void criarMapa(JFrame f){
         JFrame janela = new JFrame("Criar novo mapa");
+        janela.addWindowListener(new event(f));
+        janela.setDefaultCloseOperation(janela.DISPOSE_ON_CLOSE);
         janela.setSize(300, 200);
         janela.setLocationRelativeTo(null);
         JPanel coluna, linha1, linha2, linha3, linha4;
@@ -187,9 +220,12 @@ public class MapEditorMenu {
         return false;
     }
     
-    public static void excluiMapa(JFrame f){
+    private static void excluiMapa(JFrame f){
         JList<Mapa> listaMapa = new JList<>(new ListData(mapas));
+        listaMapa.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JFrame exclui = new JFrame("Excluir Mapa");
+        exclui.addWindowListener(new event(f));
+        exclui.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         exclui.setLocationRelativeTo(null);
         JPanel linha1, linha2, linha3;
         linha1 = new JPanel();
@@ -220,10 +256,12 @@ public class MapEditorMenu {
                 JOptionPane.showMessageDialog(null, "Voce deve selecionar um mapa para excluir!");
             }
             else if(JOptionPane.showConfirmDialog(null, "Voce tem certeza que deseja continuar?") == 0){
-                Mapa aux = listaMapa.getSelectedValue();
+                int index= listaMapa.getSelectedIndex();
+                Mapa aux  = mapas.get(index);
                 mapas.remove(aux);
                 aux.excluir();
-                
+                f.setVisible(true);
+                exclui.dispose();
             }
             
         });
@@ -257,24 +295,38 @@ public class MapEditorMenu {
     private static void naoImplementadoPopUp(){
         JOptionPane.showMessageDialog(null, "Essa opção ainda não foi implementada");
     }
-}
+    
+    static class event extends WindowAdapter{
+        JFrame f;
 
+        event(JFrame f){
+            this.f = f;
+        }
 
-
-class ListData extends AbstractListModel {
-    ArrayList<Mapa> mapas;
-
-    public ListData(ArrayList<Mapa> mapas) {
-        this.mapas = mapas;
+        @Override
+        public void windowClosed(WindowEvent e){
+            if(f == null){
+                System.exit(0);
+            }
+            f.setVisible(true);
+        }
     }
+    
+    private static class ListData extends AbstractListModel {
+        ArrayList<Mapa> mapas;
 
-    @Override
-    public int getSize() {
-      return mapas.size();
-    }
+        public ListData(ArrayList<Mapa> mapas) {
+            this.mapas = mapas;
+        }
 
-    @Override
-    public Object getElementAt(int index) {
-      return index + " - " + mapas.get(index).getNomeMapa() + " - " + mapas.get(index).getLimite();
+        @Override
+        public int getSize() {
+          return mapas.size();
+        }
+
+        @Override
+        public Object getElementAt(int index) {
+          return index + " - " + mapas.get(index).getNomeMapa() + " - " + mapas.get(index).getLimite();
+        }
     }
 }
