@@ -104,6 +104,8 @@ public class HUD extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        textoVida.setText(Double.toString(jogador.getVidaAtual()));
+        textoMunicao.setText(Integer.toString(jogador.getQtdConsumivel()));
         g.drawImage(sprite.get(0).getImage(), 0, 0, this.getWidth(), this.getHeight(), this);
     }
 }

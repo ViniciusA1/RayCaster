@@ -49,7 +49,11 @@ public abstract class Item {
         sons.emiteSom(estadoDesejado);
     }
     
-    public abstract void usar(int coordX, int coordY);
+    public abstract void usar();
     
     public abstract int getAtributoConsumivel();
+    
+    public abstract boolean isUsavel();
+    
+    public abstract boolean isRecarregavel();
 }

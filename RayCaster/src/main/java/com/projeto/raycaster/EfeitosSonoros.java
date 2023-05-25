@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -49,10 +51,13 @@ public class EfeitosSonoros {
         if(somDesejado == null)
             return;
             
+        if(somDesejado.isRunning()) {
+            somDesejado.stop();
+            System.out.println("Parou o som anterior");
+        }
         
-        somDesejado.stop();
-        somDesejado.flush();
         somDesejado.setFramePosition(0);
         somDesejado.start();
+        System.out.println("Chamou o som\n");
     }
 }

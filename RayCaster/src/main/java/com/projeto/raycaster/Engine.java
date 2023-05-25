@@ -50,7 +50,7 @@ public class Engine extends JPanel implements ActionListener {
         addMouseMotionListener(mouseHandler);
         setFocusable(true);
 
-        carregaMusicaPrincipal();
+        //carregaMusicaPrincipal();
     }
 
     private void configInicial() {
@@ -60,19 +60,12 @@ public class Engine extends JPanel implements ActionListener {
 
         mouseHandler = new MouseInput(jogador, 0.001);
 
-        Item pistola = new ArmaLonga("pistol", 100, 100, 1000);
-        Item ak47 = new ArmaLonga("ak47.txt", 300, 300, 500);
-        Item shotgun = new ArmaLonga("shotgun.txt", 50, 50, 2000);
-        Item faca = new ArmaCurta("knife.txt", 70, 2);
+        Item pistola = new ArmaLonga("pistol", 100, 100, 30, 1000);
         
         jogador.adicionaItem(pistola);
-        jogador.adicionaItem(ak47);
-        jogador.adicionaItem(shotgun);
-        jogador.adicionaItem(faca);
 
         HUD hudJogador = new HUD(jogador);
-        hudJogador.setSize(SCREENWIDTH, 100);
-        hudJogador.setLocation(0, SCREENHEIGHT - 100);
+        hudJogador.setBounds(0, SCREENHEIGHT - 100, SCREENWIDTH, 100);
         this.add(hudJogador);
         
         AnimacaoPlayer painelAnimacao = new AnimacaoPlayer(jogador);
@@ -99,9 +92,6 @@ public class Engine extends JPanel implements ActionListener {
         keyHandler.adicionaKey(KeyEvent.VK_R, () -> jogador.recarregaItem());
         
         keyHandler.adicionaKey(KeyEvent.VK_1, () -> jogador.sacaItem(0));
-        keyHandler.adicionaKey(KeyEvent.VK_2, () -> jogador.sacaItem(1));
-        keyHandler.adicionaKey(KeyEvent.VK_3, () -> jogador.sacaItem(2));
-        keyHandler.adicionaKey(KeyEvent.VK_4, () -> jogador.sacaItem(3));
     }
 
     private void carregaTexturas() {
@@ -138,8 +128,8 @@ public class Engine extends JPanel implements ActionListener {
             return;
         }
 
-        //musicaBackground.start();
-        //musicaBackground.loop(Clip.LOOP_CONTINUOUSLY);
+        musicaBackground.start();
+        musicaBackground.loop(Clip.LOOP_CONTINUOUSLY);
     }
 
     @Override

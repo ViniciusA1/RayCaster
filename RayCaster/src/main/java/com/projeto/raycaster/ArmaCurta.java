@@ -29,8 +29,17 @@ public class ArmaCurta extends Item {
     }
     
     @Override
-    public void usar(int x, int y) {
-        
+    public boolean isUsavel() {
+        return (durabilidadeAtual > 0);
     }
     
+    @Override
+    public void usar() {
+        durabilidadeAtual--;
+    }
+    
+    @Override
+    public boolean isRecarregavel() {
+        return false;
+    }
 }

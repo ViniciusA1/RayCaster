@@ -1,12 +1,5 @@
 package com.projeto.raycaster;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.swing.ImageIcon;
-
 
 
 /**
@@ -102,10 +95,12 @@ public class Player extends Entidade {
     public void usaItem(int posX, int posY) {
         long tempoAtual = System.currentTimeMillis();
         
-        if(estadoAtual != Estado.OCIOSO || tempoAtual - tempoAnterior <= itemAtual.getCooldown())
+        if(estadoAtual != Estado.OCIOSO || 
+           tempoAtual - tempoAnterior <= itemAtual.getCooldown() || 
+           !itemAtual.isUsavel())
             return;
         
-        itemAtual.usar(posX, posY);
+        itemAtual.usar();
         estadoAtual = Estado.ATIRANDO;
         
         painelAnimacao.setAnimacao(itemAtual.getAnimacao(estadoAtual));
@@ -115,11 +110,14 @@ public class Player extends Entidade {
     }
     
     public void recarregaItem() {
-        if(estadoAtual != Estado.OCIOSO)
+        if(estadoAtual != Estado.OCIOSO || !itemAtual.isRecarregavel())
             return;
         
+        ArmaLonga arma = (ArmaLonga) itemAtual;
+        
+        arma.recarregar();
         estadoAtual = Estado.RECARREGANDO;
-        painelAnimacao.setAnimacao(itemAtual.getAnimacao(estadoAtual));
+        painelAnimacao.setAnimacao(arma.getAnimacao(estadoAtual));
         
         itemAtual.reproduzSom(estadoAtual);
     }
