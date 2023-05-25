@@ -74,7 +74,7 @@ public class Player extends Entidade {
     }
     
     public void rotaciona(double deltaX) {
-        angulo += deltaX;
+        angulo = angulo + deltaX;
     }
     
     public boolean checaColisao(Mapa mapaAtual, double posX, double posY) {
@@ -109,7 +109,7 @@ public class Player extends Entidade {
         estadoAtual = Estado.ATIRANDO;
         
         painelAnimacao.setAnimacao(itemAtual.getAnimacao(estadoAtual));
-        itemAtual.reproduzSom(estadoAtual);
+        itemAtual.reproduzSom(Estado.ATIRANDO);
         
         tempoAnterior = tempoAtual;
     }

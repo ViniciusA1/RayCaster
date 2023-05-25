@@ -3,6 +3,7 @@ package com.projeto.raycaster;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -104,7 +105,7 @@ public class Engine extends JPanel implements ActionListener {
     }
 
     private void carregaTexturas() {
-        textura = new int[1][64 * 64];
+        textura = new int[1][600*600];
         try {
             BufferedImage imagem = ImageIO.read(new File("modelos/paredes/redbrick.png"));
             imagem.getRGB(0, 0, imagem.getWidth(), imagem.getHeight(),
@@ -167,7 +168,7 @@ public class Engine extends JPanel implements ActionListener {
             
             g.setColor(new Color(0, 128, 255));
             g.drawLine(i, 0, i, comecoParede);
-            g.setColor(new Color(255 / cor[0], 0, 0));
+            g.setColor(new Color((int) distancia % 255, (int) distancia % 255, (int) distancia % 255));
             g.drawLine(i, comecoParede, i, fimParede);
             g.setColor(Color.DARK_GRAY);
             g.drawLine(i, fimParede, i, SCREENHEIGHT);
@@ -242,13 +243,15 @@ public class Engine extends JPanel implements ActionListener {
 
         int[] cor = new int[1];
         int[][] frameBuffer = new int[SCREENHEIGHT][SCREENWIDTH];
+        
+        Graphics2D g2d = (Graphics2D) g;
 
         int cameraOffsetY = (int) (Math.sin(Math.toRadians(jogador.getPitch())) * 10);
         int cameraOffsetX = (int) (Math.sin(Math.toRadians(jogador.getPitch())) * 10);
 
         for (int i = 0; i < SCREENWIDTH; i++) {
             double rayAngle = (jogador.getAngulo() - jogador.getFov() / 2.0)
-                    + ((float) i / (float) SCREENWIDTH) * jogador.getFov();
+                    + ((double) i / SCREENWIDTH) * jogador.getFov();
 
             int posX, posY;
             int direcaoX, direcaoY;
@@ -306,7 +309,9 @@ public class Engine extends JPanel implements ActionListener {
             distanciaFinal *= Math.cos(rayAngle - jogador.getAngulo());
 
             int alturaParede = (int) (SCREENHEIGHT / distanciaFinal);
+            
             int comecoParede = (int) (SCREENHEIGHT - alturaParede) / 2;
+            if(comecoParede < 0) comecoParede = 0;
             int fimParede = alturaParede + comecoParede;
             if (fimParede >= SCREENHEIGHT) {
                 fimParede = SCREENHEIGHT - 1;
@@ -320,6 +325,7 @@ public class Engine extends JPanel implements ActionListener {
             } else {
                 wallX = jogador.getX() + distanciaFinal * cosRay;
             }
+            System.out.println(wallX);
             wallX -= Math.floor(wallX);
 
             int texX = (int) wallX * 64;
@@ -332,6 +338,7 @@ public class Engine extends JPanel implements ActionListener {
 
             double step = 1.0 * 64 / alturaParede;
             double texPos = (comecoParede - SCREENHEIGHT / 2 + alturaParede / 2) * step;
+            
             for (int y = comecoParede; y < fimParede; y++) {
                 int texY = (int) (texPos) & (64 - 1);
                 texPos += step;
@@ -340,16 +347,12 @@ public class Engine extends JPanel implements ActionListener {
                     color = (color >> 1) & 8355711;
                 }
                 
-                g.setColor(new Color(color));
-                g.drawLine(i, y, i, y);
+                g2d.setColor(new Color(color));
+                g2d.fillRect(i, y, 1,1);
             }
 
         }
 
-        g.drawImage(jogador.getFrameAtual().getImage(), SCREENWIDTH / 2 + cameraOffsetX, SCREENHEIGHT / 2 + cameraOffsetY,
-                SCREENWIDTH / 2, SCREENHEIGHT / 2, this);
-
-        desenhaHUD();
     }
 
     private void calculaDistancia(double anguloRaio, int[] corLocal, int[][] frameBuffer, int x) {

@@ -11,7 +11,7 @@ import javax.swing.JPanel;
  * @author vinicius
  */
 public class AnimacaoPlayer extends JPanel {
-    private Player jogador;
+    private final Player jogador;
     private Animacao animacaoAtual;
     private long tempoAnterior;
     private long tempoAtual;
@@ -24,10 +24,12 @@ public class AnimacaoPlayer extends JPanel {
     
     public void trocaItem(Item novoItem) {
         animacaoAtual = novoItem.getAnimacao(Estado.OCIOSO);
+        frameAtual = 0;
     }
     
     public void setAnimacao(Animacao novaAnimacao) {
         animacaoAtual = novaAnimacao;
+        frameAtual = 0;
     }
     
     @Override
@@ -37,12 +39,12 @@ public class AnimacaoPlayer extends JPanel {
         tempoAtual = System.currentTimeMillis();
         
         ImageIcon imagemAtual = animacaoAtual.getSprite();
-        int frameWidth = imagemAtual.getIconWidth();
-        int frameHeight = imagemAtual.getIconHeight();
+        int comprimento = animacaoAtual.getFrameWidth();
+        int altura = animacaoAtual.getFrameHeight();
         
         g.drawImage(imagemAtual.getImage(), (int) jogador.getPitch(), (int) jogador.getPitch(), 
                 this.getParent().getWidth() / 2, this.getParent().getHeight() / 2, 
-                frameAtual * 107, 0, (frameAtual + 1) * 107, 107, null);
+                frameAtual * comprimento, 0, (frameAtual + 1) * comprimento, altura, null);
      
         
         if(tempoAtual - tempoAnterior >= animacaoAtual.getVelocidadeFrame()) {

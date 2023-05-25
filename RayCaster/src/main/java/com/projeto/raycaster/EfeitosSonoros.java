@@ -51,6 +51,7 @@ public class EfeitosSonoros {
             
         
         somDesejado.stop();
+        somDesejado.flush();
         somDesejado.setFramePosition(0);
         somDesejado.start();
     }
