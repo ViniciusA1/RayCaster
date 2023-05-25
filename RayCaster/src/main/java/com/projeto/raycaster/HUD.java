@@ -25,8 +25,8 @@ import javax.swing.JPanel;
  */
 public class HUD extends JPanel {
     private final static String PATH = "modelos" + File.separator + "hud" + File.separator;
-    private List<ImageIcon> sprite;
-    private Player jogador;
+    private final List<ImageIcon> sprite;
+    private final Player jogador;
     private JLabel textoVida;
     private JLabel textoMunicao;
 
@@ -56,7 +56,7 @@ public class HUD extends JPanel {
         return fonteCustomizada;
     }
     
-    public void carregaComponentes(Font fonteCustom) {
+    private void carregaComponentes(Font fonteCustom) {
         textoVida = new JLabel(Double.toString(jogador.getVidaAtual()));
         textoVida.setFont(fonteCustom.deriveFont(50f));
         textoVida.setForeground(Color.WHITE);

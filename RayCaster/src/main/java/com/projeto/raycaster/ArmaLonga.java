@@ -7,6 +7,7 @@ package com.projeto.raycaster;
 public class ArmaLonga extends Item {
     private final int municaoMaxima;
     private int municaoAtual;
+    private int tamanhoPente;
 
     public ArmaLonga(String nome, int municaoMaxima, int municaoAtual, long cooldown) {
         super(nome, cooldown);

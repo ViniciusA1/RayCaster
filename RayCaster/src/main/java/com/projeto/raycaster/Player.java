@@ -17,12 +17,13 @@ public class Player extends Entidade {
     private double angulo;
     private double pitch;
     private double taxaPitch;
+    private long tempoAnterior;
     private Inventario<Item> mochila;
     private Item itemAtual;
     private AnimacaoPlayer painelAnimacao;
     private HUD hudJogador;
     private Estado estadoAtual;
-    private Clip clip;
+    private EfeitosSonoros som;
     
     public Player(double vidaMaxima, double x, double y, double velocidade, int fov) {
         super(vidaMaxima, x, y, velocidade, fov);
@@ -31,6 +32,7 @@ public class Player extends Entidade {
         taxaPitch = 0.5;
         mochila = new Inventario<>();
         estadoAtual = Estado.OCIOSO;
+        som = new EfeitosSonoros("player");
     }
     
     public void setPainelAnimacao(AnimacaoPlayer novoPainel) {
@@ -83,43 +85,43 @@ public class Player extends Entidade {
         mochila.guardaObjeto(novoItem);
     }
 
-    public void sacaItem(int index, HUD hudJogador) {
+    public void sacaItem(int index) {
         if(estadoAtual != Estado.OCIOSO)
             return;
         
-        try {
-            clip = AudioSystem.getClip();
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("sons/holster.wav"));
-            clip.open(audioInputStream);
-            
-            itemAtual = mochila.getObjeto(index);
-            hudJogador.atualizaItem();
-            painelAnimacao.trocaItem(itemAtual);
-
-            clip.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        itemAtual = mochila.getObjeto(index);
+        hudJogador.atualizaItem();
+        painelAnimacao.setAnimacao(itemAtual.getAnimacao(estadoAtual));
         
-        if(!clip.isRunning()) {
+        /*if(!clip.isRunning()) {
             clip.close();
             clip = null;
-        }
+        }*/
     }
     
     public void usaItem(int posX, int posY) {
-        if(estadoAtual != Estado.OCIOSO)
+        long tempoAtual = System.currentTimeMillis();
+        
+        if(estadoAtual != Estado.OCIOSO || tempoAtual - tempoAnterior <= itemAtual.getCooldown())
             return;
         
         itemAtual.usar(posX, posY);
         estadoAtual = Estado.ATIRANDO;
         
         painelAnimacao.setAnimacao(itemAtual.getAnimacao(estadoAtual));
+        itemAtual.reproduzSom(estadoAtual);
+        
+        tempoAnterior = tempoAtual;
     }
     
     public void recarregaItem() {
+        if(estadoAtual != Estado.OCIOSO)
+            return;
+        
         estadoAtual = Estado.RECARREGANDO;
         painelAnimacao.setAnimacao(itemAtual.getAnimacao(estadoAtual));
+        
+        itemAtual.reproduzSom(estadoAtual);
     }
     
     public int getQtdConsumivel() {

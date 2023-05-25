@@ -45,6 +45,7 @@ public class Engine extends JPanel implements ActionListener {
         gameTimer.start();
 
         addKeyListener(keyHandler);
+        addMouseListener(mouseHandler);
         addMouseMotionListener(mouseHandler);
         setFocusable(true);
 
@@ -52,7 +53,7 @@ public class Engine extends JPanel implements ActionListener {
     }
 
     private void configInicial() {
-        jogador = new Player(100, 2.5, 2.5, 0.05, 60);
+        jogador = new Player(100, 2.5, 2.5, 0.025, 60);
         mapaAtual = new Mapa("lobby.txt", 20);
         mapaAtual.carregar();
 
@@ -81,26 +82,31 @@ public class Engine extends JPanel implements ActionListener {
         jogador.setPainelAnimacao(painelAnimacao);
         jogador.setHUD(hudJogador);
         
-        jogador.sacaItem(0, hudJogador);
+        jogador.sacaItem(0);
 
         keyHandler = new KeyInput();
+        keyBindings();
+
+        carregaTexturas();
+    }
+    
+    private void keyBindings() {
         keyHandler.adicionaKey(KeyEvent.VK_W, () -> jogador.move(0, 1, mapaAtual));
         keyHandler.adicionaKey(KeyEvent.VK_A, () -> jogador.move(-Math.PI / 2, 1, mapaAtual));
         keyHandler.adicionaKey(KeyEvent.VK_S, () -> jogador.move(0, -1, mapaAtual));
         keyHandler.adicionaKey(KeyEvent.VK_D, () -> jogador.move(Math.PI / 2, 1, mapaAtual));
         keyHandler.adicionaKey(KeyEvent.VK_R, () -> jogador.recarregaItem());
-        keyHandler.adicionaKey(KeyEvent.VK_1, () -> jogador.sacaItem(0, hudJogador));
-        keyHandler.adicionaKey(KeyEvent.VK_2, () -> jogador.sacaItem(1, hudJogador));
-        keyHandler.adicionaKey(KeyEvent.VK_3, () -> jogador.sacaItem(2, hudJogador));
-        keyHandler.adicionaKey(KeyEvent.VK_4, () -> jogador.sacaItem(3, hudJogador));
-
-        carregaTexturas();
+        
+        keyHandler.adicionaKey(KeyEvent.VK_1, () -> jogador.sacaItem(0));
+        keyHandler.adicionaKey(KeyEvent.VK_2, () -> jogador.sacaItem(1));
+        keyHandler.adicionaKey(KeyEvent.VK_3, () -> jogador.sacaItem(2));
+        keyHandler.adicionaKey(KeyEvent.VK_4, () -> jogador.sacaItem(3));
     }
 
     private void carregaTexturas() {
         textura = new int[1][64 * 64];
         try {
-            BufferedImage imagem = ImageIO.read(new File("modelos/texturas/redbrick.png"));
+            BufferedImage imagem = ImageIO.read(new File("modelos/paredes/redbrick.png"));
             imagem.getRGB(0, 0, imagem.getWidth(), imagem.getHeight(),
                     textura[0], 0, 64);
         } catch (IOException e) {

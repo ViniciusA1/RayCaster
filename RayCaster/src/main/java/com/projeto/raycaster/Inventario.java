@@ -14,6 +14,7 @@ public class Inventario<T extends Item> {
 
     public Inventario() {
         objetos = new ArrayList<>();
+        this.tamanhoMaximo = 8;
     }
     
     public T getObjeto(int indice) {
@@ -29,6 +30,7 @@ public class Inventario<T extends Item> {
     }
     
     public void guardaObjeto(T novoObjeto) {
-        objetos.add(novoObjeto);
+        if(getTamanhoOcupado() < tamanhoMaximo)
+            objetos.add(novoObjeto);
     }
 }

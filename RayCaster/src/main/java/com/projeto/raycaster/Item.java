@@ -13,11 +13,13 @@ public abstract class Item {
     private String nome;
     private long cooldown;
     private Map<Estado, Animacao> mapaAnimacao;
+    private EfeitosSonoros sons;
 
     public Item(String nome, long cooldown) {
         mapaAnimacao = new HashMap<>();
         this.nome = nome;
         this.cooldown = cooldown;
+        sons = new EfeitosSonoros(nome);
         carregaSprites();
     }
     
@@ -41,6 +43,10 @@ public abstract class Item {
     
     public Animacao getAnimacao(Estado estadoAnimacao) {
         return mapaAnimacao.get(estadoAnimacao);
+    }
+    
+    public void reproduzSom(Estado estadoDesejado) {
+        sons.emiteSom(estadoDesejado);
     }
     
     public abstract void usar(int coordX, int coordY);
