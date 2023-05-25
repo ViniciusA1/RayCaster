@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -148,10 +149,11 @@ public class Mapa implements Guardar {
     
     @Override
     public  void excluir(){
-        File arquivoMapa = new File("maps" + File.pathSeparator + nomeMapa);
-         if(arquivoMapa.exists()){
-             arquivoMapa.delete();
-         }
+        String[] aux = nomeMapa.split(".txt");
+        File arquivoMapa = new File("maps" + File.separator + aux[0] + ".txt");
+        
+        arquivoMapa.delete();
+         
     }
     
     public static ArrayList<Mapa> carregarMapList(){

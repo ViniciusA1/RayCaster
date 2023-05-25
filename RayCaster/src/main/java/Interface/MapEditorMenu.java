@@ -43,6 +43,7 @@ public class MapEditorMenu {
     private static void mapEditorOp(){
         JFrame inicial = new JFrame("Editor de mapa");
         inicial.setSize(200, 300);
+        inicial.setLocationRelativeTo(null);
         JPanel painel = new JPanel();
         JButton b1, b2, b3, b4;
         b1 = new JButton("Criar Novo Mapa");
@@ -69,6 +70,7 @@ public class MapEditorMenu {
         painel.add(b3);
         painel.add(Box.createVerticalGlue());
         inicial.add(painel);
+        inicial.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         inicial.setVisible(true);
     }
     
@@ -76,6 +78,7 @@ public class MapEditorMenu {
     private static void criarMapa(JFrame f){
         JFrame janela = new JFrame("Criar novo mapa");
         janela.setSize(300, 200);
+        janela.setLocationRelativeTo(null);
         JPanel coluna, linha1, linha2, linha3, linha4;
         JLabel cabecalho, nomeLabel, tamanhoLabel;
         cabecalho = new JLabel("Criar Novo Mapa");
@@ -187,6 +190,7 @@ public class MapEditorMenu {
     public static void excluiMapa(JFrame f){
         JList<Mapa> listaMapa = new JList<>(new ListData(mapas));
         JFrame exclui = new JFrame("Excluir Mapa");
+        exclui.setLocationRelativeTo(null);
         JPanel linha1, linha2, linha3;
         linha1 = new JPanel();
         linha1.setLayout(new BoxLayout(linha1, BoxLayout.X_AXIS));
@@ -208,7 +212,37 @@ public class MapEditorMenu {
         linha2.add(Box.createHorizontalGlue());
         exclui.setSize(200, 300);
         
+        
+        JButton ok, cancel;
+        ok = new JButton("OK");
+        ok.addActionListener((ActionEvent e) ->{
+            if(listaMapa.isSelectionEmpty()){
+                JOptionPane.showMessageDialog(null, "Voce deve selecionar um mapa para excluir!");
+            }
+            else if(JOptionPane.showConfirmDialog(null, "Voce tem certeza que deseja continuar?") == 0){
+                Mapa aux = listaMapa.getSelectedValue();
+                mapas.remove(aux);
+                aux.excluir();
+                
+            }
+            
+        });
+        cancel = new JButton("CANCELAR");
+        cancel.addActionListener((ActionEvent e) ->{
+            mapaSelecionado = null;
+//            janela.setVisible(false);
+//            nomeCampo.setText("");
+//            tamanhoCampo.setText("");
+            f.setVisible(true);
+            exclui.dispose();
+        });
         linha3 = new JPanel();
+        linha3.setLayout(new BoxLayout(linha3, BoxLayout.X_AXIS));
+        linha3.add(Box.createHorizontalGlue());
+        linha3.add(ok);
+        linha3.add(Box.createHorizontalStrut(10));
+        linha3.add(cancel);
+        linha3.add(Box.createHorizontalGlue());
         
         JPanel painelEx = new JPanel();
         painelEx.setLayout(new BoxLayout(painelEx, BoxLayout.Y_AXIS));
