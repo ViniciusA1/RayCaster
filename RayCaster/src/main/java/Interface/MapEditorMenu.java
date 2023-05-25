@@ -326,7 +326,7 @@ public class MapEditorMenu {
 
         @Override
         public Object getElementAt(int index) {
-          return index + " - " + mapas.get(index).getNomeMapa() + " - " + mapas.get(index).getLimite();
+          return (index + 1) + " - " + mapas.get(index).getNomeMapa() + " - " + mapas.get(index).getLimite();
         }
     }
 }
