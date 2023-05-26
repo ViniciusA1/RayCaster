@@ -83,7 +83,8 @@ public class MapEditorMenu {
         
         b4 = new JButton("Voltar");
         b4.addActionListener((ActionEvent e) ->{
-            System.exit(0);//Temporario
+            f.setVisible(true);
+            inicial.dispose();
         });
         linha4.setLayout(new BoxLayout(linha4, BoxLayout.X_AXIS));
         linha4.add(Box.createVerticalGlue());
