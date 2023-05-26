@@ -20,13 +20,13 @@ public abstract class Item {
         this.nome = nome;
         this.cooldown = cooldown;
         sons = new EfeitosSonoros(nome);
-        carregaSprites();
+        carregaAnimacoes();
     }
     
-    private void carregaSprites() {
-        mapaAnimacao.put(Estado.OCIOSO, new Animacao(nome, Estado.OCIOSO));
-        mapaAnimacao.put(Estado.ATIRANDO, new Animacao(nome, Estado.ATIRANDO));
-        mapaAnimacao.put(Estado.RECARREGANDO, new Animacao(nome, Estado.RECARREGANDO));
+    private void carregaAnimacoes() {
+        mapaAnimacao.put(Estado.OCIOSO, new Animacao(Diretorio.SPRITE_ITENS + nome, Estado.OCIOSO));
+        mapaAnimacao.put(Estado.USANDO, new Animacao(Diretorio.SPRITE_ITENS + nome, Estado.USANDO));
+        mapaAnimacao.put(Estado.RECARREGANDO, new Animacao(Diretorio.SPRITE_ITENS + nome, Estado.RECARREGANDO));
     }
     
     public long getCooldown() {

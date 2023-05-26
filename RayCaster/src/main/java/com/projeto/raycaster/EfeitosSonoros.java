@@ -16,8 +16,6 @@ import javax.sound.sampled.Clip;
  * @author vinicius
  */
 public class EfeitosSonoros {
-
-    private final static String PATH = "sons" + File.separator;
     private Map<Estado, Clip> sons;
 
     public EfeitosSonoros(String nome) {
@@ -26,22 +24,23 @@ public class EfeitosSonoros {
     }
 
     private void carregarSons(String nome) {
-        File pastaSons = new File(PATH + File.separator + nome);
-
-        Estado[] possiveisSons = Estado.values();
-
-        try {
-            Clip clipAtirando = AudioSystem.getClip();
-            AudioInputStream audioInputStreamAtirando = AudioSystem.getAudioInputStream(new File(PATH + File.separator + nome + File.separator + nome + "-" + "ATIRANDO" + ".wav"));
-            clipAtirando.open(audioInputStreamAtirando);
-            sons.put(Estado.ATIRANDO, clipAtirando);
-
-            Clip clipRecarregando = AudioSystem.getClip();
-            AudioInputStream audioInputStreamRecarregando = AudioSystem.getAudioInputStream(new File(PATH + File.separator + nome + File.separator + nome + "-" + "RECARREGANDO" + ".wav"));
-            clipRecarregando.open(audioInputStreamRecarregando);
-            sons.put(Estado.RECARREGANDO, clipRecarregando);
-        } catch (Exception e) {
-            System.err.println("Som de " + nome + " não existe!");
+        Estado[] possiveisEstados = Estado.values();
+        
+        for (Estado estadoAux : possiveisEstados) {
+            String nomeEstado = estadoAux.name();
+            try {
+                Clip clip = AudioSystem.getClip();
+                
+                String caminhoSom = Diretorio.convertePath(Diretorio.SONS + nome, estadoAux) + 
+                                    ArquivoUtils.FORMATO_SOM;
+                
+                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(caminhoSom));
+                
+                clip.open(audioInputStream);
+                sons.put(estadoAux, clip);
+            } catch (Exception e) {
+                System.err.println("O estado " + nomeEstado +" não está atribuido ao item " + nome);
+            }
         }
     }
 

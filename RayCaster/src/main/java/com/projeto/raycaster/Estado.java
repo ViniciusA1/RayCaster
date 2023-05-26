@@ -6,7 +6,7 @@ package com.projeto.raycaster;
  */
 public enum Estado {
     OCIOSO,
-    ATIRANDO,
+    USANDO,
     RECARREGANDO,
     SACANDO
 }

@@ -61,8 +61,10 @@ public class Engine extends JPanel implements ActionListener {
         mouseHandler = new MouseInput(jogador, 0.001);
 
         Item pistola = new ArmaLonga("pistol", 100, 100, 30, 1000);
+        Item faca = new ArmaCurta("knife", 100, 1000);
         
         jogador.adicionaItem(pistola);
+        jogador.adicionaItem(faca);
 
         HUD hudJogador = new HUD(jogador);
         hudJogador.setBounds(0, SCREENHEIGHT - 100, SCREENWIDTH, 100);
@@ -81,7 +83,7 @@ public class Engine extends JPanel implements ActionListener {
         keyHandler = new KeyInput();
         keyBindings();
 
-        carregaTexturas();
+        //carregaTexturas();
     }
     
     private void keyBindings() {
@@ -92,12 +94,13 @@ public class Engine extends JPanel implements ActionListener {
         keyHandler.adicionaKey(KeyEvent.VK_R, () -> jogador.recarregaItem());
         
         keyHandler.adicionaKey(KeyEvent.VK_1, () -> jogador.sacaItem(0));
+        keyHandler.adicionaKey(KeyEvent.VK_2, () -> jogador.sacaItem(1));
     }
 
     private void carregaTexturas() {
         textura = new int[1][600*600];
         try {
-            BufferedImage imagem = ImageIO.read(new File("modelos/paredes/redbrick.png"));
+            BufferedImage imagem = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "redbrick.png"));
             imagem.getRGB(0, 0, imagem.getWidth(), imagem.getHeight(),
                     textura[0], 0, 64);
         } catch (IOException e) {
@@ -137,9 +140,6 @@ public class Engine extends JPanel implements ActionListener {
         super.paintComponent(g);
 
         int[] cor = new int[1];
-        
-        //int cameraOffsetY = (int) (Math.sin(Math.toRadians(jogador.getPitch())) * 10);
-        //int cameraOffsetX = (int) (Math.sin(Math.toRadians(jogador.getPitch())) * 10);
 
         for (int i = 0; i < SCREENWIDTH; i++) {
             double rayAngle = (jogador.getAngulo() - jogador.getFov() / 2.0) 
@@ -163,10 +163,7 @@ public class Engine extends JPanel implements ActionListener {
             g.setColor(Color.DARK_GRAY);
             g.drawLine(i, fimParede, i, SCREENHEIGHT);
         }
-        
-        //g.drawImage(jogador.getFrameAtual().getImage(), SCREENWIDTH / 2 + (int) jogador.getPitch(), SCREENHEIGHT / 2 + (int) jogador.getPitch(),
-                //SCREENWIDTH / 2, SCREENHEIGHT / 2, this);
-       
+               
         jogador.desenhaComponentes();
     }
     

@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import javax.swing.ImageIcon;
 
 /**
@@ -17,19 +18,18 @@ public class Animacao {
     private int quantidadeFrames;
     private int frameWidth;
     private int frameHeight;
-    private final static String PATH = "modelos" + File.separator + "itens" + File.separator;
 
-    public Animacao(String nome, Estado estadoAnimacao) {
-        String caminho = PATH + nome + File.separator + nome + "-" + estadoAnimacao.name();
+    public Animacao(String caminho, Estado estadoAnimacao) {
+        String nomeDeBusca = Diretorio.convertePath(caminho, estadoAnimacao);
         
-        sprites = ArquivoUtils.leImagem(caminho + ".png");
-        String[] dados = ArquivoUtils.leDados(caminho + ".txt");
+        sprites = ArquivoUtils.leImagem(nomeDeBusca);
+        Properties dados = ArquivoUtils.leDados(nomeDeBusca);
 
         if (dados != null) {
-            this.frameWidth = Integer.parseInt(dados[0]);
-            this.frameHeight = Integer.parseInt(dados[1]);
-            this.quantidadeFrames = Integer.parseInt(dados[2]);
-            this.velocidadeFrame = Long.parseLong(dados[3]);
+            this.frameWidth = Integer.parseInt(dados.getProperty("frameWidth"));
+            this.frameHeight = Integer.parseInt(dados.getProperty("frameHeight"));
+            this.quantidadeFrames = Integer.parseInt(dados.getProperty("quantidadeFrames"));
+            this.velocidadeFrame = Long.parseLong(dados.getProperty("velocidadeFrame"));
         }
     }
 

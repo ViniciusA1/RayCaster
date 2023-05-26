@@ -101,10 +101,10 @@ public class Player extends Entidade {
             return;
         
         itemAtual.usar();
-        estadoAtual = Estado.ATIRANDO;
+        estadoAtual = Estado.USANDO;
         
         painelAnimacao.setAnimacao(itemAtual.getAnimacao(estadoAtual));
-        itemAtual.reproduzSom(Estado.ATIRANDO);
+        itemAtual.reproduzSom(estadoAtual);
         
         tempoAnterior = tempoAtual;
     }

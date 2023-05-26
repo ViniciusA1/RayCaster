@@ -24,9 +24,9 @@ import javax.swing.JPanel;
  * @author vinicius
  */
 public class HUD extends JPanel {
-    private final static String PATH = "modelos" + File.separator + "hud" + File.separator;
     private final List<ImageIcon> sprite;
     private final Player jogador;
+    private Animacao animacaoRetrato;
     private JLabel textoVida;
     private JLabel textoMunicao;
 
@@ -45,7 +45,7 @@ public class HUD extends JPanel {
         Font fonteCustomizada = null;
         
         try {
-            fonteCustomizada = Font.createFont(Font.TRUETYPE_FONT, new File(PATH + "font.ttf"));
+            fonteCustomizada = Font.createFont(Font.TRUETYPE_FONT, new File(Diretorio.SPRITE_HUD + "font.ttf"));
         } catch (FontFormatException | IOException ex) {
             
         }
@@ -74,23 +74,9 @@ public class HUD extends JPanel {
     }
     
     private void carregaSprites() {
-        File arquivo = new File(PATH + "hud.txt");
-        Scanner leitor;
-        
-        try {
-            leitor = new Scanner(arquivo);
-        } catch(FileNotFoundException erro) {
-            return;
-        }
-        
-        while(leitor.hasNext()) {
-            String nomeImagem = leitor.nextLine();
-            
-            ImageIcon imagem = new ImageIcon(PATH + nomeImagem);
-            sprite.add(imagem);
-        }
-        
-        leitor.close();
+        ImageIcon mainHUD = new ImageIcon(Diretorio.SPRITE_HUD + "main.png");
+        animacaoRetrato = new Animacao(Diretorio.SPRITE_HUD + "player", Estado.OCIOSO);
+        sprite.add(mainHUD);
     }
     
     public ImageIcon getSprite(int index) {
