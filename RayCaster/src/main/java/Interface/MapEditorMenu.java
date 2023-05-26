@@ -7,6 +7,7 @@ import com.projeto.raycaster.Mapa;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -35,15 +36,15 @@ public class MapEditorMenu {
     private static ArrayList<Mapa> mapas;
     private static Mapa mapaSelecionado = null;
     
-    public static void inicia(JFrame f){
+    public static void inicia(JFrame f, ArrayList<BufferedImage> texturas){
         mapas = Mapa.carregarMapList();
         SwingUtilities.invokeLater(() -> {
-            mapEditorOp(f);
+            mapEditorOp(f, texturas);
         });
         
     }
     
-    private static void mapEditorOp(JFrame f){
+    private static void mapEditorOp(JFrame f, ArrayList<BufferedImage> texturas){
         JFrame inicial = new JFrame("Editor de mapa");
         
         inicial.setSize(200, 200);
@@ -54,7 +55,7 @@ public class MapEditorMenu {
         b1 = new JButton("Criar Novo Mapa");
         b1.addActionListener((ActionEvent e) -> {
             inicial.setVisible(false);
-            criarMapa(inicial);
+            criarMapa(inicial, texturas);
         });
         linha1.setLayout(new BoxLayout(linha1, BoxLayout.X_AXIS));
         linha1.add(Box.createVerticalGlue());
@@ -107,7 +108,7 @@ public class MapEditorMenu {
     }
     
     
-    private static void criarMapa(JFrame f){
+    private static void criarMapa(JFrame f, ArrayList<BufferedImage> texturas){
         JFrame janela = new JFrame("Criar novo mapa");
         janela.addWindowListener(new event(f));
         janela.setDefaultCloseOperation(janela.DISPOSE_ON_CLOSE);

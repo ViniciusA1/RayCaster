@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -30,6 +31,7 @@ import javax.swing.SwingUtilities;
  */
 public class MenuInicial {
     private static BufferedImage imagem;
+    private static ArrayList<BufferedImage> texturas;
     public static void inicia(){
         try {
             imagem = lerImagem("ImgemInicial.png");
@@ -41,6 +43,7 @@ public class MenuInicial {
             JOptionPane.showMessageDialog(null, "Não foi possível ler o arquivo " + "parede.JPG" + ".", "Visualizador", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        carregarTexturas();
         SwingUtilities.invokeLater(() -> {
             MenuInicial();
         });
@@ -76,7 +79,7 @@ public class MenuInicial {
         b1 = new JButton("Editor de mapas");
         b1.addActionListener((ActionEvent e) -> {
             inicial.setVisible(false);
-            MapEditorMenu.inicia(inicial);
+            MapEditorMenu.inicia(inicial, texturas);
         });
 //        linha1.setLayout(new BoxLayout(linha1, BoxLayout.X_AXIS));
 //        linha1.add(Box.createVerticalGlue());
@@ -141,6 +144,20 @@ public class MenuInicial {
             janela.add(game);
             janela.setLocationRelativeTo(null);
             janela.setVisible(true);
+    }
+    
+    private static void carregarTexturas(){
+        texturas = new ArrayList<>();
+        File f = new File("modelos" + File.separator + "paredes");
+        File[] imageFiles = f.listFiles();
+        for(File aux: imageFiles){
+            try{
+                texturas.add(lerImagem(aux));
+            }
+            catch(IOException e){
+                System.exit(1);
+            }
+        }
     }
     
     private static BufferedImage lerImagem(String s) throws FileNotFoundException, IOException {
