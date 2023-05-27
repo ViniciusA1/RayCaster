@@ -4,17 +4,12 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -27,6 +22,7 @@ public class HUD extends JPanel {
     private final List<ImageIcon> sprite;
     private final Player jogador;
     private Animacao animacaoRetrato;
+    private Font fontePersonalizada;
     private JLabel textoVida;
     private JLabel textoMunicao;
 
@@ -35,7 +31,7 @@ public class HUD extends JPanel {
         sprite = new ArrayList<>();
         this.jogador = jogador;
         
-        Font fontePersonalizada = carregaFonte();
+        fontePersonalizada = carregaFonte();
         
         carregaComponentes(fontePersonalizada);
         carregaSprites();
@@ -90,6 +86,7 @@ public class HUD extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        
         textoVida.setText(Double.toString(jogador.getVidaAtual()));
         textoMunicao.setText(Integer.toString(jogador.getQtdConsumivel()));
         g.drawImage(sprite.get(0).getImage(), 0, 0, this.getWidth(), this.getHeight(), this);

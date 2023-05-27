@@ -1,12 +1,8 @@
 package com.projeto.raycaster;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -28,6 +24,7 @@ public class EfeitosSonoros {
         
         for (Estado estadoAux : possiveisEstados) {
             String nomeEstado = estadoAux.name();
+            
             try {
                 Clip clip = AudioSystem.getClip();
                 

@@ -1,9 +1,5 @@
 package com.projeto.raycaster;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import javax.swing.ImageIcon;
 
@@ -12,7 +8,6 @@ import javax.swing.ImageIcon;
  * @author vinicius
  */
 public class Animacao {
-
     private ImageIcon sprites;
     private long velocidadeFrame;
     private int quantidadeFrames;

@@ -1,5 +1,7 @@
 package com.projeto.raycaster;
 
+import java.awt.Rectangle;
+
 
 
 /**
@@ -7,8 +9,7 @@ package com.projeto.raycaster;
  * @author vinic
  */
 public abstract class Entidade {
-    private double x;
-    private double y;
+    private final Hitbox hitbox;
     private double velocidade;
     private double fov;
     private double vidaMaxima;
@@ -18,17 +19,26 @@ public abstract class Entidade {
         this.vidaMaxima = vidaMaxima;
         this.vidaAtual = vidaMaxima;
         this.velocidade = velocidade;
-        this.x = x;
-        this.y = y;
+        
         this.fov = Math.toRadians(fov);
+        
+        hitbox = new Hitbox(x, y, 4, 4);
     }
 
     public double getX() {
-        return x;
+        return hitbox.getX();
     }
 
     public double getY() {
-        return y;
+        return hitbox.getY();
+    }
+    
+    public double getWidth() {
+        return hitbox.getWidth();
+    }
+    
+    public double getHeight() {
+        return hitbox.getHeight();
     }
 
     public double getVelocidade() {
@@ -47,8 +57,11 @@ public abstract class Entidade {
         return vidaAtual;
     }
     
-    public void setXY(double deltaX, double deltaY) {
-        x += deltaX;
-        y += deltaY;
+    public void moveX(double deltaX) {
+        hitbox.setX(deltaX);
+    }
+    
+    public void moveY(double deltaY) {
+        hitbox.setY(deltaY);
     }
 }

@@ -18,6 +18,7 @@ public class Mapa implements Guardar {
     private String nomeMapa;
     private int[][] grid;
     private int limite;
+    private final int tamanhoBloco = 64;
     
     @Deprecated
     public Mapa() {
@@ -57,11 +58,15 @@ public class Mapa implements Guardar {
     }
     
     public int getValor(int linha, int coluna) {
-        return grid[linha][coluna];
+        return grid[linha / tamanhoBloco][coluna / tamanhoBloco];
     }
 
     public String getNomeMapa() {
         return nomeMapa;
+    }
+    
+    public int getTamanhoBloco() {
+        return tamanhoBloco;
     }
     
     public void setValor(int linha, int coluna, int valor) {
@@ -195,7 +200,11 @@ public class Mapa implements Guardar {
         limite = 0;
     }
     
-    public boolean checaColisao(int valorX, int valorY) {
-        return (grid[valorX][valorY] != 0);
+    public boolean checaColisao(double valorX, double valorY) {
+        valorX /= tamanhoBloco;
+        valorY /= tamanhoBloco;
+        
+        return (valorX < 0 || valorY < 0 || valorX >= limite || 
+                valorY >= limite || grid[(int)valorX][(int)valorY] != 0);
     }
 }

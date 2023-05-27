@@ -1,12 +1,11 @@
 package com.projeto.raycaster;
 
-
-
 /**
  *
  * @author vinic
  */
 public class Player extends Entidade {
+
     private double angulo;
     private double pitch;
     private double taxaPitch;
@@ -17,7 +16,7 @@ public class Player extends Entidade {
     private HUD hudJogador;
     private Estado estadoAtual;
     private EfeitosSonoros som;
-    
+
     public Player(double vidaMaxima, double x, double y, double velocidade, int fov) {
         super(vidaMaxima, x, y, velocidade, fov);
         angulo = 0;
@@ -27,108 +26,131 @@ public class Player extends Entidade {
         estadoAtual = Estado.OCIOSO;
         som = new EfeitosSonoros("player");
     }
-    
+
     public void setPainelAnimacao(AnimacaoPlayer novoPainel) {
         painelAnimacao = novoPainel;
     }
-    
+
     public void setHUD(HUD hudJogador) {
         this.hudJogador = hudJogador;
     }
-    
+
     public void setEstado(Estado novoEstado) {
         estadoAtual = novoEstado;
     }
-    
+
     public double getAngulo() {
         return angulo;
     }
-    
+
     public double getPitch() {
         return pitch;
     }
-    
+
     public Item getItemAtual() {
         return itemAtual;
     }
-    
+
     public void move(double anguloRelativo, int sinal, Mapa mapaAtual) {
         double dx = sinal * super.getVelocidade() * Math.cos(angulo + anguloRelativo);
         double dy = sinal * super.getVelocidade() * Math.sin(angulo + anguloRelativo);
-        
+
         pitch += taxaPitch;
-        
-        if(pitch >= 16 || pitch <= -16) {
+
+        if (pitch >= 16 || pitch <= -16) {
             taxaPitch *= -1;
         }
         
-        if(!checaColisao(mapaAtual, dx + super.getX(), dy + super.getY()))
-            setXY(dx, dy);
+        trataColisao(mapaAtual, dx, dy);
     }
-    
+
     public void rotaciona(double deltaX) {
         angulo = angulo + deltaX;
     }
-    
-    public boolean checaColisao(Mapa mapaAtual, double posX, double posY) {
-        return (mapaAtual.checaColisao((int) posX, (int) posY));
+
+    public void trataColisao(Mapa mapaAtual, double posX, double posY) {
+        boolean colidiuX = false;
+        boolean colidiuY = false;
+        double novoX = posX + getX();
+        double novoY = posY + getY();
+        
+        for (double i = novoX - getWidth(); i <= novoX + getWidth(); i++) {
+            for (double j = novoY - getHeight(); j <= novoY + getHeight(); j++) {
+                if (mapaAtual.checaColisao(i, j)) {
+                    colidiuY |= !mapaAtual.checaColisao(i, getY());
+                    colidiuX |= !mapaAtual.checaColisao(getX(), j);
+                }
+            }
+        }
+        
+        if(!colidiuX)
+            moveX(posX);
+        if(!colidiuY)
+            moveY(posY);
     }
-    
+
     public void adicionaItem(Item novoItem) {
         mochila.guardaObjeto(novoItem);
     }
 
     public void sacaItem(int index) {
-        if(estadoAtual != Estado.OCIOSO)
+        if (estadoAtual != Estado.OCIOSO) {
             return;
-        
-        itemAtual = mochila.getObjeto(index);
+        }
+
+        Item novoItem = mochila.getObjeto(index);
+        if (novoItem == itemAtual) {
+            return;
+        }
+
+        itemAtual = novoItem;
         hudJogador.atualizaItem();
         painelAnimacao.setAnimacao(itemAtual.getAnimacao(estadoAtual));
-        
-        /*if(!clip.isRunning()) {
-            clip.close();
-            clip = null;
-        }*/
+
+        estadoAtual = Estado.SACANDO;
+        som.emiteSom(estadoAtual);
     }
-    
+
     public void usaItem(int posX, int posY) {
         long tempoAtual = System.currentTimeMillis();
-        
-        if(estadoAtual != Estado.OCIOSO || 
-           tempoAtual - tempoAnterior <= itemAtual.getCooldown() || 
-           !itemAtual.isUsavel())
+
+        if (estadoAtual != Estado.OCIOSO
+                || tempoAtual - tempoAnterior <= itemAtual.getCooldown()
+                || !itemAtual.isUsavel()) {
             return;
-        
+        }
+
         itemAtual.usar();
         estadoAtual = Estado.USANDO;
-        
+
         painelAnimacao.setAnimacao(itemAtual.getAnimacao(estadoAtual));
         itemAtual.reproduzSom(estadoAtual);
-        
+
         tempoAnterior = tempoAtual;
     }
-    
+
     public void recarregaItem() {
-        if(estadoAtual != Estado.OCIOSO || !itemAtual.isRecarregavel())
+        if (estadoAtual != Estado.OCIOSO || !itemAtual.isRecarregavel()) {
             return;
-        
+        }
+
         ArmaLonga arma = (ArmaLonga) itemAtual;
-        
+
         arma.recarregar();
         estadoAtual = Estado.RECARREGANDO;
         painelAnimacao.setAnimacao(arma.getAnimacao(estadoAtual));
-        
+
         itemAtual.reproduzSom(estadoAtual);
     }
-    
+
     public int getQtdConsumivel() {
-        if(itemAtual == null) 
+        if (itemAtual == null) {
             return -1;
-        
+        }
+
         return itemAtual.getAtributoConsumivel();
     }
-    
+
     public void desenhaComponentes() {
         hudJogador.repaint();
         painelAnimacao.repaint();
