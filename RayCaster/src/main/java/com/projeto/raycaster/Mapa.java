@@ -18,7 +18,7 @@ public class Mapa implements Guardar {
     private String nomeMapa;
     private int[][] grid;
     private int limite;
-    private final int tamanhoBloco = 64;
+    private final int tamanhoBloco = 32;
     
     @Deprecated
     public Mapa() {

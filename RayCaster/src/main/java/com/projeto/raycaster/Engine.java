@@ -241,12 +241,9 @@ public class Engine extends JPanel implements ActionListener {
         super.paintComponent(g);
 
         int[] cor = new int[1];
-        int[][] frameBuffer = new int[SCREENHEIGHT][SCREENWIDTH];
+        int[] frameBuffer = new int[SCREENHEIGHT*SCREENWIDTH];
         
         Graphics2D g2d = (Graphics2D) g;
-
-        int cameraOffsetY = (int) (Math.sin(Math.toRadians(jogador.getPitch())) * 10);
-        int cameraOffsetX = (int) (Math.sin(Math.toRadians(jogador.getPitch())) * 10);
         
         int tamanhoBloco = mapaAtual.getTamanhoBloco();
         double CORRECTION = (SCREENWIDTH / (2 * Math.tan(jogador.getFov() / 2.0)));
@@ -266,8 +263,8 @@ public class Engine extends JPanel implements ActionListener {
             posX = (int) jogador.getX();
             posY = (int) jogador.getY();
 
-            deltaX = Math.sqrt(1 + (sinRay * sinRay) / (cosRay * cosRay));
-            deltaY = Math.sqrt(1 + (cosRay * cosRay) / (sinRay * sinRay));
+            deltaX = (cosRay == 0) ? Double.MAX_VALUE : Math.abs(1 / cosRay);
+            deltaY = (sinRay == 0) ? Double.MAX_VALUE : Math.abs(1 / sinRay);
 
             // Verifica a orientação em X do raio
             if (cosRay < 0) {
@@ -321,15 +318,14 @@ public class Engine extends JPanel implements ActionListener {
 
             int texNum = mapaAtual.getValor(posX, posY) - 1;
             int texWidth = 64;
-          
-
+         
             double wallX;
             if (cor[0] == 0) {
                 wallX = jogador.getY() + distanciaFinal * sinRay;
             } else {
                 wallX = jogador.getX() + distanciaFinal * cosRay;
             }
-            System.out.println(wallX);
+            
             wallX -= Math.floor(wallX);
 
             int texX = (int) (wallX * texWidth);
@@ -345,20 +341,19 @@ public class Engine extends JPanel implements ActionListener {
                 int texY = (int) (texPos) & (texWidth - 1);
                 texPos += step;
                 int color = textura[texNum][texWidth*texY + texX];
+                
                 if (cor[0] == 1) {
                     color = (color >> 1) & 8355711;
                 }
                 
-                g2d.setColor(new Color(color));
-                g2d.fillRect(i, y, 1,1);
+                frameBuffer[y * SCREENWIDTH + i] = color;
             }
-
         }
+        
+        BufferedImage frame = new BufferedImage(SCREENWIDTH, SCREENHEIGHT, BufferedImage.TYPE_INT_RGB);
+        frame.setRGB(0, 0, SCREENWIDTH, SCREENHEIGHT, frameBuffer, 0, SCREENWIDTH);
 
-    }
-
-    private void calculaDistancia(double anguloRaio, int[] corLocal, int[][] frameBuffer, int x) {
-
+        g2d.drawImage(frame, 0, 0, null);
     }
 
     @Override
