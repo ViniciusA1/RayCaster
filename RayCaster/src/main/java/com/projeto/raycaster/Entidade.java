@@ -22,7 +22,7 @@ public abstract class Entidade {
         
         this.fov = Math.toRadians(fov);
         
-        hitbox = new Hitbox(x, y, 4, 4);
+        hitbox = new Hitbox(x, y, 16, 16);
     }
 
     public double getX() {

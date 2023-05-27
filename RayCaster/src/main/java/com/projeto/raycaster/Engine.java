@@ -63,21 +63,21 @@ public class Engine extends JPanel implements ActionListener {
 
         Item pistola = new ArmaLonga("pistol", 100, 100, 30, 500);
         Item faca = new ArmaCurta("knife", 100, 1000);
-        
+
         jogador.adicionaItem(pistola);
         jogador.adicionaItem(faca);
 
         HUD hudJogador = new HUD(jogador);
         hudJogador.setBounds(0, SCREENHEIGHT - 100, SCREENWIDTH, 100);
         this.add(hudJogador);
-        
+
         AnimacaoPlayer painelAnimacao = new AnimacaoPlayer(jogador);
         painelAnimacao.setBounds(SCREENWIDTH / 2, SCREENHEIGHT / 2, SCREENWIDTH / 2, SCREENHEIGHT / 2);
         this.add(painelAnimacao);
-        
+
         jogador.setPainelAnimacao(painelAnimacao);
         jogador.setHUD(hudJogador);
-        
+
         jogador.sacaItem(0);
 
         keyHandler = new KeyInput();
@@ -85,20 +85,20 @@ public class Engine extends JPanel implements ActionListener {
 
         carregaTexturas();
     }
-    
+
     private void keyBindings() {
         keyHandler.adicionaKey(KeyEvent.VK_W, () -> jogador.move(0, 1, mapaAtual));
         keyHandler.adicionaKey(KeyEvent.VK_A, () -> jogador.move(-Math.PI / 2, 1, mapaAtual));
         keyHandler.adicionaKey(KeyEvent.VK_S, () -> jogador.move(0, -1, mapaAtual));
         keyHandler.adicionaKey(KeyEvent.VK_D, () -> jogador.move(Math.PI / 2, 1, mapaAtual));
         keyHandler.adicionaKey(KeyEvent.VK_R, () -> jogador.recarregaItem());
-        
+
         keyHandler.adicionaKey(KeyEvent.VK_1, () -> jogador.sacaItem(0));
         keyHandler.adicionaKey(KeyEvent.VK_2, () -> jogador.sacaItem(1));
     }
 
     private void carregaTexturas() {
-        textura = new int[1][64*64];
+        textura = new int[1][64 * 64];
         try {
             BufferedImage imagem = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "01 - redbrick.png"));
             imagem.getRGB(0, 0, imagem.getWidth(), imagem.getHeight(),
@@ -135,116 +135,15 @@ public class Engine extends JPanel implements ActionListener {
         musicaBackground.loop(Clip.LOOP_CONTINUOUSLY);
     }
 
-    /*@Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-
-        int[] cor = new int[1];
-        double CORRECTION = (SCREENWIDTH / (2 * Math.tan(jogador.getFov() / 2.0)));
-        int tamanhoBloco = mapaAtual.getTamanhoBloco();
-        
-        Graphics2D g2d = (Graphics2D) g;
-        
-        AffineTransform affine = new AffineTransform();
-        g2d.setTransform(affine);
-
-        for (int i = 0; i < SCREENWIDTH; i++) {
-            double rayAngle = (jogador.getAngulo() - jogador.getFov() / 2.0) 
-                    + ((float) i / (float) SCREENWIDTH) * jogador.getFov();
-
-
-            double distancia = calculaDistancia(rayAngle, cor) * 
-                    Math.cos(rayAngle - jogador.getAngulo());
-
-            int alturaParede = (int) ((tamanhoBloco / distancia) * CORRECTION);
-            int comecoParede = (int) (SCREENHEIGHT - alturaParede) / 2;
-            
-            if (comecoParede < 0) 
-                comecoParede = 0;
-            
-            int fimParede = comecoParede + alturaParede; 
-            
-            if (fimParede >= SCREENHEIGHT) 
-                fimParede = SCREENHEIGHT - 1;
-            
-            
-            g2d.setColor(Color.DARK_GRAY);
-            g2d.drawLine(i, 0, i, comecoParede);
-            g2d.setColor(new Color(255 / cor[0], 0, 0));
-            g2d.drawLine(i, comecoParede, i, fimParede);
-            g2d.setColor(Color.DARK_GRAY);
-            g2d.drawLine(i, fimParede, i, SCREENHEIGHT);
-        }
-               
-        jogador.desenhaComponentes();
-    }
-    
-    private double calculaDistancia(double anguloRaio, int[] corLocal) {
-        int posX, posY;
-        int direcaoX, direcaoY;
-        double deltaX, deltaY;
-        double distanciaX, distanciaY;
-        double cosRay = Math.cos(anguloRaio);
-        double sinRay = Math.sin(anguloRaio);
-
-        // Posição inicial do ponto extremo do raio
-        posX = (int) jogador.getX();
-        posY = (int) jogador.getY();
-        
-        // Quantas unidades por vez o raio deve andar
-        deltaX = (cosRay == 0 ? Double.MAX_VALUE : Math.abs(1 / cosRay));
-        deltaY = (sinRay == 0 ? Double.MAX_VALUE : Math.abs(1 / sinRay));
-
-        // Verifica a orientação em X do raio
-        if (cosRay < 0) {
-            direcaoX = -1;
-            distanciaX = (jogador.getX() - posX) * deltaX;
-        } else {
-            direcaoX = 1;
-            distanciaX = (posX + 1.0 - jogador.getX()) * deltaX;
-        }
-
-        // Verifica a orientação em Y do raio
-        if (sinRay < 0) {
-            direcaoY = -1;
-            distanciaY = (jogador.getY() - posY) * deltaY;
-        } else {
-            direcaoY = 1;
-            distanciaY = (posY + 1.0 - jogador.getY()) * deltaY;
-        }
-
-        // Percorre o mapa até encontrar o primeiro obstáculo
-        while (true) {
-            
-            // Verifica qual componente do raio é menor e aumenta-a
-            if (distanciaX < distanciaY) {
-                distanciaX += deltaX;
-                posX += direcaoX;
-                corLocal[0] = 1;
-            } else {
-                distanciaY += deltaY;
-                posY += direcaoY;
-                corLocal[0] = 2;
-            }
-
-            // Checa a colisão do raio com a parede
-            if (mapaAtual.checaColisao(posX, posY)) {
-                break;
-            }
-        }
-
-        return (corLocal[0] == 1 ? (distanciaX - deltaX) : (distanciaY - deltaY));
-    }*/
-    
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
         int[] cor = new int[1];
-        int[] frameBuffer = new int[SCREENHEIGHT*SCREENWIDTH];
-        
+        int[] frameBuffer = new int[SCREENHEIGHT * SCREENWIDTH];
+
         Graphics2D g2d = (Graphics2D) g;
-        
+
         int tamanhoBloco = mapaAtual.getTamanhoBloco();
         double CORRECTION = (SCREENWIDTH / (2 * Math.tan(jogador.getFov() / 2.0)));
 
@@ -305,12 +204,15 @@ public class Engine extends JPanel implements ActionListener {
             }
 
             double distanciaFinal = (cor[0] == 0) ? (distanciaX - deltaX) : (distanciaY - deltaY);
+
             distanciaFinal *= Math.cos(rayAngle - jogador.getAngulo());
 
             int alturaParede = (int) ((tamanhoBloco / distanciaFinal) * CORRECTION);
-            
+
             int comecoParede = (int) (SCREENHEIGHT - alturaParede) / 2;
-            if(comecoParede < 0) comecoParede = 0;
+            if (comecoParede < 0) {
+                comecoParede = 0;
+            }
             int fimParede = alturaParede + comecoParede;
             if (fimParede >= SCREENHEIGHT) {
                 fimParede = SCREENHEIGHT - 1;
@@ -318,7 +220,7 @@ public class Engine extends JPanel implements ActionListener {
 
             int texNum = mapaAtual.getValor(posX, posY) - 1;
             int texWidth = 64;
-         
+
             double wallX;
             if (cor[0] == 0) {
                 wallX = jogador.getY() + distanciaFinal * sinRay;
@@ -326,30 +228,31 @@ public class Engine extends JPanel implements ActionListener {
                 wallX = jogador.getX() + distanciaFinal * cosRay;
             }
             
+            wallX /= tamanhoBloco;
             wallX -= Math.floor(wallX);
 
             int texX = (int) (wallX * texWidth);
-            
+
             if ((cor[0] == 0 && cosRay > 0) || (cor[0] == 1 && sinRay < 0)) {
                 texX = texWidth - texX - 1;
             }
 
             double step = 1.0 * texWidth / alturaParede;
             double texPos = (comecoParede - SCREENHEIGHT / 2 + alturaParede / 2) * step;
-            
+
             for (int y = comecoParede; y < fimParede; y++) {
                 int texY = (int) (texPos) & (texWidth - 1);
                 texPos += step;
-                int color = textura[texNum][texWidth*texY + texX];
-                
+                int color = textura[texNum][texWidth * texY + texX];
+
                 if (cor[0] == 1) {
                     color = (color >> 1) & 8355711;
                 }
-                
+
                 frameBuffer[y * SCREENWIDTH + i] = color;
             }
         }
-        
+
         BufferedImage frame = new BufferedImage(SCREENWIDTH, SCREENHEIGHT, BufferedImage.TYPE_INT_RGB);
         frame.setRGB(0, 0, SCREENWIDTH, SCREENHEIGHT, frameBuffer, 0, SCREENWIDTH);
 
