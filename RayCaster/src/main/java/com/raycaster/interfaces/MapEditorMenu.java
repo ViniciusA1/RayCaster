@@ -3,7 +3,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.raycaster.interfaces;
-import com.raycaster.engine.Mapa;
+import com.raycaster.mapa.MapGroup.ListData;
+import com.raycaster.mapa.Mapa;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -34,7 +35,6 @@ import javax.swing.ListSelectionModel;
  */
 public class MapEditorMenu {
     private static ArrayList<Mapa> mapas;
-    private static Mapa mapaSelecionado = null;
     
     public static void inicia(JFrame f, ArrayList<BufferedImage> texturas){
         mapas = Mapa.carregarMapList();
@@ -159,7 +159,6 @@ public class MapEditorMenu {
             else{
                 Mapa map = new Mapa(nomeCampo.getText(), Integer.parseInt((String)(tamanhoCampo.getText())));
                 mapas.add(map);
-                mapaSelecionado = map;
                 try {
                     map.salvar();
                 } catch (IOException ex) {
@@ -172,7 +171,6 @@ public class MapEditorMenu {
         });
         cancel = new JButton("CANCELAR");
         cancel.addActionListener((ActionEvent e) ->{
-            mapaSelecionado = null;
 //            janela.setVisible(false);
 //            nomeCampo.setText("");
 //            tamanhoCampo.setText("");
@@ -223,7 +221,7 @@ public class MapEditorMenu {
     }
     
     private static void excluiMapa(JFrame f){
-        JList<Mapa> listaMapa = new JList<>(new ListData(mapas));
+        JList<Mapa> listaMapa = new JList<>(new ListData<>(mapas));
         listaMapa.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JFrame exclui = new JFrame("Excluir Mapa");
         exclui.addWindowListener(new event(f));
@@ -269,7 +267,6 @@ public class MapEditorMenu {
         });
         cancel = new JButton("CANCELAR");
         cancel.addActionListener((ActionEvent e) ->{
-            mapaSelecionado = null;
 //            janela.setVisible(false);
 //            nomeCampo.setText("");
 //            tamanhoCampo.setText("");
@@ -314,21 +311,5 @@ public class MapEditorMenu {
         }
     }
     
-    private static class ListData extends AbstractListModel {
-        ArrayList<Mapa> mapas;
 
-        public ListData(ArrayList<Mapa> mapas) {
-            this.mapas = mapas;
-        }
-
-        @Override
-        public int getSize() {
-          return mapas.size();
-        }
-
-        @Override
-        public Object getElementAt(int index) {
-          return (index + 1) + " - " + mapas.get(index).getNomeMapa() + " - " + mapas.get(index).getLimite();
-        }
-    }
 }

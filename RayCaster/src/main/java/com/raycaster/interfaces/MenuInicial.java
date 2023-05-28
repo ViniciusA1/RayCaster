@@ -5,7 +5,7 @@
 package com.raycaster.interfaces;
 
 import com.raycaster.engine.Engine;
-import com.raycaster.engine.Mapa;
+import com.raycaster.mapa.Mapa;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
