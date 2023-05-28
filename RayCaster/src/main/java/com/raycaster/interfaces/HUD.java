@@ -1,5 +1,9 @@
-package com.projeto.raycaster;
+package com.raycaster.interfaces;
 
+import com.raycaster.engine.Estado;
+import com.raycaster.engine.Diretorio;
+import com.raycaster.entidades.Player;
+import com.raycaster.engine.Animacao;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontFormatException;

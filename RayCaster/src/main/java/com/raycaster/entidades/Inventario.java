@@ -1,5 +1,6 @@
-package com.projeto.raycaster;
+package com.raycaster.entidades;
 
+import com.raycaster.itens.Item;
 import java.util.ArrayList;
 import java.util.List;
 

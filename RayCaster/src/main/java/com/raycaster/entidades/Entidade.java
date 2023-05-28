@@ -1,4 +1,4 @@
-package com.projeto.raycaster;
+package com.raycaster.entidades;
 
 import java.awt.Rectangle;
 

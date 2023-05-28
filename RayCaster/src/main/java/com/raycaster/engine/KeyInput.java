@@ -1,4 +1,4 @@
-package com.projeto.raycaster;
+package com.raycaster.engine;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;

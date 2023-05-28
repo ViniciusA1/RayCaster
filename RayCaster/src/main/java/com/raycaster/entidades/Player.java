@@ -1,11 +1,19 @@
-package com.projeto.raycaster;
+package com.raycaster.entidades;
+
+import com.raycaster.interfaces.AnimacaoPlayer;
+import com.raycaster.itens.ArmaLonga;
+import com.raycaster.engine.EfeitosSonoros;
+import com.raycaster.engine.Estado;
+import com.raycaster.interfaces.HUD;
+import com.raycaster.itens.Item;
+import com.raycaster.engine.Mapa;
 
 /**
- *
- * @author vinic
+ * Classe que guarda todos os atributos e métodos do jogador principal do jogo.
+ * @author Vinicius Augusto
+ * @author Bruno Zara
  */
 public class Player extends Entidade {
-
     private double angulo;
     private double pitch;
     private double taxaPitch;
@@ -17,6 +25,14 @@ public class Player extends Entidade {
     private Estado estadoAtual;
     private EfeitosSonoros som;
 
+    /**
+     * Construtor principal do jogador, recebe os atributos necessitados pela classe.
+     * @param vidaMaxima Vida máxima do jogador
+     * @param x Posição inicial em x do jogador
+     * @param y Posição inicial em y do jogador
+     * @param velocidade Velocidade do jogador
+     * @param fov Campo de visão do jogador
+     */
     public Player(double vidaMaxima, double x, double y, double velocidade, int fov) {
         super(vidaMaxima, x, y, velocidade, fov);
         angulo = 0;
@@ -27,30 +43,60 @@ public class Player extends Entidade {
         som = new EfeitosSonoros("player");
     }
 
+    /**
+     * "Seta" um novo painel de animação para os itens do jogador.
+     * @param novoPainel Novo painel de animação recebido
+     */
     public void setPainelAnimacao(AnimacaoPlayer novoPainel) {
         painelAnimacao = novoPainel;
     }
 
+    /**
+     * "Seta" uma nova HUD para o jogador.
+     * @param hudJogador Nova HUD recebida
+     */
     public void setHUD(HUD hudJogador) {
         this.hudJogador = hudJogador;
     }
 
+    /**
+     * "Seta" um novo estado para o jogador.
+     * @param novoEstado Novo estado recebido
+     */
     public void setEstado(Estado novoEstado) {
         estadoAtual = novoEstado;
     }
 
+    /**
+     * Disponibiliza o angulo do jogador para código externo.
+     * @return Retorna o angulo de rotação do jogador.
+     */
     public double getAngulo() {
         return angulo;
     }
 
+    /**
+     * Disponibiliza o "pitch" do jogador para código externo.
+     * @return Retorna o valor do "pitch" do jogador
+     */
     public double getPitch() {
         return pitch;
     }
 
+    /**
+     * Disponibiliza o item atual do jogador para código externo.
+     * @return Retorna o item atualmente selecionado pelo jogador.
+     */
     public Item getItemAtual() {
         return itemAtual;
     }
 
+    /**
+     * Move o jogador no mapa atual de acordo com seu angulo e posição anterior.
+     * @param anguloRelativo Angulo relativo ao movimento desejado (W,A,S,D)
+     * @param sinal Sinal relativo ao movimento desejado (frente ou trás)
+     * @param mapaAtual Mapa atual em que o jogador será movido
+     */
     public void move(double anguloRelativo, int sinal, Mapa mapaAtual) {
         double dx = sinal * super.getVelocidade() * Math.cos(angulo + anguloRelativo);
         double dy = sinal * super.getVelocidade() * Math.sin(angulo + anguloRelativo);
@@ -64,10 +110,20 @@ public class Player extends Entidade {
         trataColisao(mapaAtual, dx, dy);
     }
 
+    /**
+     * Rotaciona o player em torno do seu angulo.
+     * @param deltaX Variação do angulo que deve ser somada
+     */
     public void rotaciona(double deltaX) {
         angulo = angulo + deltaX;
     }
 
+    /**
+     * Verifica e trata a colisão da hitbox do jogador com os objetos do mapa
+     * @param mapaAtual Mapa em que a colisão ocorre
+     * @param posX Posição em x do jogador
+     * @param posY Posição em y do jogador
+     */
     public void trataColisao(Mapa mapaAtual, double posX, double posY) {
         boolean colidiuX = false;
         boolean colidiuY = false;
@@ -89,10 +145,18 @@ public class Player extends Entidade {
             moveY(posY);
     }
 
+    /**
+     * Adiciona um novo item no inventário do jogador.
+     * @param novoItem 
+     */
     public void adicionaItem(Item novoItem) {
         mochila.guardaObjeto(novoItem);
     }
 
+    /**
+     * Saca um item do inventário do jogador.
+     * @param index Índice do novo item
+     */
     public void sacaItem(int index) {
         if (estadoAtual != Estado.OCIOSO) {
             return;
@@ -111,6 +175,11 @@ public class Player extends Entidade {
         som.emiteSom(estadoAtual);
     }
 
+    /**
+     * Executa a ação de usar o item atual do jogador.
+     * @param posX Posição x em que o item foi utilizado
+     * @param posY Posição y em que o item foi utilizado
+     */
     public void usaItem(int posX, int posY) {
         long tempoAtual = System.currentTimeMillis();
 
@@ -129,6 +198,9 @@ public class Player extends Entidade {
         tempoAnterior = tempoAtual;
     }
 
+    /**
+     * Recarrega, se possível, o item atual do jogador.
+     */
     public void recarregaItem() {
         if (estadoAtual != Estado.OCIOSO || !itemAtual.isRecarregavel()) {
             return;
@@ -143,6 +215,10 @@ public class Player extends Entidade {
         itemAtual.reproduzSom(estadoAtual);
     }
 
+    /**
+     * Disponibiliza o número do consumível do item para código externo.
+     * @return Retorna a quantidade do atributo consumível do item atual do jogador
+     */
     public int getQtdConsumivel() {
         if (itemAtual == null) {
             return -1;
@@ -151,6 +227,9 @@ public class Player extends Entidade {
         return itemAtual.getAtributoConsumivel();
     }
 
+    /**
+     * Chama os métodos de redesenho dos componenetes de janela do player.
+     */
     public void desenhaComponentes() {
         hudJogador.repaint();
         painelAnimacao.repaint();

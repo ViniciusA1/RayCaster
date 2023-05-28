@@ -1,4 +1,4 @@
-package com.projeto.raycaster;
+package com.raycaster.engine;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -14,7 +14,7 @@ import javax.swing.JOptionPane;
  *
  * @author vinicius
  */
-public class Mapa implements Guardar {
+public class Mapa {
     private String nomeMapa;
     private int[][] grid;
     private int limite;
@@ -98,7 +98,7 @@ public class Mapa implements Guardar {
         return aux;
     }
     
-    @Override
+    
     public void carregar() {
         File arquivoMapa = new File("maps" + File.separator + nomeMapa);
         Scanner leitor;
@@ -126,7 +126,6 @@ public class Mapa implements Guardar {
      * @author BrunoZara
      * @throws java.io.IOException
      */
-    @Override
     public void salvar() throws IOException{
         FileWriter out;
         String[] nomeMapaTXT = nomeMapa.split(".txt");
@@ -152,7 +151,6 @@ public class Mapa implements Guardar {
         out.close();       
     }
     
-    @Override
     public  void excluir(){
         String[] aux = nomeMapa.split(".txt");
         File arquivoMapa = new File("maps" + File.separator + aux[0] + ".txt");

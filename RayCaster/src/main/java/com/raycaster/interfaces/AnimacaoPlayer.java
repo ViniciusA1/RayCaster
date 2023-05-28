@@ -1,5 +1,9 @@
-package com.projeto.raycaster;
+package com.raycaster.interfaces;
 
+import com.raycaster.engine.Estado;
+import com.raycaster.itens.Item;
+import com.raycaster.entidades.Player;
+import com.raycaster.engine.Animacao;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import javax.swing.ImageIcon;

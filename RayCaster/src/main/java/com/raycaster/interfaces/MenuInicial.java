@@ -2,10 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Interface;
+package com.raycaster.interfaces;
 
-import com.projeto.raycaster.Engine;
-import com.projeto.raycaster.Mapa;
+import com.raycaster.engine.Engine;
+import com.raycaster.engine.Mapa;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;

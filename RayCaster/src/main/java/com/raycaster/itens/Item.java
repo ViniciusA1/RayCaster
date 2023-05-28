@@ -1,5 +1,9 @@
-package com.projeto.raycaster;
+package com.raycaster.itens;
 
+import com.raycaster.engine.Animacao;
+import com.raycaster.engine.Diretorio;
+import com.raycaster.engine.EfeitosSonoros;
+import com.raycaster.engine.Estado;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
