@@ -47,6 +47,10 @@ public class Player extends Entidade {
         estadoAtual = Estado.OCIOSO;
         som = new EfeitosSonoros("player");
     }
+    
+    public Player() {
+        
+    }
 
     /**
      * "Seta" um novo painel de animação para os itens do jogador.

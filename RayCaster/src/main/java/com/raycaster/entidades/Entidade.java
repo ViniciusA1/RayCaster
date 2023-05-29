@@ -26,6 +26,11 @@ public abstract class Entidade {
         
         hitbox = new Hitbox(x, y, largura);
     }
+    
+    public Entidade() {
+        hitbox = null;
+        FOG = 0;
+    }
 
     public double getX() {
         return hitbox.getX();

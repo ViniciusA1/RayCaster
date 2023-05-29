@@ -71,7 +71,8 @@ public class Engine extends JPanel implements ActionListener {
      * do player, armas e keybindings.
      */
     private void configInicial() {
-        jogador = new Player(100, 400, 300, 16, 2, 60, 500);
+        //jogador = new Player(100, 400, 300, 16, 2, 60, 500);
+        jogador = ArquivoUtils.criaObjeto("dados/player/player", Player.class);
         mapaAtual = new Mapa("lobby.txt", 20);
         mapaAtual.carregar();
 
@@ -248,11 +249,28 @@ public class Engine extends JPanel implements ActionListener {
             }
 
             // Calcula o valor real da distancia percorrida pelo raio que atingiu a parede primeiro
-            double distanciaFinal = (eixo == 0) ? (distanciaX - deltaX) : (distanciaY - deltaY);
-
+            // e sua posição na coordenada x
+            
+            double paredeX;
+            double distanciaFinal;
+            
+            if (eixo == 0) {
+                distanciaFinal = distanciaX - deltaX;
+                paredeX = jogador.getY() + distanciaFinal * sinRaio;
+            }
+            else {
+                distanciaFinal = distanciaY - deltaY;
+                paredeX = jogador.getX() + distanciaFinal * cosRaio;
+            }
+            
+                                    
+            paredeX /= tamanhoBloco;
+            paredeX -= Math.floor(paredeX);
+            
             // Fator de correção para o efeito fisheye (olho de peixe)
             distanciaFinal *= Math.cos(anguloRaio - jogador.getAngulo());
             
+            // Determina o fator da "neblina" que deve ser aplicado pela distancia encontrada
             if(distanciaFinal > distanciaMaxima)
                 distanciaFinal = distanciaMaxima;
             
@@ -279,18 +297,6 @@ public class Engine extends JPanel implements ActionListener {
             // Determina o tamanho da textura a ser ajustado
             int tamanhoTextura = 128;
 
-            // Determina a posição no eixo x em que a parede foi atingida
-            double paredeX;
-            
-            if (eixo == 0)
-                paredeX = jogador.getY() + distanciaFinal * sinRaio;
-            else
-                paredeX = jogador.getX() + distanciaFinal * cosRaio;
-            
-                                    
-            paredeX /= tamanhoBloco;
-            paredeX -= Math.floor(paredeX);
-
             // Valor real da coluna de textura que deve ser percorrida
             int texturaX = (int) (paredeX * tamanhoTextura);
 
@@ -314,13 +320,13 @@ public class Engine extends JPanel implements ActionListener {
             }
             
 
-            for(int j = 0; j < comecoParede; j++) {
+            /*for(int j = 0; j < comecoParede; j++) {
                 frameBuffer[j * SCREENWIDTH + i] = transformaCor(corTeto, 1);
             }
             
             for(int j = fimParede; j < SCREENHEIGHT; j++) {
                 frameBuffer[j * SCREENWIDTH + i] = transformaCor(corChao, 1);
-            }
+            }*/
         }
 
         // Usa as cores RGB acumuladas no frameBuffer para criar uma imagem e renderiza-la

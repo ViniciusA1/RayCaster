@@ -18,6 +18,7 @@ public class MouseInput extends MouseAdapter {
     private int centroX;
     private int centroY;
     private final Player jogador;
+    private boolean isLeftClick;
 
     /**
      * Construtor do controlador, recebe o jogador associado ao evento e a 
@@ -28,6 +29,7 @@ public class MouseInput extends MouseAdapter {
     public MouseInput(Player jogador, double sensibilidade) {
         this.jogador = jogador;
         this.sensibilidade = sensibilidade;
+        this.isLeftClick = false;
     }
     
     /**
@@ -35,9 +37,11 @@ public class MouseInput extends MouseAdapter {
      * @param e Evento gerado pelo mouse
      */
     @Override
-    public void mouseClicked(MouseEvent e) {
-        if(e.getButton() == MouseEvent.BUTTON1)
+    public void mousePressed(MouseEvent e) {
+        if(e.getButton() == MouseEvent.BUTTON1) {
+            isLeftClick = true;
             jogador.usaItem(e.getX(), e.getY());
+        }
         
         mouseMoved(e);
     }
@@ -48,10 +52,15 @@ public class MouseInput extends MouseAdapter {
      */
     @Override
     public void mouseDragged(MouseEvent e) {
-        if(e.getButton() == MouseEvent.BUTTON1)
+        if(isLeftClick)
             jogador.usaItem(e.getX(), e.getY());
         
         mouseMoved(e);
+    }
+    
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        isLeftClick = false;
     }
     
     /**
