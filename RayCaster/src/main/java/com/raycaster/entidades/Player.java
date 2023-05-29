@@ -6,7 +6,9 @@ import com.raycaster.engine.EfeitosSonoros;
 import com.raycaster.engine.Estado;
 import com.raycaster.interfaces.HUD;
 import com.raycaster.itens.Item;
-import com.raycaster.engine.Mapa;
+import com.raycaster.mapa.Mapa;
+import com.raycaster.itens.Arma;
+import java.util.List;
 
 /**
  * Classe que guarda todos os atributos e métodos do jogador principal do jogo.
@@ -18,7 +20,7 @@ public class Player extends Entidade {
     private double pitch;
     private double taxaPitch;
     private long tempoAnterior;
-    private Inventario<Item> mochila;
+    private Inventario<Arma> mochila;
     private Item itemAtual;
     private AnimacaoPlayer painelAnimacao;
     private HUD hudJogador;
@@ -30,11 +32,14 @@ public class Player extends Entidade {
      * @param vidaMaxima Vida máxima do jogador
      * @param x Posição inicial em x do jogador
      * @param y Posição inicial em y do jogador
+     * @param largura Largura da hitbox do jogador
      * @param velocidade Velocidade do jogador
      * @param fov Campo de visão do jogador
+     * @param FOG Distância máxima de visão do jogador
      */
-    public Player(double vidaMaxima, double x, double y, double velocidade, int fov) {
-        super(vidaMaxima, x, y, velocidade, fov);
+    public Player(double vidaMaxima, double x, double y, double largura, double velocidade, int fov, double FOG) {
+        super(vidaMaxima, x, y, largura, velocidade, fov, FOG);
+        
         angulo = 0;
         pitch = 0;
         taxaPitch = 0.5;
@@ -129,9 +134,10 @@ public class Player extends Entidade {
         boolean colidiuY = false;
         double novoX = posX + getX();
         double novoY = posY + getY();
+        double tamanho = getLargura();
         
-        for (double i = novoX - getWidth(); i <= novoX + getWidth(); i++) {
-            for (double j = novoY - getHeight(); j <= novoY + getHeight(); j++) {
+        for (double i = novoX - tamanho; i <= novoX + tamanho; i++) {
+            for (double j = novoY - tamanho; j <= novoY + tamanho; j++) {
                 if (mapaAtual.checaColisao(i, j)) {
                     colidiuY |= !mapaAtual.checaColisao(i, getY());
                     colidiuX |= !mapaAtual.checaColisao(getX(), j);
@@ -139,18 +145,24 @@ public class Player extends Entidade {
             }
         }
         
+        
         if(!colidiuX)
             moveX(posX);
+        
         if(!colidiuY)
             moveY(posY);
     }
 
     /**
-     * Adiciona um novo item no inventário do jogador.
-     * @param novoItem 
+     * Adiciona uma nova arma no inventário do jogador. 
+     * @param novaArma Nova arma a ser adicionada
      */
-    public void adicionaItem(Item novoItem) {
-        mochila.guardaObjeto(novoItem);
+    public void adicionaArma(Arma novaArma) {
+        mochila.guardaObjeto(novaArma);
+    }
+    
+    public void adicionaArma(List<Arma> novasArmas) {
+        mochila.guardaObjeto(novasArmas);
     }
 
     /**

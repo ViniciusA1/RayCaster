@@ -4,13 +4,13 @@ package com.raycaster.itens;
  *
  * @author vinic
  */
-public class ArmaCurta extends Item {
+public class ArmaCurta extends Arma {
     private final int durabilidadeMaxima;
     private int durabilidadeAtual;
     private static final int taxaQuebra = 1;
 
-    public ArmaCurta(String nome, int durabilidadeMaxima, long cooldown) {
-        super(nome, cooldown);
+    public ArmaCurta(String nome, int durabilidadeMaxima, long cooldown, double dano) {
+        super(nome, cooldown, dano);
         this.durabilidadeMaxima = durabilidadeMaxima;
         this.durabilidadeAtual = durabilidadeMaxima;
     }

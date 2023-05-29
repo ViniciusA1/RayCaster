@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
  * @author Bruno Zara
  */
 public class Animacao {
-    private ImageIcon sprites;
+    private final ImageIcon sprites;
     private long velocidadeFrame;
     private int quantidadeFrames;
     private int frameWidth;
@@ -25,7 +25,7 @@ public class Animacao {
         String nomeDeBusca = Diretorio.convertePath(caminho, estadoAnimacao);
         
         sprites = ArquivoUtils.leImagem(nomeDeBusca);
-        Properties dados = ArquivoUtils.leDados(nomeDeBusca);
+        Properties dados = ArquivoUtils.lePropriedade(nomeDeBusca);
 
         if (dados != null) {
             this.frameWidth = Integer.parseInt(dados.getProperty("frameWidth"));

@@ -1,8 +1,5 @@
 package com.raycaster.engine;
 
-import com.raycaster.engine.Estado;
-import com.raycaster.engine.ArquivoUtils;
-import com.raycaster.engine.Diretorio;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;

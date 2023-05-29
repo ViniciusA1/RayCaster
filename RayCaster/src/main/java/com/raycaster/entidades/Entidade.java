@@ -12,17 +12,19 @@ public abstract class Entidade {
     private final Hitbox hitbox;
     private double velocidade;
     private double fov;
+    private final double FOG;
     private double vidaMaxima;
     private double vidaAtual;
 
-    public Entidade(double vidaMaxima, double x, double y, double velocidade, double fov) {
+    public Entidade(double vidaMaxima, double x, double y, double largura, double velocidade, double fov, double FOG) {
         this.vidaMaxima = vidaMaxima;
         this.vidaAtual = vidaMaxima;
         this.velocidade = velocidade;
         
         this.fov = Math.toRadians(fov);
+        this.FOG = FOG;
         
-        hitbox = new Hitbox(x, y, 16, 16);
+        hitbox = new Hitbox(x, y, largura);
     }
 
     public double getX() {
@@ -33,12 +35,8 @@ public abstract class Entidade {
         return hitbox.getY();
     }
     
-    public double getWidth() {
-        return hitbox.getWidth();
-    }
-    
-    public double getHeight() {
-        return hitbox.getHeight();
+    public double getLargura() {
+        return hitbox.getLargura();
     }
 
     public double getVelocidade() {
@@ -47,6 +45,10 @@ public abstract class Entidade {
     
     public double getFov() {
         return fov;
+    }
+    
+    public double getFOG() {
+        return FOG;
     }
     
     public double getVidaMaxima() {

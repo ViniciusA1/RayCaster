@@ -7,14 +7,12 @@ package com.raycaster.entidades;
 public class Hitbox {
     private double x;
     private double y;
-    private final double width;
-    private final double height;
+    private final double largura;
 
-    public Hitbox(double x, double y, double width, double height) {
+    public Hitbox(double x, double y, double largura) {
         this.x = x;
         this.y = y;
-        this.width = width;
-        this.height = height;
+        this.largura = largura;
     }
 
     public double getX() {
@@ -25,12 +23,8 @@ public class Hitbox {
         return y;
     }
 
-    public double getWidth() {
-        return width;
-    }
-
-    public double getHeight() {
-        return height;
+    public double getLargura() {
+        return largura;
     }
 
     public void setX(double dx) {

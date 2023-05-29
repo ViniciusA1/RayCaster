@@ -1,11 +1,13 @@
 package com.raycaster.engine;
 
 import com.raycaster.interfaces.AnimacaoPlayer;
-import com.raycaster.itens.ArmaCurta;
-import com.raycaster.itens.ArmaLonga;
 import com.raycaster.interfaces.HUD;
-import com.raycaster.itens.Item;
 import com.raycaster.entidades.Player;
+import com.raycaster.itens.Arma;
+import com.raycaster.mapa.Mapa;
+
+
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -14,6 +16,7 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -37,6 +40,7 @@ public class Engine extends JPanel implements ActionListener {
     private KeyInput keyHandler;
     private MouseInput mouseHandler;
     private int[][] textura;
+    private Clip musicaBackground;
 
     /**
      * Construtor da engine, recebe o tamanho horizontal e vertical da JFrame
@@ -59,7 +63,7 @@ public class Engine extends JPanel implements ActionListener {
         addMouseMotionListener(mouseHandler);
         setFocusable(true);
 
-        //carregaMusicaPrincipal();
+        carregaMusicaPrincipal();
     }
 
     /**
@@ -67,17 +71,15 @@ public class Engine extends JPanel implements ActionListener {
      * do player, armas e keybindings.
      */
     private void configInicial() {
-        jogador = new Player(100, 400, 300, 2, 60);
+        jogador = new Player(100, 400, 300, 16, 2, 60, 500);
         mapaAtual = new Mapa("lobby.txt", 20);
         mapaAtual.carregar();
 
         mouseHandler = new MouseInput(jogador, 0.001);
 
-        Item pistola = new ArmaLonga("pistol", 100, 100, 30, 500);
-        Item faca = new ArmaCurta("knife", 100, 1000);
-
-        jogador.adicionaItem(pistola);
-        jogador.adicionaItem(faca);
+        List<Arma> armas = ArquivoUtils.leItens(Diretorio.DADOS_ITENS, Arma.class);
+        
+        jogador.adicionaArma(armas);
 
         HUD hudJogador = new HUD(jogador);
         hudJogador.setBounds(0, SCREENHEIGHT - 100, SCREENWIDTH, 100);
@@ -107,6 +109,7 @@ public class Engine extends JPanel implements ActionListener {
         keyHandler.adicionaKey(KeyEvent.VK_S, () -> jogador.move(0, -1, mapaAtual));
         keyHandler.adicionaKey(KeyEvent.VK_D, () -> jogador.move(Math.PI / 2, 1, mapaAtual));
         keyHandler.adicionaKey(KeyEvent.VK_R, () -> jogador.recarregaItem());
+        keyHandler.adicionaKey(KeyEvent.VK_ESCAPE, () -> this.fechaJogo());
 
         keyHandler.adicionaKey(KeyEvent.VK_1, () -> jogador.sacaItem(0));
         keyHandler.adicionaKey(KeyEvent.VK_2, () -> jogador.sacaItem(1));
@@ -116,11 +119,11 @@ public class Engine extends JPanel implements ActionListener {
      * Carrega todas as texturas das paredes do jogo armazenadas no grid.
      */
     private void carregaTexturas() {
-        textura = new int[1][64 * 64];
+        textura = new int[1][128 * 128];
         try {
-            BufferedImage imagem = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "01 - redbrick.png"));
+            BufferedImage imagem = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "03 - wall.png"));
             imagem.getRGB(0, 0, imagem.getWidth(), imagem.getHeight(),
-                    textura[0], 0, 64);
+                    textura[0], 0, 128);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -130,7 +133,7 @@ public class Engine extends JPanel implements ActionListener {
      * Carrega a música principal do jogo que ficará em loop durante a execução.
      */
     private void carregaMusicaPrincipal() {
-        File arquivoAudio = new File("sons" + File.separator + "background.wav");
+        File arquivoAudio = new File(Diretorio.SONS + "background.wav");
         AudioInputStream audioStream;
 
         try {
@@ -139,7 +142,6 @@ public class Engine extends JPanel implements ActionListener {
             return;
         }
 
-        Clip musicaBackground;
         try {
             musicaBackground = AudioSystem.getClip();
         } catch (LineUnavailableException ex) {
@@ -166,7 +168,7 @@ public class Engine extends JPanel implements ActionListener {
         super.paintComponent(g);
 
         // Fator que representa qual lado da parede foi atingido (vertical ou horizontal)
-        int[] cor = new int[1];
+        int eixo;
         
         // Protótipo de "framebuffer" utilizado para acelerar a renderização
         int[] frameBuffer = new int[SCREENHEIGHT * SCREENWIDTH];
@@ -180,6 +182,12 @@ public class Engine extends JPanel implements ActionListener {
         // Fator de projeção utilizado para adequar as paredes ao monitor
         double fatorProjecao = (SCREENWIDTH / (2 * Math.tan(jogador.getFov() / 2.0)));
 
+        // Distancia de visão máxima permitida pelo jogo
+        double distanciaMaxima = jogador.getFOG();
+        
+        // Definição das cores do teto e chão
+        int corTeto = new Color(20, 20, 20).getRGB();
+        int corChao = new Color(64, 64, 64).getRGB();
         
         // Cálculo e renderização de todas as colunas de pixel da tela
         for (int i = 0; i < SCREENWIDTH; i++) {
@@ -226,11 +234,11 @@ public class Engine extends JPanel implements ActionListener {
                 if (distanciaX < distanciaY) {
                     distanciaX += deltaX;
                     posX += direcaoX;
-                    cor[0] = 0;
+                    eixo = 0;
                 } else {
                     distanciaY += deltaY;
                     posY += direcaoY;
-                    cor[0] = 1;
+                    eixo = 1;
                 }
 
                 // Checa a colisão do raio com a parede
@@ -240,10 +248,15 @@ public class Engine extends JPanel implements ActionListener {
             }
 
             // Calcula o valor real da distancia percorrida pelo raio que atingiu a parede primeiro
-            double distanciaFinal = (cor[0] == 0) ? (distanciaX - deltaX) : (distanciaY - deltaY);
+            double distanciaFinal = (eixo == 0) ? (distanciaX - deltaX) : (distanciaY - deltaY);
 
             // Fator de correção para o efeito fisheye (olho de peixe)
             distanciaFinal *= Math.cos(anguloRaio - jogador.getAngulo());
+            
+            if(distanciaFinal > distanciaMaxima)
+                distanciaFinal = distanciaMaxima;
+            
+            double fatorFOG = 1.0 - (distanciaFinal / distanciaMaxima);
 
             // Calcula os valores da altura da parede, seu começo e fim no eixo y
             int alturaParede = (int) ((tamanhoBloco / distanciaFinal) * fatorProjecao);
@@ -256,23 +269,25 @@ public class Engine extends JPanel implements ActionListener {
             int fimParede = alturaParede + comecoParede;
             
             // Verifica se o indice da parede sai do limite da tela
-            if(fimParede > SCREENHEIGHT)
-                fimParede = SCREENHEIGHT;
+            if(fimParede >= SCREENHEIGHT)
+                fimParede = SCREENHEIGHT - 1;
+            
 
             // Busca o id da textura com base no seu valor no mapa
             int idTextura = mapaAtual.getValor(posX, posY) - 1;
             
             // Determina o tamanho da textura a ser ajustado
-            int tamanhoTextura = 64;
+            int tamanhoTextura = 128;
 
             // Determina a posição no eixo x em que a parede foi atingida
             double paredeX;
             
-            if (cor[0] == 0)
+            if (eixo == 0)
                 paredeX = jogador.getY() + distanciaFinal * sinRaio;
             else
                 paredeX = jogador.getX() + distanciaFinal * cosRaio;
             
+                                    
             paredeX /= tamanhoBloco;
             paredeX -= Math.floor(paredeX);
 
@@ -280,7 +295,7 @@ public class Engine extends JPanel implements ActionListener {
             int texturaX = (int) (paredeX * tamanhoTextura);
 
             // 
-            if ((cor[0] == 0 && cosRaio > 0) || (cor[0] == 1 && sinRaio < 0)) {
+            if ((eixo == 0 && cosRaio > 0) || (eixo == 1 && sinRaio < 0)) {
                 texturaX = tamanhoTextura - texturaX - 1;
             }
 
@@ -293,10 +308,18 @@ public class Engine extends JPanel implements ActionListener {
                 int texturaY = (int) posicaoTextura & (tamanhoTextura - 1);
                 posicaoTextura += variacao;
                 
-                int color = textura[idTextura][tamanhoTextura * texturaY + texturaX];
+                int corPixel = textura[idTextura][tamanhoTextura * texturaY + texturaX];
                 
-                if(cor[0] == 1) color = (color >> 1) & 8355711;
-                frameBuffer[y * SCREENWIDTH + i] = color;
+                frameBuffer[y * SCREENWIDTH + i] = transformaCor(corPixel, fatorFOG);
+            }
+            
+
+            for(int j = 0; j < comecoParede; j++) {
+                frameBuffer[j * SCREENWIDTH + i] = transformaCor(corTeto, 1);
+            }
+            
+            for(int j = fimParede; j < SCREENHEIGHT; j++) {
+                frameBuffer[j * SCREENWIDTH + i] = transformaCor(corChao, 1);
             }
         }
 
@@ -311,6 +334,14 @@ public class Engine extends JPanel implements ActionListener {
 
         // Renderiza o frame todo
         render2D.drawImage(frame, 0, 0, null);
+    }
+    
+    private int transformaCor(int cor, double fator) {
+        int red = (int) (((cor >> 16) & 255) * fator);
+        int green = (int) (((cor >> 8) & 255) * fator);
+        int blue = (int) ((cor & 255) * fator);
+                
+        return (red << 16) | (green << 8) | blue;
     }
 
     /**
@@ -328,5 +359,11 @@ public class Engine extends JPanel implements ActionListener {
      */
     private void update() {
         keyHandler.executaMetodo();
+    }
+    
+    private void fechaJogo() {
+        musicaBackground.stop();
+        //função pra fechar o painel
+        
     }
 }

@@ -34,4 +34,9 @@ public class Inventario<T extends Item> {
         if(getTamanhoOcupado() < tamanhoMaximo)
             objetos.add(novoObjeto);
     }
+    
+    public void guardaObjeto(List<T> novosObjetos) {
+        if(novosObjetos.size() <= tamanhoMaximo)
+            objetos = novosObjetos;
+    }
 }

@@ -4,14 +4,14 @@ package com.raycaster.itens;
  *
  * @author vinic
  */
-public class ArmaLonga extends Item {
+public class ArmaLonga extends Arma {
     private final int municaoMaxima;
     private int municaoAtual;
     private int tamanhoPente;
     private int balasNoPente;
 
-    public ArmaLonga(String nome, int municaoMaxima, int municaoAtual, int tamanhoPente, long cooldown) {
-        super(nome, cooldown);
+    public ArmaLonga(String nome, int municaoMaxima, int tamanhoPente, long cooldown, double dano) {
+        super(nome, cooldown, dano);
         this.municaoMaxima = municaoMaxima;
         this.municaoAtual = municaoMaxima / 2;
         this.tamanhoPente = tamanhoPente;

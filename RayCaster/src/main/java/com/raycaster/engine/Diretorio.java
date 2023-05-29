@@ -9,9 +9,11 @@ import java.io.File;
 public class Diretorio {
     public static final String MODELOS = "modelos" + File.separator;
     public static final String SONS = "sons" + File.separator;
+    public static final String DADOS = "dados" + File.separator;
     public static final String SPRITE_HUD = MODELOS + "hud" + File.separator;
     public static final String SPRITE_ITENS = MODELOS + "itens" + File.separator;
     public static final String TEXTURA_PAREDE = MODELOS + "paredes" + File.separator;
+    public static final String DADOS_ITENS = DADOS + "itens" + File.separator;
     
     private Diretorio() {}
     
