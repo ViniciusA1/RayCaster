@@ -139,7 +139,7 @@ public class MenuInicial {
             janela.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             janela.setResizable(false);
 
-            Engine game = new Engine(800, 600);
+            Engine game = new Engine(800, 600, janela);
 
             janela.add(game);
             janela.setLocationRelativeTo(null);
