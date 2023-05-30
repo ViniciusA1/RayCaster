@@ -5,15 +5,20 @@
 package com.raycaster.interfaces;
 import com.raycaster.mapa.MapGroup.ListData;
 import com.raycaster.mapa.Mapa;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -44,6 +49,63 @@ public class MapEditorMenu {
         
     }
     
+    public static void mapEditor(JFrame f){
+        Mapa mapa = mapas.get(0);
+        int[] x = new int[1];
+        int[] y = new int[1];
+        JPanel grid = new JPanel(){
+            @Override
+            public void paintComponent(Graphics g){
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(Color.BLACK);
+                g2.fillRect(0, 0, this.getWidth(), this.getHeight());
+                g2.translate(this.getWidth()/2, this.getHeight()/2);
+                Path2D path = new Path2D.Double();
+                
+                g2.setColor(Color.WHITE);
+                for(int i = 0; i <= mapa.getLimite(); i++){
+                    path.moveTo((-(mapa.getLimite()/2)*64) + i*64 + x[0], (-(mapa.getLimite()/2)*64) + y[0]);
+                    path.lineTo((-(mapa.getLimite()/2)*64) + i*64 + x[0], ((mapa.getLimite()/2)*64) + y[0]);
+                    path.closePath();
+                }
+                for(int i = 0; i <= mapa.getLimite(); i++){
+                    path.moveTo((-(mapa.getLimite()/2)*64) + x[0], (-(mapa.getLimite()/2)*64) + i*64 + y[0]);
+                    path.lineTo(((mapa.getLimite()/2)*64) + x[0], (-(mapa.getLimite()/2)*64) + i*64 + y[0]);
+                    path.closePath();
+                }
+                g2.draw(path);
+                
+                
+            }
+        };
+        grid.addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                x[0] = (int) e.getX() -x[0];
+                y[0] = (int) e.getY() -y[0];
+                grid.repaint();
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+
+            }
+        });
+        
+        JFrame editor = new JFrame("Editor de mapas");
+        editor.setSize(800, 600);
+        //JScrollPane scrollp = new JScrollPane(grid);
+        //JPanel painel = new JPanel();
+        //painel.setLayout(new BoxLayout(painel, 0));
+        //painel.add(scrollp);
+        editor.add(grid);
+        editor.addWindowListener(new event(f));
+        editor.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        editor.setVisible(true);
+        
+        
+    }
+    
     private static void mapEditorOp(JFrame f, ArrayList<BufferedImage> texturas){
         JFrame inicial = new JFrame("Editor de mapa");
         
@@ -65,7 +127,8 @@ public class MapEditorMenu {
         b2 = new JButton("Editar Mapa");
         b2.addActionListener((ActionEvent e) ->{
             //editor de mapa
-            naoImplementadoPopUp();
+            mapEditor(inicial);
+            //naoImplementadoPopUp();
         });
         linha2.setLayout(new BoxLayout(linha2, BoxLayout.X_AXIS));
         linha2.add(Box.createVerticalGlue());
@@ -300,6 +363,12 @@ public class MapEditorMenu {
 
         event(JFrame f){
             this.f = f;
+        }
+        
+        @Override
+        public void windowOpened(WindowEvent e){
+            if(f != null)
+                f.setVisible(false);
         }
 
         @Override
