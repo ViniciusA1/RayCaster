@@ -4,6 +4,8 @@
  */
 package com.raycaster.engine;
 
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +57,12 @@ public class Textura {
         return posY;
     }
     
+    public BufferedImage getRGB(){
+        BufferedImage imagem = new BufferedImage(this.getTamanho(), this.getTamanho(), BufferedImage.TYPE_INT_RGB);
+        imagem.setRGB(0, 0, this.getTamanho(), this.getTamanho(), this.getTextura(), 0, this.getTamanho());
+        return imagem;
+    }
+    
     
     
     
@@ -84,4 +92,14 @@ public class Textura {
         }
         return texturas;
     }
+    
+    public static Textura getTextura(ArrayList<Textura> texturas, int id){
+        for(Textura aux: texturas){
+            if(id == aux.getID()){
+                return aux;
+            }
+        }
+        return null;
+    }
+    
 }
