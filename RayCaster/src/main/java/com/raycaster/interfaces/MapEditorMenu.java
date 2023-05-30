@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Path2D;
@@ -55,6 +56,8 @@ public class MapEditorMenu {
     
     public static void mapEditor(JFrame f){
         ArrayList<Textura> texturas = Textura.carregaTexturas(new File("modelos" + File.separator + "paredes"));
+        double[] zoomFactor = new double[1];
+        zoomFactor[0] = 1;
         Mapa mapa = mapas.get(0);
         int[] x = new int[1];
         int[] y = new int[1];
@@ -70,13 +73,15 @@ public class MapEditorMenu {
                 g2.fillRect(0, 0, this.getWidth(), this.getHeight());
                 g2.translate(this.getWidth()/2, this.getHeight()/2);
                 Path2D path = new Path2D.Double();
-                for(int i = 0; i<mapa.getLimite() && this.getWidth()/2 <= Math.abs((mapa.getLimite()/2)*64 + i*64 + x[0]); i++){
-                    for(int j = 0 ; j<mapa.getLimite()  && this.getHeight()/2 <= Math.abs((mapa.getLimite()/2)*64 + j*64 + y[0]); j++){
+                int bloco = (int) (64 * zoomFactor[0]);
+                for(int i = 0; i<mapa.getLimite(); i++){
+                    for(int j = 0 ; j<mapa.getLimite(); j++){
                         int id = mapa.getID(i, j);
+                        if((this.getWidth()/2 <= Math.abs(((mapa.getLimite()/2) + i)*bloco + x[0]) && this.getHeight()/2 <= Math.abs(((mapa.getLimite()/2) + j) *bloco + y[0])))
                         if(id > 0){
                             Textura textura = Textura.getTextura(texturas, id);
                             BufferedImage imagem = textura.getRGB();
-                            g2.drawImage(imagem, (-(mapa.getLimite()/2)*64) + i*64 + x[0], (-(mapa.getLimite()/2)*64) + j*64 + y[0], 64, 64, null);
+                            g2.drawImage(imagem, (-(mapa.getLimite()/2) + i) *bloco + x[0], (-(mapa.getLimite()/2) + j)*bloco + y[0], bloco, bloco, null);
                         }
                     }
                 }
@@ -84,14 +89,14 @@ public class MapEditorMenu {
                 
                 g2.setColor(Color.WHITE);
                 for(int i = 0; i <= mapa.getLimite(); i++){
-                    path.moveTo((-(mapa.getLimite()/2)*64) + i*64 + x[0], (-(mapa.getLimite()/2)*64) + y[0]);
-                    path.lineTo((-(mapa.getLimite()/2)*64) + i*64 + x[0], ((mapa.getLimite()/2)*64) + y[0]);
+                    path.moveTo((-(mapa.getLimite()/2) + i)*bloco + x[0], (-(mapa.getLimite()/2)*bloco) + y[0]);
+                    path.lineTo((-(mapa.getLimite()/2) + i)*bloco + x[0], ((mapa.getLimite()/2)*bloco) + y[0]);
                     path.closePath();
                 }
                 
-                for(int i = 0; i <= mapa.getLimite(); i++){
-                    path.moveTo((-(mapa.getLimite()/2)*64) + x[0], (-(mapa.getLimite()/2)*64) + i*64 + y[0]);
-                    path.lineTo(((mapa.getLimite()/2)*64) + x[0], (-(mapa.getLimite()/2)*64) + i*64 + y[0]);
+                for(int i = 0; i <= mapa.getLimite() ; i++){
+                    path.moveTo((-(mapa.getLimite()/2)*bloco) + x[0], (-(mapa.getLimite()/2) + i)*bloco + y[0]);
+                    path.lineTo(((mapa.getLimite()/2)*bloco) + x[0], (-(mapa.getLimite()/2) + i)*bloco + y[0]);
                     path.closePath();
                 }
                 
@@ -125,9 +130,17 @@ public class MapEditorMenu {
                 anteriorX = e.getX();
                 anteriorY = e.getY();
             }
+            
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e){
+                int movimento = e.getWheelRotation();
+                zoomFactor[0] += 0.1 * movimento;
+                grid.repaint();
+            }
         };
         
         grid.addMouseListener(adaptador);
+        grid.addMouseWheelListener(adaptador);
         grid.addMouseMotionListener(adaptador);
         
         
