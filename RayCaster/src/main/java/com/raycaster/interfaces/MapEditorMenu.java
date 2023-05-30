@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
@@ -53,6 +54,7 @@ public class MapEditorMenu {
         Mapa mapa = mapas.get(0);
         int[] x = new int[1];
         int[] y = new int[1];
+        
         JPanel grid = new JPanel(){
             @Override
             public void paintComponent(Graphics g){
@@ -68,29 +70,47 @@ public class MapEditorMenu {
                     path.lineTo((-(mapa.getLimite()/2)*64) + i*64 + x[0], ((mapa.getLimite()/2)*64) + y[0]);
                     path.closePath();
                 }
+                
                 for(int i = 0; i <= mapa.getLimite(); i++){
                     path.moveTo((-(mapa.getLimite()/2)*64) + x[0], (-(mapa.getLimite()/2)*64) + i*64 + y[0]);
                     path.lineTo(((mapa.getLimite()/2)*64) + x[0], (-(mapa.getLimite()/2)*64) + i*64 + y[0]);
                     path.closePath();
                 }
+                
                 g2.draw(path);
                 
                 
             }
         };
-        grid.addMouseMotionListener(new MouseMotionListener() {
+
+        // método novo para mover a grid
+        MouseAdapter adaptador = new MouseAdapter() {
+            private int anteriorX;
+            private int anteriorY;
+            
             @Override
             public void mouseDragged(MouseEvent e) {
-                x[0] = (int) e.getX() -x[0];
-                y[0] = (int) e.getY() -y[0];
+                int atualX = e.getX();
+                int atualY = e.getY();
+                             
+                x[0] += (atualX - anteriorX);
+                y[0] += (atualY - anteriorY);
+                
+                anteriorX = atualX;
+                anteriorY = atualY;
+                
                 grid.repaint();
             }
 
             @Override
             public void mouseMoved(MouseEvent e) {
-
+                anteriorX = e.getX();
+                anteriorY = e.getY();
             }
-        });
+        };
+        
+        grid.addMouseListener(adaptador);
+        grid.addMouseMotionListener(adaptador);
         
         JFrame editor = new JFrame("Editor de mapas");
         editor.setSize(800, 600);

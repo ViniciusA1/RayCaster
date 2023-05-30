@@ -130,11 +130,15 @@ public class Engine extends JPanel implements ActionListener {
      * Carrega todas as texturas das paredes do jogo armazenadas no grid.
      */
     private void carregaTexturas() {
-        textura = new int[1][128 * 128];
+        textura = new int[3][128 * 128];
         try {
-            BufferedImage imagem = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "03 - wall.png"));
-            imagem.getRGB(0, 0, imagem.getWidth(), imagem.getHeight(),
-                    textura[0], 0, 128);
+            BufferedImage parede = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "01 - wall.png"));
+            BufferedImage chao = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "02 - floor.png"));
+            BufferedImage teto = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "03 - ceil.png"));
+            
+            parede.getRGB(0, 0, 128, 128, textura[0], 0, 128);
+            chao.getRGB(0, 0, 128, 128, textura[1], 0, 128);
+            teto.getRGB(0, 0, 128, 128, textura[2], 0, 128);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -365,7 +369,7 @@ public class Engine extends JPanel implements ActionListener {
         
         // Posições do raio mínimo (mais a esquerda) e do raio máximo (mais a direita).
         // Ambos representam os limites mínimos e máximos do teto/chão a ser renderizado
-        double angle = playerAngulo - playerFOV / 2.0;
+        double angle = playerAngulo - playerFOV / 2;
         double cosRaioMinimo = Math.cos(angle);
         double sinRaioMinimo = Math.sin(angle);
         double cosRaioMaximo = Math.cos(angle + playerFOV);
@@ -391,8 +395,8 @@ public class Engine extends JPanel implements ActionListener {
             double incrementoY = distanciaLinha * (sinRaioMaximo - sinRaioMinimo) / SCREENWIDTH;
 
             // Posições nas coordenadas x e y da posição atual no teto e chão
-            double posX = playerX / tamanhoBloco + distanciaLinha * cosRaioMinimo;
-            double posY = playerY / tamanhoBloco + distanciaLinha * sinRaioMinimo;
+            double posX = (playerX / tamanhoBloco) + distanciaLinha * cosRaioMinimo;
+            double posY = (playerY / tamanhoBloco) + distanciaLinha * sinRaioMinimo;
 
             // Percorre, em cada linha, os pixels da coluna para aplicar 
             // a cor da textura adequada
@@ -412,8 +416,8 @@ public class Engine extends JPanel implements ActionListener {
                 posY += incrementoY;
 
                 // Índices das texturas para teto e chão
-                int chaoID = 0;
-                int tetoID = 0;
+                int chaoID = 1;
+                int tetoID = 2;
                 int corPixel;
 
                 // Aplica as cores das texturas em ambas as figuras
