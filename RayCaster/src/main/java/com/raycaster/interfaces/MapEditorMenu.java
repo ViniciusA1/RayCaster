@@ -46,10 +46,10 @@ import javax.swing.ListSelectionModel;
 public class MapEditorMenu {
     private static ArrayList<Mapa> mapas;
     
-    public static void inicia(JFrame f, ArrayList<BufferedImage> texturas){
+    public static void inicia(JFrame f){
         mapas = Mapa.carregarMapList();
         SwingUtilities.invokeLater(() -> {
-            mapEditorOp(f, texturas);
+            mapEditorOp(f);
         });
         
     }
@@ -156,7 +156,7 @@ public class MapEditorMenu {
         
     }
     
-    private static void mapEditorOp(JFrame f, ArrayList<BufferedImage> texturas){
+    private static void mapEditorOp(JFrame f){
         JFrame inicial = new JFrame("Editor de mapa");
         
         inicial.setSize(200, 200);
@@ -167,7 +167,7 @@ public class MapEditorMenu {
         b1 = new JButton("Criar Novo Mapa");
         b1.addActionListener((ActionEvent e) -> {
             inicial.setVisible(false);
-            criarMapa(inicial, texturas);
+            criarMapa(inicial);
         });
         linha1.setLayout(new BoxLayout(linha1, BoxLayout.X_AXIS));
         linha1.add(Box.createVerticalGlue());
@@ -221,7 +221,7 @@ public class MapEditorMenu {
     }
     
     
-    private static void criarMapa(JFrame f, ArrayList<BufferedImage> texturas){
+    private static void criarMapa(JFrame f){
         JFrame janela = new JFrame("Criar novo mapa");
         janela.addWindowListener(new event(f));
         janela.setDefaultCloseOperation(janela.DISPOSE_ON_CLOSE);
@@ -404,23 +404,43 @@ public class MapEditorMenu {
         exclui.setVisible(true);
     }
     
-    private static void naoImplementadoPopUp(){
-        JOptionPane.showMessageDialog(null, "Essa opção ainda não foi implementada");
-    }
     
+    /**
+     * Classe auxiliar que serve para ler os eventos da janela e executar comandos dependendo da ação tomada
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
     static class event extends WindowAdapter{
         JFrame f;
 
+        /**
+         * Contrutor do evento 
+         * @param f referencia da janela anterior
+         * @author Vinicius Augusto
+         * @author Bruno Zara
+         */
         event(JFrame f){
             this.f = f;
         }
         
+        /**
+         * Metodo executado quando a janela atual é aberta
+         * @param e
+         * @author Vinicius Augusto
+         * @author Bruno Zara
+         */
         @Override
         public void windowOpened(WindowEvent e){
             if(f != null)
                 f.setVisible(false);
         }
 
+        /**
+         * Metodo executado quando a janela atual é fechada
+         * @param e 
+         * @author Vinicius Augusto
+         * @author Bruno Zara
+         */
         @Override
         public void windowClosed(WindowEvent e){
             if(f == null){

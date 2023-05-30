@@ -26,12 +26,21 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 /**
- *
- * @author bruno
+ * Classe que cria o menu inicial
+ * 
+ * @author Vinicius Augusto
+ * @author Bruno Zara
  */
 public class MenuInicial {
     private static BufferedImage imagem;
-    private static ArrayList<BufferedImage> texturas;
+    //private static ArrayList<BufferedImage> texturas;
+    
+    /**
+     * Método para iniciar o jogo em uma thread apropriada
+     * 
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
     public static void inicia(){
         try {
             imagem = lerImagem("ImgemInicial.png");
@@ -43,13 +52,18 @@ public class MenuInicial {
             JOptionPane.showMessageDialog(null, "Não foi possível ler o arquivo " + "parede.JPG" + ".", "Visualizador", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        carregarTexturas();
+        //carregarTexturas();
         SwingUtilities.invokeLater(() -> {
             MenuInicial();
         });
         
     }
     
+    /**
+     * Metodo que cria e mostra a interface grafica responsavel pelo menu inicial
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
     private static void MenuInicial(){
         JFrame inicial = new JFrame("Menu inicial");
         JPanel coluna = new JPanel();
@@ -79,7 +93,7 @@ public class MenuInicial {
         b1 = new JButton("Editor de mapas");
         b1.addActionListener((ActionEvent e) -> {
             inicial.setVisible(false);
-            MapEditorMenu.inicia(inicial, texturas);
+            MapEditorMenu.inicia(inicial);
         });
 //        linha1.setLayout(new BoxLayout(linha1, BoxLayout.X_AXIS));
 //        linha1.add(Box.createVerticalGlue());
@@ -131,6 +145,12 @@ public class MenuInicial {
         inicial.setVisible(true);
     }
     
+    /**
+     * Metodo que inicia o jogo
+     * @param f Janela anterior que vai ser reaberta quando o jogo fechar
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
     private static void jogar(JFrame f){
         JFrame janela = new JFrame();
             janela.setTitle("RayCaster");
@@ -146,24 +166,46 @@ public class MenuInicial {
             janela.setVisible(true);
     }
     
-    private static void carregarTexturas(){
-        texturas = new ArrayList<>();
-        File f = new File("modelos" + File.separator + "paredes");
-        File[] imageFiles = f.listFiles();
-        for(File aux: imageFiles){
-            try{
-                texturas.add(lerImagem(aux));
-            }
-            catch(IOException e){
-                System.exit(1);
-            }
-        }
-    }
+//    private static void carregarTexturas(){
+//        texturas = new ArrayList<>();
+//        File f = new File("modelos" + File.separator + "paredes");
+//        File[] imageFiles = f.listFiles();
+//        for(File aux: imageFiles){
+//            try{
+//                texturas.add(lerImagem(aux));
+//            }
+//            catch(IOException e){
+//                System.exit(1);
+//            }
+//        }
+//    }
     
+    /**
+     * Metodo para Abrir uma imagem
+     * 
+     * @param s uma String com o diretorio do arquivo da imagem
+     * @return  BufferedImage contendo a imagem que esta no diretorio especificado ou null se o diretorio estar vazio
+     * @throws FileNotFoundException
+     * @throws IOException 
+     * 
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
     private static BufferedImage lerImagem(String s) throws FileNotFoundException, IOException {
         return lerImagem(new File(s));
     }
 
+    /**
+     * Metodo para Abrir uma imagem
+     * 
+     * @param s uma String com o diretorio do arquivo da imagem
+     * @return  BufferedImage contendo a imagem que esta no diretorio especificado ou null se o diretorio estar vazio
+     * @throws FileNotFoundException
+     * @throws IOException 
+     * 
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
     private static BufferedImage lerImagem(File f) throws FileNotFoundException, IOException {
         if (!f.exists()) throw new FileNotFoundException();
         return ImageIO.read(f);
