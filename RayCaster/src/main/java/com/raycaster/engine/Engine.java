@@ -12,6 +12,8 @@ import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +24,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -42,14 +45,16 @@ public class Engine extends JPanel implements ActionListener {
     private MouseInput mouseHandler;
     private int[][] textura;
     private Clip musicaBackground;
+    private JFrame janela;
 
     /**
      * Construtor da engine, recebe o tamanho horizontal e vertical da JFrame
      *
      * @param width Comprimento horizontal da tela
      * @param height Comprimento vertical da tela
+     * @param janela a janela a que esse componente esta associado
      */
-    public Engine(int width, int height) {
+    public Engine(int width, int height, JFrame janela) {
         this.SCREENWIDTH = width;
         this.SCREENHEIGHT = height;
         setLayout(null);
@@ -66,6 +71,9 @@ public class Engine extends JPanel implements ActionListener {
         setFocusable(true);
 
         carregaMusicaPrincipal();
+        
+        this.janela = janela;
+        janela.addWindowListener(new desligaSom(musicaBackground));
     }
 
     /**
@@ -451,8 +459,31 @@ public class Engine extends JPanel implements ActionListener {
     }
 
     private void fechaJogo() {
-        musicaBackground.stop();
+        //musicaBackground.stop();
+        janela.dispose();
         //função pra fechar o painel
 
+    }
+    
+    static class desligaSom extends WindowAdapter{
+        Clip c;
+
+        desligaSom(Clip c){
+            this.c = c;
+        }
+        
+        @Override
+        public void windowOpened(WindowEvent e){
+            if(c != null)
+                c.start();
+        }
+
+        @Override
+        public void windowClosed(WindowEvent e){
+            if(c == null){
+                System.exit(0);
+            }
+            c.stop();
+        }
     }
 }
