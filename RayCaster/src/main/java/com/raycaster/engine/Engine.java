@@ -6,7 +6,6 @@ import com.raycaster.entidades.Player;
 import com.raycaster.itens.Arma;
 import com.raycaster.mapa.Mapa;
 
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -28,10 +27,12 @@ import javax.swing.Timer;
 
 /**
  * Classe que guarda todos os atributos e métodos do motor gŕafico do jogo.
+ *
  * @author Vinicius Augusto
  * @author Bruno Zara
  */
 public class Engine extends JPanel implements ActionListener {
+
     private final int SCREENWIDTH;
     private final int SCREENHEIGHT;
     private final Timer gameTimer;
@@ -44,6 +45,7 @@ public class Engine extends JPanel implements ActionListener {
 
     /**
      * Construtor da engine, recebe o tamanho horizontal e vertical da JFrame
+     *
      * @param width Comprimento horizontal da tela
      * @param height Comprimento vertical da tela
      */
@@ -67,8 +69,8 @@ public class Engine extends JPanel implements ActionListener {
     }
 
     /**
-     * Aplica as configurações iniciais ao jogo, incluindo configurações
-     * do player, armas e keybindings.
+     * Aplica as configurações iniciais ao jogo, incluindo configurações do
+     * player, armas e keybindings.
      */
     private void configInicial() {
         //jogador = new Player(100, 400, 300, 16, 2, 60, 500);
@@ -79,7 +81,7 @@ public class Engine extends JPanel implements ActionListener {
         mouseHandler = new MouseInput(jogador, 0.001);
 
         List<Arma> armas = ArquivoUtils.leItens(Diretorio.DADOS_ITENS, Arma.class);
-        
+
         jogador.adicionaArma(armas);
 
         HUD hudJogador = new HUD(jogador);
@@ -160,40 +162,50 @@ public class Engine extends JPanel implements ActionListener {
     }
 
     /**
-     * Renderiza todos os componentes associados a tela (JPanel) principal do jogo,
-     * incluindo o cálculo e uso efetivo do raycasting.
+     * Renderiza todos os componentes associados a tela (JPanel) principal do
+     * jogo, incluindo o cálculo e uso efetivo do raycasting.
+     *
      * @param g Componente gráfico utilizado pela JPanel para renderizar a tela
      */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        // Coleta alguns dados do player para evitar overhead de métodos no loop
+        double playerAngulo = jogador.getAngulo();
+        double playerX = jogador.getX();
+        double playerY = jogador.getY();
+        double playerFOV = jogador.getFov();
+
+        // Distancia de visão máxima permitida pelo jogo
+        double distanciaMaxima = jogador.getFOG();
+
+        // Guarda o tamanho dos blocos do mapa
+        int tamanhoBloco = mapaAtual.getTamanhoBloco();
+
         // Fator que representa qual lado da parede foi atingido (vertical ou horizontal)
         int eixo;
-        
+
         // Protótipo de "framebuffer" utilizado para acelerar a renderização
         int[] frameBuffer = new int[SCREENHEIGHT * SCREENWIDTH];
 
         // Classe filha de Graphics que inclui métodos adicionais para gráficos 2D
         Graphics2D render2D = (Graphics2D) g;
 
-        // Guarda o tamanho dos blocos do mapa
-        int tamanhoBloco = mapaAtual.getTamanhoBloco();
-        
         // Fator de projeção utilizado para adequar as paredes ao monitor
-        double fatorProjecao = (SCREENWIDTH / (2 * Math.tan(jogador.getFov() / 2.0)));
+        double fatorProjecao = (SCREENWIDTH / (2 * Math.tan(playerFOV / 2.0)));
 
-        // Distancia de visão máxima permitida pelo jogo
-        double distanciaMaxima = jogador.getFOG();
-        
-        // Definição das cores do teto e chão
-        int corTeto = new Color(20, 20, 20).getRGB();
-        int corChao = new Color(64, 64, 64).getRGB();
-        
+        // Tamanho das texturas para renderização
+        int tamanhoTextura = 128;
+
+        // Renderiza o teto e o chão do mapa
+        renderizaExtremidades(frameBuffer, playerX, playerY, playerAngulo, playerFOV,
+                tamanhoTextura, tamanhoBloco);
+
         // Cálculo e renderização de todas as colunas de pixel da tela
         for (int i = 0; i < SCREENWIDTH; i++) {
-            double anguloRaio = (jogador.getAngulo() - jogador.getFov() / 2.0)
-                    + ((double) i / SCREENWIDTH) * jogador.getFov();
+            double anguloRaio = (playerAngulo - playerFOV / 2.0)
+                    + ((double) i / SCREENWIDTH) * playerFOV;
 
             int posX, posY;
             int direcaoX, direcaoY;
@@ -203,8 +215,8 @@ public class Engine extends JPanel implements ActionListener {
             double sinRaio = Math.sin(anguloRaio);
 
             // Posição inicial do ponto extremo do raio
-            posX = (int) jogador.getX();
-            posY = (int) jogador.getY();
+            posX = (int) playerX;
+            posY = (int) playerY;
 
             // Determina o quanto é possivel andar em cada unidade do mapa
             deltaX = (cosRaio == 0) ? Double.MAX_VALUE : Math.abs(1 / cosRaio);
@@ -213,19 +225,19 @@ public class Engine extends JPanel implements ActionListener {
             // Verifica a orientação em X do raio
             if (cosRaio < 0) {
                 direcaoX = -1;
-                distanciaX = (jogador.getX() - posX) * deltaX;
+                distanciaX = (playerX - posX) * deltaX;
             } else {
                 direcaoX = 1;
-                distanciaX = (posX + 1.0 - jogador.getX()) * deltaX;
+                distanciaX = (posX + 1.0 - playerX) * deltaX;
             }
 
             // Verifica a orientação em Y do raio
             if (sinRaio < 0) {
                 direcaoY = -1;
-                distanciaY = (jogador.getY() - posY) * deltaY;
+                distanciaY = (playerY - posY) * deltaY;
             } else {
                 direcaoY = 1;
-                distanciaY = (posY + 1.0 - jogador.getY()) * deltaY;
+                distanciaY = (posY + 1.0 - playerY) * deltaY;
             }
 
             // Percorre o mapa até encontrar o primeiro obstáculo
@@ -250,57 +262,53 @@ public class Engine extends JPanel implements ActionListener {
 
             // Calcula o valor real da distancia percorrida pelo raio que atingiu a parede primeiro
             // e sua posição na coordenada x
-            
             double paredeX;
             double distanciaFinal;
-            
+
             if (eixo == 0) {
                 distanciaFinal = distanciaX - deltaX;
-                paredeX = jogador.getY() + distanciaFinal * sinRaio;
-            }
-            else {
+                paredeX = playerY + distanciaFinal * sinRaio;
+            } else {
                 distanciaFinal = distanciaY - deltaY;
-                paredeX = jogador.getX() + distanciaFinal * cosRaio;
+                paredeX = playerX + distanciaFinal * cosRaio;
             }
-            
-                                    
+
             paredeX /= tamanhoBloco;
             paredeX -= Math.floor(paredeX);
-            
+
             // Fator de correção para o efeito fisheye (olho de peixe)
-            distanciaFinal *= Math.cos(anguloRaio - jogador.getAngulo());
-            
+            distanciaFinal *= Math.cos(anguloRaio - playerAngulo);
+
             // Determina o fator da "neblina" que deve ser aplicado pela distancia encontrada
-            if(distanciaFinal > distanciaMaxima)
+            if (distanciaFinal > distanciaMaxima) {
                 distanciaFinal = distanciaMaxima;
-            
+            }
+
             double fatorFOG = 1.0 - (distanciaFinal / distanciaMaxima);
 
             // Calcula os valores da altura da parede, seu começo e fim no eixo y
             int alturaParede = (int) ((tamanhoBloco / distanciaFinal) * fatorProjecao);
             int comecoParede = (int) (SCREENHEIGHT - alturaParede) / 2;
-            
+
             // Verifica se o indice da parede sai do limite da tela
-            if(comecoParede < 0)
+            if (comecoParede < 0) {
                 comecoParede = 0;
-            
+            }
+
             int fimParede = alturaParede + comecoParede;
-            
+
             // Verifica se o indice da parede sai do limite da tela
-            if(fimParede >= SCREENHEIGHT)
+            if (fimParede >= SCREENHEIGHT) {
                 fimParede = SCREENHEIGHT - 1;
-            
+            }
 
             // Busca o id da textura com base no seu valor no mapa
             int idTextura = mapaAtual.getValor(posX, posY) - 1;
-            
-            // Determina o tamanho da textura a ser ajustado
-            int tamanhoTextura = 128;
 
             // Valor real da coluna de textura que deve ser percorrida
             int texturaX = (int) (paredeX * tamanhoTextura);
 
-            // 
+            // Determina a posição final da textura em X com base em seu comprimento real
             if ((eixo == 0 && cosRaio > 0) || (eixo == 1 && sinRaio < 0)) {
                 texturaX = tamanhoTextura - texturaX - 1;
             }
@@ -313,45 +321,120 @@ public class Engine extends JPanel implements ActionListener {
             for (int y = comecoParede; y < fimParede; y++) {
                 int texturaY = (int) posicaoTextura & (tamanhoTextura - 1);
                 posicaoTextura += variacao;
-                
+
                 int corPixel = textura[idTextura][tamanhoTextura * texturaY + texturaX];
-                
+
                 frameBuffer[y * SCREENWIDTH + i] = transformaCor(corPixel, fatorFOG);
             }
-            
-
-            /*for(int j = 0; j < comecoParede; j++) {
-                frameBuffer[j * SCREENWIDTH + i] = transformaCor(corTeto, 1);
-            }
-            
-            for(int j = fimParede; j < SCREENHEIGHT; j++) {
-                frameBuffer[j * SCREENWIDTH + i] = transformaCor(corChao, 1);
-            }*/
         }
 
         // Usa as cores RGB acumuladas no frameBuffer para criar uma imagem e renderiza-la
-        
-        BufferedImage frame = new BufferedImage(SCREENWIDTH, SCREENHEIGHT, 
-                                                BufferedImage.TYPE_INT_RGB);
-        
+        BufferedImage frame = new BufferedImage(SCREENWIDTH, SCREENHEIGHT,
+                BufferedImage.TYPE_INT_RGB);
+
         // "Seta" os valores das cores do frame
-        frame.setRGB(0, 0, SCREENWIDTH, SCREENHEIGHT, frameBuffer, 
-                     0, SCREENWIDTH);
+        frame.setRGB(0, 0, SCREENWIDTH, SCREENHEIGHT, frameBuffer,
+                0, SCREENWIDTH);
 
         // Renderiza o frame todo
         render2D.drawImage(frame, 0, 0, null);
     }
-    
+
+    /**
+     * Renderiza as extremidades (teto e chão) do mapa atual.
+     * @param frameBuffer Array de números inteiros que guarda os pixels do frame
+     * @param playerX Posição em x do jogador
+     * @param playerY Posição em y do jogador
+     * @param playerAngulo Angulo do jogador
+     * @param playerFOV Campo de visão do jogador
+     * @param tamanhoTextura Tamanho inteiro da textura
+     * @param tamanhoBloco Tamanho de cada bloco do mapa
+     */
+    private void renderizaExtremidades(int[] frameBuffer, double playerX, double playerY,
+            double playerAngulo, double playerFOV,
+            int tamanhoTextura, int tamanhoBloco) 
+    {
+        
+        // Posições do raio mínimo (mais a esquerda) e do raio máximo (mais a direita).
+        // Ambos representam os limites mínimos e máximos do teto/chão a ser renderizado
+        double angle = playerAngulo - playerFOV / 2.0;
+        double cosRaioMinimo = Math.cos(angle);
+        double sinRaioMinimo = Math.sin(angle);
+        double cosRaioMaximo = Math.cos(angle + playerFOV);
+        double sinRaioMaximo = Math.sin(angle + playerFOV);
+        
+        // Posição central da visão do jogador (meio da tela)
+        double centroDeVisao = SCREENHEIGHT / 2;
+
+        // Percorre todas linhas necessárias da tela para renderizar a imagem
+        for (int y = 0; y < SCREENHEIGHT; y++) {
+            
+            // Posição relativa da linha sendo desenhada e da posição
+            // central da tela.
+            int posicaoRelativa = (int) (y - centroDeVisao);
+
+            // Distancia horizontal da linha baseado no centro de visão e 
+            // na posição relativa da linha em relação ao centro
+            double distanciaLinha = centroDeVisao / posicaoRelativa;
+
+            // Calcula os incrementos necessários para a posição real do 
+            // teto/chão em x e y
+            double incrementoX = distanciaLinha * (cosRaioMaximo - cosRaioMinimo) / SCREENWIDTH;
+            double incrementoY = distanciaLinha * (sinRaioMaximo - sinRaioMinimo) / SCREENWIDTH;
+
+            // Posições nas coordenadas x e y da posição atual no teto e chão
+            double posX = playerX / tamanhoBloco + distanciaLinha * cosRaioMinimo;
+            double posY = playerY / tamanhoBloco + distanciaLinha * sinRaioMinimo;
+
+            // Percorre, em cada linha, os pixels da coluna para aplicar 
+            // a cor da textura adequada
+            for (int x = 0; x < SCREENWIDTH; x++) {
+                
+                // Posições das coordenadas reais convertidas em posições 
+                // dentro da própria imagem da textura
+                
+                int texturaX = (int) (tamanhoTextura * (posX - (int) posX))
+                        & (tamanhoTextura - 1);
+
+                int texturaY = (int) (tamanhoTextura * (posY - (int) posY))
+                        & (tamanhoTextura - 1);
+
+                // Incrementa as posições para desenhar o próximo pixel
+                posX += incrementoX;
+                posY += incrementoY;
+
+                // Índices das texturas para teto e chão
+                int chaoID = 0;
+                int tetoID = 0;
+                int corPixel;
+
+                // Aplica as cores das texturas em ambas as figuras
+                corPixel = textura[chaoID][tamanhoTextura * texturaY + texturaX];
+                frameBuffer[y * SCREENWIDTH + x] = corPixel;
+
+                corPixel = textura[tetoID][tamanhoTextura * texturaY + texturaX];
+                frameBuffer[(SCREENHEIGHT - y - 1) * SCREENWIDTH + x] = corPixel;
+            }
+        }
+    }
+
+    /**
+     * Transforma as componentes de uma cor aplicando o efeito de FOG
+     * @param cor Cor atual do pixel
+     * @param fator Fator para aplicação do FOG
+     * @return Retorna a cor com o efeito aplicado
+     */
     private int transformaCor(int cor, double fator) {
         int red = (int) (((cor >> 16) & 255) * fator);
         int green = (int) (((cor >> 8) & 255) * fator);
         int blue = (int) ((cor & 255) * fator);
-                
+
         return (red << 16) | (green << 8) | blue;
     }
 
     /**
      * Executa as ações do frame atual (determinado pelo timer).
+     *
      * @param e Evento ocorrido
      */
     @Override
@@ -366,10 +449,10 @@ public class Engine extends JPanel implements ActionListener {
     private void update() {
         keyHandler.executaMetodo();
     }
-    
+
     private void fechaJogo() {
         musicaBackground.stop();
         //função pra fechar o painel
-        
+
     }
 }
