@@ -51,6 +51,17 @@ public class IntFilter extends DocumentFilter{
         }
     }
 
+    /**
+     * Metodo que sobrescreve alguma parte do documento
+     * @param fb
+     * @param offset
+     * @param length
+     * @param text
+     * @param attrs
+     * @throws BadLocationException 
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
     @Override
     public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
         Document doc = fb.getDocument();
@@ -62,7 +73,17 @@ public class IntFilter extends DocumentFilter{
             super.replace(fb, offset, length, text, attrs);
 
     }
-
+    
+    
+    /**
+     * Metodo responsavel por apagar uma caractere
+     * @param fb
+     * @param offset
+     * @param length
+     * @throws BadLocationException 
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
     @Override
     public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
         Document doc = fb.getDocument();

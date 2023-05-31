@@ -13,8 +13,9 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 /**
- *
- * @author bruno
+ * Classe que armazena uma textura
+ * @author Vinicius Augusto
+ * @author Bruno Zara
  */
 public class Textura {
     private int ID;
@@ -33,30 +34,79 @@ public class Textura {
         this.posY = posY;
     }
 
+    /**
+     * metodo que devolve o id da textura carregada
+     * @return ID da textura carregada
+     * 
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
     public int getID() {
         return ID;
     }
 
+    /**
+     * metodo que devolve uma vetor contendo o RGB dos pixeis da textura carregada
+     * @return um vetor de inteiros contando o RGB dos pixeis da textura carregada
+     * 
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
     public int[] getTextura() {
         return textura;
     }
 
+    /**
+     * metodo que devolve o tamanho da textura carregada
+     * @return tamanho da textura carregada
+     * 
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
     public int getTamanho() {
         return tamanho;
     }
 
+    /**
+     * metodo que devolve o nome da textura carregada
+     * @return nome da textura carregada
+     * 
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
     public String getNome() {
         return nome;
     }
 
+    /**
+     * Metodo que retorna a posição horizontal da textura atual no texture panel
+     * @return a posição horizontal da textura atual no texture panel
+     * 
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
     public int getPosX() {
         return posX;
     }
 
+    /**
+     * Metodo que retorna a posição Vertical da textura atual no texture panel
+     * @return a posição vertical da textura atual no texture panel
+     * 
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
     public int getPosY() {
         return posY;
     }
     
+    /**
+     * Metodo que convete o vetor de RGB para uma bufferedImage
+     * @return Uma bufferedImage contendo a textura atual
+     * 
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
     public BufferedImage getRGB(){
         BufferedImage imagem = new BufferedImage(this.getTamanho(), this.getTamanho(), BufferedImage.TYPE_INT_RGB);
         imagem.setRGB(0, 0, this.getTamanho(), this.getTamanho(), this.getTextura(), 0, this.getTamanho());
@@ -65,7 +115,14 @@ public class Textura {
     
     
     
-    
+    /**
+     * metodo que carrega todas as texturas na pasta de textura
+     * @param diretorio diretorio que contem as texturas
+     * @return um ArrayList contendo todas as testuras contidas em diretorio
+     * 
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
     public static ArrayList<Textura> carregaTexturas(File diretorio) {
         File[] imagens = diretorio.listFiles();
         ArrayList<Textura> texturas = new ArrayList<>();
@@ -93,6 +150,15 @@ public class Textura {
         return texturas;
     }
     
+    /**
+     * Metodo que busca uma textura em um arraylist com base no id informado
+     * @param texturas Arraylist contendo todas as texturas carregadas
+     * @param id O ID da textura que esta sendo buscada
+     * @return A textura com o ID desejado ou null caso não exista
+     * 
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
     public static Textura getTextura(ArrayList<Textura> texturas, int id){
         for(Textura aux: texturas){
             if(id == aux.getID()){

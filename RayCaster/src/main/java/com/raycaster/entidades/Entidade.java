@@ -8,7 +8,8 @@ import java.util.EnumSet;
 
 /**
  *
- * @author vinic
+ * @author Vinicius Augusto
+ * @author Bruno Zara
  */
 public abstract class Entidade {
     private final Hitbox hitbox;

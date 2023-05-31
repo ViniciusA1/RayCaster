@@ -40,12 +40,17 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
 /**
- *
- * @author bruno
+ * Classe que cria e executa as intefaces grafica referentes ao editor de mapas 
+ * @author Vinicius Augusto
+ * @author Bruno Zara
  */
 public class MapEditorMenu {
     private static ArrayList<Mapa> mapas;
     
+    /**
+     * 
+     * @param f 
+     */
     public static void inicia(JFrame f){
         mapas = Mapa.carregarMapList();
         SwingUtilities.invokeLater(() -> {
@@ -54,7 +59,7 @@ public class MapEditorMenu {
         
     }
     
-    public static void mapEditor(JFrame f){
+    private static void mapEditor(JFrame f){
         ArrayList<Textura> texturas = Textura.carregaTexturas(new File("modelos" + File.separator + "paredes"));
         double[] zoomFactor = new double[1];
         zoomFactor[0] = 1;
