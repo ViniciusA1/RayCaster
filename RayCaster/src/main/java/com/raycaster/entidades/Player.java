@@ -8,6 +8,7 @@ import com.raycaster.interfaces.HUD;
 import com.raycaster.itens.Item;
 import com.raycaster.mapa.Mapa;
 import com.raycaster.itens.Arma;
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -37,15 +38,17 @@ public class Player extends Entidade {
      * @param fov Campo de visão do jogador
      * @param FOG Distância máxima de visão do jogador
      */
-    public Player(double vidaMaxima, double x, double y, double largura, double velocidade, int fov, double FOG) {
-        super(vidaMaxima, x, y, largura, velocidade, fov, FOG);
+    public Player(double vidaMaxima, double x, double y, double largura, double velocidade, 
+            int fov, double FOG, EnumSet<Estado> possiveisEstados) {
+        
+        super(vidaMaxima, x, y, largura, velocidade, fov, FOG, possiveisEstados);
         
         angulo = 0;
         pitch = 0;
         taxaPitch = 0.5;
         mochila = new Inventario<>();
         estadoAtual = Estado.OCIOSO;
-        som = new EfeitosSonoros("player");
+        som = new EfeitosSonoros("player", possiveisEstados);
     }
     
     public Player() {

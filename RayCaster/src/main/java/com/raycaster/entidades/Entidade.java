@@ -1,6 +1,8 @@
 package com.raycaster.entidades;
 
+import com.raycaster.engine.Estado;
 import java.awt.Rectangle;
+import java.util.EnumSet;
 
 
 
@@ -15,14 +17,18 @@ public abstract class Entidade {
     private final double FOG;
     private double vidaMaxima;
     private double vidaAtual;
+    private EnumSet<Estado> possiveisEstados;
 
-    public Entidade(double vidaMaxima, double x, double y, double largura, double velocidade, double fov, double FOG) {
+    public Entidade(double vidaMaxima, double x, double y, double largura, 
+            double velocidade, double fov, double FOG, EnumSet<Estado> possiveisEstados) {
         this.vidaMaxima = vidaMaxima;
         this.vidaAtual = vidaMaxima;
         this.velocidade = velocidade;
         
         this.fov = Math.toRadians(fov);
         this.FOG = FOG;
+        
+        this.possiveisEstados = possiveisEstados;
         
         hitbox = new Hitbox(x, y, largura);
     }
@@ -62,6 +68,10 @@ public abstract class Entidade {
     
     public double getVidaAtual() {
         return vidaAtual;
+    }
+    
+    public boolean contemEstado(Estado estadoRecebido) {
+        return possiveisEstados.contains(estadoRecebido);
     }
     
     public void moveX(double deltaX) {

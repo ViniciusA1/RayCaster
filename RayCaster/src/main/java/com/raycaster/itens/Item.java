@@ -4,8 +4,9 @@ import com.raycaster.engine.Animacao;
 import com.raycaster.engine.Diretorio;
 import com.raycaster.engine.EfeitosSonoros;
 import com.raycaster.engine.Estado;
-import java.io.File;
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import javax.swing.ImageIcon;
 
@@ -16,21 +17,27 @@ import javax.swing.ImageIcon;
 public abstract class Item {
     private String nome;
     private long cooldown;
+    private EnumSet<Estado> possiveisEstados;
     private Map<Estado, Animacao> mapaAnimacao;
     private EfeitosSonoros sons;
 
-    public Item(String nome, long cooldown) {
-        mapaAnimacao = new HashMap<>();
+    public Item(String nome, long cooldown, EnumSet<Estado> possiveisEstados) {
         this.nome = nome;
         this.cooldown = cooldown;
-        sons = new EfeitosSonoros(nome);
+        this.possiveisEstados = possiveisEstados;
+        
+        sons = new EfeitosSonoros(nome, possiveisEstados);
+        mapaAnimacao = new HashMap<>();
         carregaAnimacoes();
     }
     
     private void carregaAnimacoes() {
-        mapaAnimacao.put(Estado.OCIOSO, new Animacao(Diretorio.SPRITE_ITENS + nome, Estado.OCIOSO));
-        mapaAnimacao.put(Estado.USANDO, new Animacao(Diretorio.SPRITE_ITENS + nome, Estado.USANDO));
-        mapaAnimacao.put(Estado.RECARREGANDO, new Animacao(Diretorio.SPRITE_ITENS + nome, Estado.RECARREGANDO));
+        for (Estado estadoAux : possiveisEstados) {
+            Animacao novaAnimacao = new Animacao(Diretorio.SPRITE_ITENS + nome, 
+                      estadoAux);
+            
+            mapaAnimacao.put(estadoAux, novaAnimacao);
+        }
     }
     
     public long getCooldown() {
@@ -51,6 +58,10 @@ public abstract class Item {
     
     public void reproduzSom(Estado estadoDesejado) {
         sons.emiteSom(estadoDesejado);
+    }
+    
+    public boolean contemEstado(Estado estadoRecebido) {
+        return possiveisEstados.contains(estadoRecebido);
     }
     
     public abstract void usar();

@@ -81,14 +81,16 @@ public class Engine extends JPanel implements ActionListener {
      * player, armas e keybindings.
      */
     private void configInicial() {
-        //jogador = new Player(100, 400, 300, 16, 2, 60, 500);
-        jogador = ArquivoUtils.criaObjeto("dados/player/player", Player.class);
+        List<Player> jogadores = ArquivoUtils.leObjetos(Diretorio.DADOS_ENTIDADES, 
+                                Player.class);
+        jogador = jogadores.get(0);
+        
         mapaAtual = new Mapa("lobby.txt", 20);
         mapaAtual.carregar();
 
         mouseHandler = new MouseInput(jogador, 0.001);
 
-        List<Arma> armas = ArquivoUtils.leItens(Diretorio.DADOS_ITENS, Arma.class);
+        List<Arma> armas = ArquivoUtils.leObjetos(Diretorio.DADOS_ITENS, Arma.class);
 
         jogador.adicionaArma(armas);
 

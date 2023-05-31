@@ -1,5 +1,8 @@
 package com.raycaster.itens;
 
+import com.raycaster.engine.Estado;
+import java.util.EnumSet;
+
 /**
  *
  * @author vinicius
@@ -7,8 +10,8 @@ package com.raycaster.itens;
 public abstract class Arma extends Item {
     private double dano;
     
-    public Arma(String nome, long cooldown, double dano) {
-        super(nome, cooldown);
+    public Arma(String nome, long cooldown, EnumSet<Estado> possiveisEstados, double dano) {
+        super(nome, cooldown, possiveisEstados);
         
         this.dano = dano;
     }

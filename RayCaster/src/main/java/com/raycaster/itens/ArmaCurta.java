@@ -1,5 +1,8 @@
 package com.raycaster.itens;
 
+import com.raycaster.engine.Estado;
+import java.util.EnumSet;
+
 /**
  *
  * @author vinic
@@ -7,10 +10,11 @@ package com.raycaster.itens;
 public class ArmaCurta extends Arma {
     private final int durabilidadeMaxima;
     private int durabilidadeAtual;
-    private static final int taxaQuebra = 1;
+    private static final int TAXA_QUEBRA = 1;
 
-    public ArmaCurta(String nome, int durabilidadeMaxima, long cooldown, double dano) {
-        super(nome, cooldown, dano);
+    public ArmaCurta(String nome, int durabilidadeMaxima, EnumSet<Estado> possiveisEstados, 
+            long cooldown, double dano) {
+        super(nome, cooldown, possiveisEstados, dano);
         this.durabilidadeMaxima = durabilidadeMaxima;
         this.durabilidadeAtual = durabilidadeMaxima;
     }
@@ -25,7 +29,7 @@ public class ArmaCurta extends Arma {
     }
 
     public static int getTaxaQuebra() {
-        return taxaQuebra;
+        return TAXA_QUEBRA;
     }
     
     @Override
@@ -35,11 +39,11 @@ public class ArmaCurta extends Arma {
     
     @Override
     public void usar() {
-        durabilidadeAtual--;
+        durabilidadeAtual -= TAXA_QUEBRA;
     }
     
     @Override
     public boolean isRecarregavel() {
-        return false;
+        return (contemEstado(Estado.RECARREGANDO));
     }
 }

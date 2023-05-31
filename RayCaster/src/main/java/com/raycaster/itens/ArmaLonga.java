@@ -1,5 +1,8 @@
 package com.raycaster.itens;
 
+import com.raycaster.engine.Estado;
+import java.util.EnumSet;
+
 /**
  *
  * @author vinic
@@ -10,8 +13,9 @@ public class ArmaLonga extends Arma {
     private int tamanhoPente;
     private int balasNoPente;
 
-    public ArmaLonga(String nome, int municaoMaxima, int tamanhoPente, long cooldown, double dano) {
-        super(nome, cooldown, dano);
+    public ArmaLonga(String nome, int municaoMaxima, int tamanhoPente, EnumSet<Estado> possiveisEstados, 
+            long cooldown, double dano) {
+        super(nome, cooldown, possiveisEstados, dano);
         this.municaoMaxima = municaoMaxima;
         this.municaoAtual = municaoMaxima / 2;
         this.tamanhoPente = tamanhoPente;
@@ -35,7 +39,8 @@ public class ArmaLonga extends Arma {
     
     @Override
     public boolean isRecarregavel() {
-        return (municaoAtual > 0 && balasNoPente < tamanhoPente);
+        return (contemEstado(Estado.RECARREGANDO) && 
+                municaoAtual > 0 && balasNoPente < tamanhoPente);
     }
     
     public void recarregar() {

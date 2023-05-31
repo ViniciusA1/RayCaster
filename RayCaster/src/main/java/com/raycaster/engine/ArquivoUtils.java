@@ -1,32 +1,53 @@
 package com.raycaster.engine;
 
-import com.raycaster.entidades.Hitbox;
-import com.raycaster.entidades.Inventario;
+import com.raycaster.entidades.Entidade;
+import com.raycaster.entidades.Player;
 import com.raycaster.itens.*;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Properties;
 import javax.swing.ImageIcon;
 
 /**
- *
- * @author vinicius
+ * Classe que guarda os atributos e métodos estáticos para manipulação de arquivos
+ * (carregamento e leitura).
+ * @author Vinicius Augusto
+ * @author Bruno Zara
  */
 public class ArquivoUtils {
 
     public final static String FORMATO_IMAGEM = ".png";
     public final static String FORMATO_SOM = ".wav";
     public final static String FORMATO_DADOS = ".properties";
+    
+    
+    /**
+     * 
+     */
+    private static class StripProperties extends Properties {
+        @Override
+        public String getProperty(String key) {
+            String valor = super.getProperty(key);
+            
+            if (valor != null)
+                valor = valor.strip();
+            
+            return valor;
+        }
+    }
 
+    /**
+     *
+     * @param nomeArquivo
+     * @return
+     */
     public static Properties lePropriedade(String nomeArquivo) {
-        Properties propriedades = new Properties();
+        StripProperties propriedades = new StripProperties();
 
         nomeArquivo += FORMATO_DADOS;
 
@@ -42,91 +63,6 @@ public class ArquivoUtils {
         return propriedades;
     }
 
-    public static <T> T criaObjeto(String nomeArquivo, Class<T> classeObjeto) {
-        Properties propriedades = lePropriedade(nomeArquivo);
-
-        T novoObjeto;
-
-        try {
-            novoObjeto = classeObjeto.getDeclaredConstructor().newInstance();
-        } catch (NoSuchMethodException | SecurityException | InstantiationException
-                | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            System.out.println("Erro! " + ex.getMessage());
-            return null;
-        }
-
-        Field[] campos = getCampos(classeObjeto);
-
-        for (Field campoAux : campos) {
-            campoAux.setAccessible(true);
-            String nomeCampo = campoAux.getName().strip();
-            String propriedadeCampo = propriedades.getProperty(nomeCampo);
-
-            if (propriedadeCampo == null) {
-                continue;
-            }
-
-            propriedadeCampo = propriedadeCampo.strip();
-
-            Object atributo = converteDado(propriedadeCampo, campoAux.getType(), classeObjeto);
-
-            try {
-                campoAux.set(novoObjeto, atributo);
-            } catch (IllegalArgumentException | IllegalAccessException ex) {
-                System.err.println("Erro! " + ex.getMessage());
-                return null;
-            }
-        }
-
-        return novoObjeto;
-    }
-
-    private static Object converteDado(String dado, Class<?> classeDado, Class<?> classeObjeto) {
-     
-        if (classeDado == String.class) {
-            return dado;
-        } else if (classeDado == int.class) {
-            return Integer.valueOf(dado);
-        } else if (classeDado == double.class) {
-            return Double.valueOf(dado);
-        } else if (classeDado == boolean.class) {
-            return Boolean.valueOf(dado);
-        } else if (classeDado == long.class) {
-            return Long.valueOf(dado);
-        } else if (classeDado == Hitbox.class) {
-            String[] valor = dado.split(",");
-
-            return new Hitbox(Double.parseDouble(valor[0]), Double.parseDouble(valor[1]),
-                    Double.parseDouble(valor[2]));
-
-        } else if (classeDado == Inventario.class) {
-            return new Inventario<>();
-        } else if(classeDado == Estado.class) {
-            return Estado.OCIOSO;
-        } else if(classeDado == EfeitosSonoros.class) {
-            return new EfeitosSonoros(classeObjeto.getSimpleName().toLowerCase());
-        }
-
-        return null;
-    }
-    
-    private static Field[] getCampos(Class<?> classe) {
-        List<Field> campos = new ArrayList<>();
-
-        Field[] camposDaClasse = classe.getDeclaredFields();
-        campos.addAll(Arrays.asList(camposDaClasse));
-        
-        Class<?> superClasse = classe.getSuperclass();
-
-        while(superClasse != null) {
-            Field[] camposDaSuperClasse = superClasse.getDeclaredFields();
-            campos.addAll(Arrays.asList(camposDaSuperClasse));
-            superClasse = superClasse.getSuperclass();
-        }
-
-        return campos.toArray(Field[]::new);
-    } 
-
     public static ImageIcon leImagem(String nomeImagem) {
         nomeImagem += FORMATO_IMAGEM;
 
@@ -139,9 +75,9 @@ public class ArquivoUtils {
         return new ImageIcon(nomeImagem);
     }
 
-    public static <T extends Item> List<T> leItens(String nomeArquivo, Class<T> classeItem) {
+    public static <T> List<T> leObjetos(String nomeArquivo, Class<T> classeObjeto) {
         List<T> listaItens = new ArrayList<>();
-        nomeArquivo += classeItem.getSimpleName().toLowerCase();
+        nomeArquivo += classeObjeto.getSimpleName();
 
         Properties dado = lePropriedade(nomeArquivo);
         String tipo;
@@ -153,11 +89,15 @@ public class ArquivoUtils {
         int id = 1;
 
         while ((tipo = dado.getProperty("type" + id)) != null) {
-            T itemLido = criaItem(dado, tipo, id);
+            T objetoLido = null;
+            
+            if(Item.class.isAssignableFrom(classeObjeto))
+                objetoLido = (T) criaItem(dado, tipo, id);
+            else if(Entidade.class.isAssignableFrom(classeObjeto))
+                objetoLido = (T) criaEntidade(dado, tipo, id);
 
-            if (itemLido != null) {
-                listaItens.add(itemLido);
-            }
+            if (objetoLido != null)
+                listaItens.add(objetoLido);
 
             id++;
         }
@@ -166,10 +106,18 @@ public class ArquivoUtils {
     }
 
     private static <T extends Item> T criaItem(Properties dado, String tipo, int id) {
-        T itemLido;
+        T itemCriado;
 
         String nome = dado.getProperty("nome" + id);
         long cooldown = Long.parseLong(dado.getProperty("cooldown" + id));
+        
+        String[] estados = dado.getProperty("estados" + id).split(",");
+        EnumSet<Estado> possiveisEstados = EnumSet.noneOf(Estado.class);
+        
+        for(String estadoAux : estados) {
+            Estado novoEstado = Estado.valueOf(estadoAux.strip());
+            possiveisEstados.add(novoEstado);
+        }
 
         switch (tipo) {
             case "ArmaLonga" -> {
@@ -177,19 +125,50 @@ public class ArquivoUtils {
                 int pente = Integer.parseInt(dado.getProperty("tamanhoPente" + id));
                 double dano = Double.parseDouble(dado.getProperty("dano" + id));
 
-                itemLido = (T) new ArmaLonga(nome, municao, pente, cooldown, dano);
+                itemCriado = (T) new ArmaLonga(nome, municao, 
+                        pente, possiveisEstados, cooldown, dano);
             }
             case "ArmaCurta" -> {
                 int durabilidade = Integer.parseInt(dado.getProperty("durabilidadeMaxima" + id));
                 double dano = Double.parseDouble(dado.getProperty("dano" + id));
 
-                itemLido = (T) new ArmaCurta(nome, durabilidade, cooldown, dano);
+                itemCriado = (T) new ArmaCurta(nome, durabilidade,
+                        possiveisEstados, cooldown, dano);
             }
             default -> {
                 return null;
             }
         }
 
-        return itemLido;
+        return itemCriado;
+    }
+    
+    private static <T extends Entidade> T criaEntidade(Properties dado, String tipo, int id) {
+        T entidadeCriada;
+        
+        double vidaMaxima = Double.parseDouble(dado.getProperty("vidaMaxima" + id)); 
+        double x = Double.parseDouble(dado.getProperty("x" + id)); 
+        double y = Double.parseDouble(dado.getProperty("y" + id));
+        double largura = Double.parseDouble(dado.getProperty("largura" + id));
+        double velocidade = Double.parseDouble(dado.getProperty("velocidade" + id)); 
+        int fov = Integer.parseInt(dado.getProperty("fov" + id));
+        double FOG = Double.parseDouble(dado.getProperty("FOG" + id));
+        
+        String[] estados = dado.getProperty("estados" + id).split(",");
+        EnumSet<Estado> possiveisEstados = EnumSet.noneOf(Estado.class);
+        
+        for(String estadoAux : estados) {
+            Estado novoEstado = Estado.valueOf(estadoAux.strip());
+            possiveisEstados.add(novoEstado);
+        }
+        
+        switch(tipo) {
+            case "Player" -> {
+                entidadeCriada = (T) new Player(vidaMaxima, x, y, largura, velocidade, fov, FOG, possiveisEstados);
+            }
+            default -> entidadeCriada = null;
+        }
+        
+        return entidadeCriada;
     }
 }
