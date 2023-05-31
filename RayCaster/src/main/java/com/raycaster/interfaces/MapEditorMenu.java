@@ -7,8 +7,10 @@ import com.raycaster.engine.Textura;
 import com.raycaster.mapa.MapGroup.ListData;
 import com.raycaster.mapa.Mapa;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -48,8 +50,10 @@ public class MapEditorMenu {
     private static ArrayList<Mapa> mapas;
     
     /**
-     * 
-     * @param f 
+     * Metodo que carrega os mapas salvos e inicia o Editor de Mapas em uma thread especifica
+     * @param f Frame da janela anterior
+     * @author Vinicius Augusto
+     * @author Bruno Zara
      */
     public static void inicia(JFrame f){
         mapas = Mapa.carregarMapList();
@@ -58,6 +62,7 @@ public class MapEditorMenu {
         });
         
     }
+    
     
     private static void mapEditor(JFrame f){
         ArrayList<Textura> texturas = Textura.carregaTexturas(new File("modelos" + File.separator + "paredes"));
@@ -82,12 +87,12 @@ public class MapEditorMenu {
                 for(int i = 0; i<mapa.getLimite(); i++){
                     for(int j = 0 ; j<mapa.getLimite(); j++){
                         int id = mapa.getID(i, j);
-                        if((this.getWidth()/2 <= Math.abs(((mapa.getLimite()/2) + i)*bloco + x[0]) && this.getHeight()/2 <= Math.abs(((mapa.getLimite()/2) + j) *bloco + y[0])))
-                        if(id > 0){
-                            Textura textura = Textura.getTextura(texturas, id);
-                            BufferedImage imagem = textura.getRGB();
-                            g2.drawImage(imagem, (-(mapa.getLimite()/2) + i) *bloco + x[0], (-(mapa.getLimite()/2) + j)*bloco + y[0], bloco, bloco, null);
-                        }
+                        if((this.getWidth()/2 <= ((Math.abs(mapa.getLimite())/2) + i)*bloco + x[0] && this.getHeight()/2 <= ((Math.abs(mapa.getLimite()/2) + j) *bloco + y[0])))
+                            if(id > 0){
+                                Textura textura = Textura.getTextura(texturas, id);
+                                BufferedImage imagem = textura.getRGB();
+                                g2.drawImage(imagem, (-(mapa.getLimite()/2) + i) *bloco + x[0], (-(mapa.getLimite()/2) + j)*bloco + y[0], bloco, bloco, null);
+                            }
                     }
                 }
                 
@@ -139,8 +144,28 @@ public class MapEditorMenu {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e){
                 int movimento = e.getWheelRotation();
-                zoomFactor[0] += 0.1 * movimento;
-                grid.repaint();
+                if(movimento > 0 && zoomFactor[0] < 6){
+                    zoomFactor[0] += 0.1 * movimento;
+                    grid.repaint();
+                }
+                else if(movimento < 0  && zoomFactor[0] > 0.5){
+                    zoomFactor[0] += 0.1 * movimento;
+                    grid.repaint();
+                }
+                
+            }
+            
+            @Override
+            public void mouseClicked(MouseEvent e){
+                int x = e.getX();
+                int y = e.getY();
+                Dimension d = editor.getSize();
+                Point p = grid.getLocation();
+                x = (x - p.x) ;
+                y = (y - p.y) ;
+                x = x -d.width/2;
+                y = y -d.height/2;
+                JOptionPane.showMessageDialog(null, "X = " + x + ", y = " + y);
             }
         };
         
