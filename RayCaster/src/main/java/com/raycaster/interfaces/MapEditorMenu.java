@@ -6,14 +6,19 @@ package com.raycaster.interfaces;
 import com.raycaster.engine.Textura;
 import com.raycaster.mapa.MapGroup.ListData;
 import com.raycaster.mapa.Mapa;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.WindowAdapter;
@@ -69,8 +74,11 @@ public class MapEditorMenu {
         double[] zoomFactor = new double[1];
         zoomFactor[0] = 1;
         Mapa mapa = mapas.get(0);
-        int[] x = new int[1];
-        int[] y = new int[1];
+                
+        int[] x = new int[2];
+        int[] y = new int[2];
+        int[] idSelec = new int[1];
+        idSelec[0] = 0;
         JFrame editor = new JFrame("Editor de mapas");
         editor.setSize(800, 600);
         
@@ -97,6 +105,7 @@ public class MapEditorMenu {
                 }
                 
                 
+                
                 g2.setColor(Color.WHITE);
                 for(int i = 0; i <= mapa.getLimite(); i++){
                     path.moveTo((-(mapa.getLimite()/2) + i)*bloco + x[0], (-(mapa.getLimite()/2)*bloco) + y[0]);
@@ -115,6 +124,59 @@ public class MapEditorMenu {
                 
             }
         };
+        
+        class TextureBox extends JPanel implements MouseListener{
+            Textura tex;
+
+            TextureBox(Textura t){
+                tex = t;
+                this.setLayout(new BorderLayout());
+                this.setSize(66, 70);
+                this.add(Box.createRigidArea(new Dimension(66, 66)));
+                this.add(new JLabel(tex.toString()), BorderLayout.PAGE_END);
+                this.addMouseListener(this);
+
+                this.repaint();
+
+
+            }
+
+            @Override
+            public void paintComponent(Graphics g){
+                g.drawImage(tex.getRGB(), 1, 1, 65, 64, this);
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(idSelec[0] == tex.getID()){
+                    idSelec[0] = 0;
+                }
+                else{
+                    idSelec[0] = tex.getID();
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {}
+
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+
+        }
+        
+        JPanel texturePanel = new JPanel();
+        texturePanel.setBounds(0, 0, editor.getWidth()/5, editor.getHeight());
+        for(Textura aux : texturas){
+            texturePanel.add(new TextureBox(aux));
+        }
 
         // método novo para mover a grid
         MouseAdapter adaptador = new MouseAdapter() {
@@ -157,17 +219,22 @@ public class MapEditorMenu {
             
             @Override
             public void mouseClicked(MouseEvent e){
-                int x = e.getX();
-                int y = e.getY();
-                Dimension d = editor.getSize();
+                x[1] = e.getX();
+                y[1] = e.getY();
+                Dimension d = grid.getSize();
                 Point p = grid.getLocation();
-                x = (x - p.x) ;
-                y = (y - p.y) ;
-                x = x -d.width/2;
-                y = y -d.height/2;
-                JOptionPane.showMessageDialog(null, "X = " + x + ", y = " + y);
+                x[1] = (x[1] - p.x) ;
+                y[1] = (y[1] - p.y) ;
+                x[1] = x[1] -d.width/2;
+                y[1] = y[1] -d.height/2;
+                int bloco = (int) (64 * zoomFactor[0]);
+                JOptionPane.showMessageDialog(null, "X = " + (x[1] -x[0] +(mapa.getLimite()/2) * bloco)/bloco + ", y = " + (y[1] -y[0] +(mapa.getLimite()/2) * bloco)/bloco);
+                mapa.setValor((x[1] -x[0] +(mapa.getLimite()/2) * bloco)/bloco, (y[1] -y[0] +(mapa.getLimite()/2) * bloco)/bloco, idSelec[0]);
+                grid.repaint();
             }
         };
+        
+        
         
         grid.addMouseListener(adaptador);
         grid.addMouseWheelListener(adaptador);
@@ -178,6 +245,8 @@ public class MapEditorMenu {
         //JPanel painel = new JPanel();
         //painel.setLayout(new BoxLayout(painel, 0));
         //painel.add(scrollp);
+        editor.setLayout(new GridLayout(1,3,20,0));
+        editor.add(texturePanel);
         editor.add(grid);
         editor.addWindowListener(new event(f));
         editor.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -479,6 +548,8 @@ public class MapEditorMenu {
             f.setVisible(true);
         }
     }
+    
+    
     
 
 }

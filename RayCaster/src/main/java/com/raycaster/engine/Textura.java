@@ -154,7 +154,7 @@ public class Textura {
      * Metodo que busca uma textura em um arraylist com base no id informado
      * @param texturas Arraylist contendo todas as texturas carregadas
      * @param id O ID da textura que esta sendo buscada
-     * @return A textura com o ID desejado ou null caso não exista
+     * @return A textura com o ID desejado ou null caso não encontrado
      * 
      * @author Vinicius Augusto
      * @author Bruno Zara
@@ -166,6 +166,11 @@ public class Textura {
             }
         }
         return null;
+    }
+    
+    @Override
+    public String toString(){
+        return (this.getID() + " - " + this.getNome());
     }
     
 }
