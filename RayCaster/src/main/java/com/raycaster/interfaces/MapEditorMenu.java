@@ -73,6 +73,8 @@ public class MapEditorMenu {
         ArrayList<Textura> texturas = Textura.carregaTexturas(new File("modelos" + File.separator + "paredes"));
         double[] zoomFactor = new double[1];
         zoomFactor[0] = 1;
+        int[] selecionado = new int[1];
+        selecionado[0] = -1;
         Mapa mapa = mapas.get(0);
                 
         int[] x = new int[2];
@@ -125,7 +127,8 @@ public class MapEditorMenu {
             }
         };
         
-        class TextureBox extends JPanel implements MouseListener{
+        
+        class TextureBox extends JPanel{
             Textura tex;
 
             TextureBox(Textura t){
@@ -134,50 +137,29 @@ public class MapEditorMenu {
                 this.setSize(66, 70);
                 this.add(Box.createRigidArea(new Dimension(66, 66)));
                 this.add(new JLabel(tex.toString()), BorderLayout.PAGE_END);
-                this.addMouseListener(this);
 
                 this.repaint();
-
 
             }
 
             @Override
             public void paintComponent(Graphics g){
+                
                 g.drawImage(tex.getRGB(), 1, 1, 65, 64, this);
-            }
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if(idSelec[0] == tex.getID()){
-                    idSelec[0] = 0;
-                }
-                else{
-                    idSelec[0] = tex.getID();
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {}
-
-            @Override
-            public void mouseReleased(MouseEvent e) {}
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
             }
 
         }
         
-        JPanel texturePanel = new JPanel();
-        texturePanel.setBounds(0, 0, editor.getWidth()/5, editor.getHeight());
+        
+        
+        JPanel textureList = new JPanel();
         for(Textura aux : texturas){
-            texturePanel.add(new TextureBox(aux));
+            textureList.add(new TextureBox(aux));
         }
-
+        JPanel texturePanel = new JPanel();
+        texturePanel.setSize(editor.getWidth()/5, editor.getHeight());
+        texturePanel.add(textureList);
+        
         // método novo para mover a grid
         MouseAdapter adaptador = new MouseAdapter() {
             private int anteriorX;
@@ -240,11 +222,6 @@ public class MapEditorMenu {
         grid.addMouseWheelListener(adaptador);
         grid.addMouseMotionListener(adaptador);
         
-        
-        //JScrollPane scrollp = new JScrollPane(grid);
-        //JPanel painel = new JPanel();
-        //painel.setLayout(new BoxLayout(painel, 0));
-        //painel.add(scrollp);
         editor.setLayout(new GridLayout(1,3,20,0));
         editor.add(texturePanel);
         editor.add(grid);
