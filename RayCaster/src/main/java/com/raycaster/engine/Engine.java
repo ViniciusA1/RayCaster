@@ -6,7 +6,6 @@ import com.raycaster.interfaces.HUD;
 import com.raycaster.entidades.Player;
 import com.raycaster.itens.Arma;
 import com.raycaster.mapa.Mapa;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
