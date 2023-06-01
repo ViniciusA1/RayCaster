@@ -265,7 +265,7 @@ public class Mapa{
 
                 for(int i = 0, j; i < tamanho; i++) {
                     for(j = 0; j < tamanho; j++)
-                        mapaCarregado.setValor(i, j, leitor.nextInt());
+                        mapaCarregado.setValor(j, i, leitor.nextInt());
                 }
                 mapas.add(mapaCarregado);
                 leitor.close();
