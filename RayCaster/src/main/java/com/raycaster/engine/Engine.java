@@ -1,12 +1,12 @@
 package com.raycaster.engine;
 
+import com.raycaster.interfaces.LayoutEngine;
 import com.raycaster.interfaces.AnimacaoPlayer;
 import com.raycaster.interfaces.HUD;
 import com.raycaster.entidades.Player;
 import com.raycaster.itens.Arma;
 import com.raycaster.mapa.Mapa;
-
-import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -36,8 +36,8 @@ import javax.swing.Timer;
  */
 public class Engine extends JPanel implements ActionListener {
 
-    private final int SCREENWIDTH;
-    private final int SCREENHEIGHT;
+    private int SCREENWIDTH;
+    private int SCREENHEIGHT;
     private final Timer gameTimer;
     private Player jogador;
     private Mapa mapaAtual;
@@ -57,7 +57,7 @@ public class Engine extends JPanel implements ActionListener {
     public Engine(int width, int height, JFrame janela) {
         this.SCREENWIDTH = width;
         this.SCREENHEIGHT = height;
-        setLayout(null);
+        setLayout(new LayoutEngine());
 
         configInicial();
 
@@ -71,7 +71,7 @@ public class Engine extends JPanel implements ActionListener {
         setFocusable(true);
 
         carregaMusicaPrincipal();
-        
+
         this.janela = janela;
         janela.addWindowListener(new desligaSom(musicaBackground));
     }
@@ -81,10 +81,10 @@ public class Engine extends JPanel implements ActionListener {
      * player, armas e keybindings.
      */
     private void configInicial() {
-        List<Player> jogadores = ArquivoUtils.leObjetos(Diretorio.DADOS_ENTIDADES, 
-                                Player.class);
+        List<Player> jogadores = ArquivoUtils.leObjetos(Diretorio.DADOS_ENTIDADES,
+                Player.class);
         jogador = jogadores.get(0);
-        
+
         mapaAtual = new Mapa("lobby.txt", 20);
         mapaAtual.carregar();
 
@@ -94,13 +94,11 @@ public class Engine extends JPanel implements ActionListener {
 
         jogador.adicionaArma(armas);
 
-        HUD hudJogador = new HUD(jogador);
-        hudJogador.setBounds(0, SCREENHEIGHT - 100, SCREENWIDTH, 100);
-        this.add(hudJogador);
-
+        HUD hudJogador = new HUD(jogador);        
         AnimacaoPlayer painelAnimacao = new AnimacaoPlayer(jogador);
-        painelAnimacao.setBounds(SCREENWIDTH / 2, SCREENHEIGHT / 2, SCREENWIDTH / 2, SCREENHEIGHT / 2);
-        this.add(painelAnimacao);
+        
+        this.add(hudJogador, "hud");
+        this.add(painelAnimacao, "animacao");
 
         jogador.setPainelAnimacao(painelAnimacao);
         jogador.setHUD(hudJogador);
@@ -137,7 +135,7 @@ public class Engine extends JPanel implements ActionListener {
             BufferedImage parede = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "01 - wall.png"));
             BufferedImage chao = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "02 - floor.png"));
             BufferedImage teto = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "03 - ceil.png"));
-            
+
             parede.getRGB(0, 0, 128, 128, textura[0], 0, 128);
             chao.getRGB(0, 0, 128, 128, textura[1], 0, 128);
             teto.getRGB(0, 0, 128, 128, textura[2], 0, 128);
@@ -351,12 +349,14 @@ public class Engine extends JPanel implements ActionListener {
                 0, SCREENWIDTH);
 
         // Renderiza o frame todo
-        render2D.drawImage(frame, 0, 0, null);
+        render2D.drawImage(frame, 0, 0, this.getWidth(), this.getHeight(), null);
     }
 
     /**
      * Renderiza as extremidades (teto e chão) do mapa atual.
-     * @param frameBuffer Array de números inteiros que guarda os pixels do frame
+     *
+     * @param frameBuffer Array de números inteiros que guarda os pixels do
+     * frame
      * @param playerX Posição em x do jogador
      * @param playerY Posição em y do jogador
      * @param playerAngulo Angulo do jogador
@@ -366,9 +366,8 @@ public class Engine extends JPanel implements ActionListener {
      */
     private void renderizaExtremidades(int[] frameBuffer, double playerX, double playerY,
             double playerAngulo, double playerFOV,
-            int tamanhoTextura, int tamanhoBloco) 
-    {
-        
+            int tamanhoTextura, int tamanhoBloco) {
+
         // Posições do raio mínimo (mais a esquerda) e do raio máximo (mais a direita).
         // Ambos representam os limites mínimos e máximos do teto/chão a ser renderizado
         double angle = playerAngulo - playerFOV / 2;
@@ -376,22 +375,22 @@ public class Engine extends JPanel implements ActionListener {
         double sinRaioMinimo = Math.sin(angle);
         double cosRaioMaximo = Math.cos(angle + playerFOV);
         double sinRaioMaximo = Math.sin(angle + playerFOV);
-        
+
         // Posição central da visão do jogador (meio da tela)
         double centroDeVisao = SCREENHEIGHT / 2;
 
         // Percorre todas linhas necessárias da tela para renderizar a imagem
         for (int y = 0; y < SCREENHEIGHT; y++) {
-            
+
             // Posição relativa da linha sendo desenhada e da posição
             // central da tela.
             int posicaoRelativa = (int) (y - centroDeVisao);
 
-            // Distancia horizontal da linha baseado no centro de visão e 
+            // Distancia horizontal da linha baseado no centro de visão e
             // na posição relativa da linha em relação ao centro
             double distanciaLinha = centroDeVisao / posicaoRelativa;
 
-            // Calcula os incrementos necessários para a posição real do 
+            // Calcula os incrementos necessários para a posição real do
             // teto/chão em x e y
             double incrementoX = distanciaLinha * (cosRaioMaximo - cosRaioMinimo) / SCREENWIDTH;
             double incrementoY = distanciaLinha * (sinRaioMaximo - sinRaioMinimo) / SCREENWIDTH;
@@ -400,13 +399,12 @@ public class Engine extends JPanel implements ActionListener {
             double posX = (playerX / tamanhoBloco) + distanciaLinha * cosRaioMinimo;
             double posY = (playerY / tamanhoBloco) + distanciaLinha * sinRaioMinimo;
 
-            // Percorre, em cada linha, os pixels da coluna para aplicar 
+            // Percorre, em cada linha, os pixels da coluna para aplicar
             // a cor da textura adequada
             for (int x = 0; x < SCREENWIDTH; x++) {
-                
-                // Posições das coordenadas reais convertidas em posições 
+
+                // Posições das coordenadas reais convertidas em posições
                 // dentro da própria imagem da textura
-                
                 int texturaX = (int) (tamanhoTextura * (posX - (int) posX))
                         & (tamanhoTextura - 1);
 
@@ -434,6 +432,7 @@ public class Engine extends JPanel implements ActionListener {
 
     /**
      * Transforma as componentes de uma cor aplicando o efeito de FOG
+     *
      * @param cor Cor atual do pixel
      * @param fator Fator para aplicação do FOG
      * @return Retorna a cor com o efeito aplicado
@@ -470,23 +469,25 @@ public class Engine extends JPanel implements ActionListener {
         //função pra fechar o painel
 
     }
-    
-    static class desligaSom extends WindowAdapter{
+
+    static class desligaSom extends WindowAdapter {
+
         Clip c;
 
-        desligaSom(Clip c){
+        desligaSom(Clip c) {
             this.c = c;
-        }
-        
-        @Override
-        public void windowOpened(WindowEvent e){
-            if(c != null)
-                c.start();
         }
 
         @Override
-        public void windowClosed(WindowEvent e){
-            if(c == null){
+        public void windowOpened(WindowEvent e) {
+            if (c != null) {
+                c.start();
+            }
+        }
+
+        @Override
+        public void windowClosed(WindowEvent e) {
+            if (c == null) {
                 System.exit(0);
             }
             c.stop();

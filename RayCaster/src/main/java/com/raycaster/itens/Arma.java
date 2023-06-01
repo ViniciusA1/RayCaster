@@ -19,4 +19,5 @@ public abstract class Arma extends Item {
     public double getDano() {
         return dano;
     }
+    
 }

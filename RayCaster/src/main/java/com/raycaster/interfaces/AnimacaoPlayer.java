@@ -48,8 +48,8 @@ public class AnimacaoPlayer extends JPanel {
         int altura = animacaoAtual.getFrameHeight();
         
         g.drawImage(imagemAtual.getImage(), (int) jogador.getPitch(), (int) jogador.getPitch(), 
-                this.getParent().getWidth() / 2, this.getParent().getHeight() / 2, 
-                frameAtual * comprimento, 0, (frameAtual + 1) * comprimento, altura, null);
+                    this.getWidth(), this.getHeight(), frameAtual * comprimento, 
+                    0, (frameAtual + 1) * comprimento, altura, null);
      
         
         if(tempoAtual - tempoAnterior >= animacaoAtual.getVelocidadeFrame()) {

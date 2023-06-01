@@ -64,11 +64,11 @@ public abstract class Item {
         return possiveisEstados.contains(estadoRecebido);
     }
     
+    public abstract boolean isUsavel();
     public abstract void usar();
     
-    public abstract int getAtributoConsumivel();
-    
-    public abstract boolean isUsavel();
-    
     public abstract boolean isRecarregavel();
+    public abstract void recarregar();
+    
+    public abstract int getAtributoConsumivel();
 }
