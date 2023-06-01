@@ -4,22 +4,11 @@ import com.raycaster.engine.Estado;
 import com.raycaster.engine.Diretorio;
 import com.raycaster.entidades.Player;
 import com.raycaster.engine.Animacao;
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.FontFormatException;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -38,40 +27,21 @@ public class HUD extends JPanel {
     private JLabel textoMunicao;
 
     public HUD(Player jogador) {
-        setLayout(new FlowLayout(FlowLayout.LEFT));
+        setLayout(new LayoutHUD("font.ttf"));
         sprite = new ArrayList<>();
         this.jogador = jogador;
 
-        fontePersonalizada = carregaFonte();
-
-        carregaComponentes(fontePersonalizada);
+        carregaComponentes();
         carregaSprites();
     }
 
-    private Font carregaFonte() {
-        Font fonteCustomizada = null;
-
-        try {
-            fonteCustomizada = Font.createFont(Font.TRUETYPE_FONT, new File(Diretorio.SPRITE_HUD + "font.ttf"));
-        } catch (FontFormatException | IOException ex) {
-
-        }
-
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        ge.registerFont(fonteCustomizada);
-
-        return fonteCustomizada;
-    }
-
-    private void carregaComponentes(Font fonteCustom) {
+    private void carregaComponentes() {
         textoVida = new JLabel(Double.toString(jogador.getVidaAtual()));
-        textoVida.setFont(fonteCustom.deriveFont(50f));
         textoVida.setForeground(Color.WHITE);
-
+        
         textoMunicao = new JLabel(Integer.toString(jogador.getQtdConsumivel()));
-        textoMunicao.setFont(fonteCustom.deriveFont(50f));
         textoMunicao.setForeground(Color.WHITE);
-
+        
         add(textoMunicao);
         add(textoVida);
     }

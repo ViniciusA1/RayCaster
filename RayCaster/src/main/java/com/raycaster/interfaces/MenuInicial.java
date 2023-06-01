@@ -157,7 +157,7 @@ public class MenuInicial {
             janela.setSize(800, 600);
             janela.addWindowListener(new MapEditorMenu.event(f));
             janela.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            janela.setResizable(false);
+            janela.setResizable(true);
 
             Engine game = new Engine(800, 600, janela);
 
