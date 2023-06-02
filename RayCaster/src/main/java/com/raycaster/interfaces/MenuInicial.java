@@ -154,12 +154,12 @@ public class MenuInicial {
     private static void jogar(JFrame f){
         JFrame janela = new JFrame();
             janela.setTitle("RayCaster");
-            janela.setSize(800, 600);
+            janela.setSize(300, 200);
             janela.addWindowListener(new MapEditorMenu.event(f));
             janela.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             janela.setResizable(true);
 
-            Engine game = new Engine(800, 600, janela);
+            Engine game = new Engine(300, 200, janela);
 
             janela.add(game);
             janela.setLocationRelativeTo(null);

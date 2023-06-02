@@ -13,10 +13,12 @@ import java.util.List;
 
 /**
  * Classe que guarda todos os atributos e métodos do jogador principal do jogo.
+ *
  * @author Vinicius Augusto
  * @author Bruno Zara
  */
 public class Player extends Entidade {
+
     private double angulo;
     private double pitch;
     private double taxaPitch;
@@ -29,7 +31,9 @@ public class Player extends Entidade {
     private EfeitosSonoros som;
 
     /**
-     * Construtor principal do jogador, recebe os atributos necessitados pela classe.
+     * Construtor principal do jogador, recebe os atributos necessitados pela
+     * classe.
+     *
      * @param vidaMaxima Vida máxima do jogador
      * @param x Posição inicial em x do jogador
      * @param y Posição inicial em y do jogador
@@ -37,12 +41,13 @@ public class Player extends Entidade {
      * @param velocidade Velocidade do jogador
      * @param fov Campo de visão do jogador
      * @param FOG Distância máxima de visão do jogador
+     * @param possiveisEstados
      */
-    public Player(double vidaMaxima, double x, double y, double largura, double velocidade, 
+    public Player(double vidaMaxima, double x, double y, double largura, double velocidade,
             int fov, double FOG, EnumSet<Estado> possiveisEstados) {
-        
+
         super(vidaMaxima, x, y, largura, velocidade, fov, FOG, possiveisEstados);
-        
+
         angulo = 0;
         pitch = 0;
         taxaPitch = 0.5;
@@ -50,13 +55,10 @@ public class Player extends Entidade {
         estadoAtual = Estado.OCIOSO;
         som = new EfeitosSonoros("player", possiveisEstados);
     }
-    
-    public Player() {
-        
-    }
 
     /**
      * "Seta" um novo painel de animação para os itens do jogador.
+     *
      * @param novoPainel Novo painel de animação recebido
      */
     public void setPainelAnimacao(AnimacaoPlayer novoPainel) {
@@ -65,6 +67,7 @@ public class Player extends Entidade {
 
     /**
      * "Seta" uma nova HUD para o jogador.
+     *
      * @param hudJogador Nova HUD recebida
      */
     public void setHUD(HUD hudJogador) {
@@ -73,6 +76,7 @@ public class Player extends Entidade {
 
     /**
      * "Seta" um novo estado para o jogador.
+     *
      * @param novoEstado Novo estado recebido
      */
     public void setEstado(Estado novoEstado) {
@@ -81,6 +85,7 @@ public class Player extends Entidade {
 
     /**
      * Disponibiliza o angulo do jogador para código externo.
+     *
      * @return Retorna o angulo de rotação do jogador.
      */
     public double getAngulo() {
@@ -89,6 +94,7 @@ public class Player extends Entidade {
 
     /**
      * Disponibiliza o "pitch" do jogador para código externo.
+     *
      * @return Retorna o valor do "pitch" do jogador
      */
     public double getPitch() {
@@ -97,6 +103,7 @@ public class Player extends Entidade {
 
     /**
      * Disponibiliza o item atual do jogador para código externo.
+     *
      * @return Retorna o item atualmente selecionado pelo jogador.
      */
     public Item getItemAtual() {
@@ -105,6 +112,7 @@ public class Player extends Entidade {
 
     /**
      * Move o jogador no mapa atual de acordo com seu angulo e posição anterior.
+     *
      * @param anguloRelativo Angulo relativo ao movimento desejado (W,A,S,D)
      * @param sinal Sinal relativo ao movimento desejado (frente ou trás)
      * @param mapaAtual Mapa atual em que o jogador será movido
@@ -118,12 +126,13 @@ public class Player extends Entidade {
         if (pitch >= 16 || pitch <= -16) {
             taxaPitch *= -1;
         }
-        
+
         trataColisao(mapaAtual, dx, dy);
     }
 
     /**
      * Rotaciona o player em torno do seu angulo.
+     *
      * @param deltaX Variação do angulo que deve ser somada
      */
     public void rotaciona(double deltaX) {
@@ -132,6 +141,7 @@ public class Player extends Entidade {
 
     /**
      * Verifica e trata a colisão da hitbox do jogador com os objetos do mapa
+     *
      * @param mapaAtual Mapa em que a colisão ocorre
      * @param posX Posição em x do jogador
      * @param posY Posição em y do jogador
@@ -159,21 +169,48 @@ public class Player extends Entidade {
         if(!colidiuY)
             moveY(posY);
     }
+    
+    /*public void trataColisao(Mapa mapaAtual, double posX, double posY) {
+        double xMin = posX;
+        double yMin = posY;
+
+        double xMax = xMin + getLargura();
+        double yMax = yMin + getLargura();
+        
+        boolean colidiu = false;
+
+        // Verifica a colisão com os blocos do mapa
+        for (double i = xMin; i < xMax; i++) {
+            for (double j = yMin; j < yMax; j++) {
+                if(mapaAtual.checaColisao(i, j)) {
+                    System.out.println("passou");
+                    colidiu = true;
+                }
+            }
+        }
+        
+        if(!colidiu) {
+            moveX(posX);
+            moveY(posY);
+        }
+    }*/
 
     /**
-     * Adiciona uma nova arma no inventário do jogador. 
+     * Adiciona uma nova arma no inventário do jogador.
+     *
      * @param novaArma Nova arma a ser adicionada
      */
     public void adicionaArma(Arma novaArma) {
         mochila.guardaObjeto(novaArma);
     }
-    
+
     public void adicionaArma(List<Arma> novasArmas) {
         mochila.guardaObjeto(novasArmas);
     }
 
     /**
      * Saca um item do inventário do jogador.
+     *
      * @param index Índice do novo item
      */
     public void sacaItem(int index) {
@@ -196,6 +233,7 @@ public class Player extends Entidade {
 
     /**
      * Executa a ação de usar o item atual do jogador.
+     *
      * @param posX Posição x em que o item foi utilizado
      * @param posY Posição y em que o item foi utilizado
      */
@@ -236,7 +274,9 @@ public class Player extends Entidade {
 
     /**
      * Disponibiliza o número do consumível do item para código externo.
-     * @return Retorna a quantidade do atributo consumível do item atual do jogador
+     *
+     * @return Retorna a quantidade do atributo consumível do item atual do
+     * jogador
      */
     public int getQtdConsumivel() {
         if (itemAtual == null) {

@@ -7,9 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
-import javax.swing.JOptionPane;
 
 /**
  * Classe responsavel por armazenar os mapas
@@ -25,7 +23,7 @@ public class Mapa{
     
     /**
      * Construtor de intacias do tipo mapa
-     * @param nomeMapa nome associado ao mapa etambem o nome do arquivo no qual o mapa será salvo
+     * @param nomeMapa Nome associado ao mapa e também o nome do arquivo no qual o mapa será salvo
      * @param limite Tamanho do mapa = LimitexLimete
      * @author Vinicius Augusto
      * @author Bruno Zara

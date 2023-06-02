@@ -383,7 +383,7 @@ public class Engine extends JPanel implements ActionListener {
 
             // Posição relativa da linha sendo desenhada e da posição
             // central da tela.
-            int posicaoRelativa = (int) (y - centroDeVisao);
+            double posicaoRelativa = y - centroDeVisao;
 
             // Distancia horizontal da linha baseado no centro de visão e
             // na posição relativa da linha em relação ao centro
@@ -395,8 +395,8 @@ public class Engine extends JPanel implements ActionListener {
             double incrementoY = distanciaLinha * (sinRaioMaximo - sinRaioMinimo) / SCREENWIDTH;
 
             // Posições nas coordenadas x e y da posição atual no teto e chão
-            double posX = (playerX / tamanhoBloco) + distanciaLinha * cosRaioMinimo;
-            double posY = (playerY / tamanhoBloco) + distanciaLinha * sinRaioMinimo;
+            double posX = (playerX / (tamanhoBloco * 1.5)) + distanciaLinha * cosRaioMinimo;
+            double posY = (playerY / (tamanhoBloco * 1.5)) + distanciaLinha * sinRaioMinimo;
 
             // Percorre, em cada linha, os pixels da coluna para aplicar
             // a cor da textura adequada
