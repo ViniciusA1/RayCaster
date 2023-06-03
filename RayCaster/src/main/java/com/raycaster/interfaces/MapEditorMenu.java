@@ -112,6 +112,8 @@ public class MapEditorMenu {
                 
                 Path2D path = new Path2D.Double();
                 int bloco = (int) (64 * zoomFactor[0]);
+                int xi = -(mapa[0].getLimite()/2)*bloco;
+                int yi = -(mapa[0].getLimite()/2)*bloco;
                 for(int i = 0; i<mapa[0].getLimite(); i++){
                     for(int j = 0 ; j<mapa[0].getLimite(); j++){
                         int id = mapa[0].getID(i, j);
@@ -119,7 +121,7 @@ public class MapEditorMenu {
                             if(id > 0){
                                 Textura textura = Textura.getTextura(texturas, id);
                                 BufferedImage imagem = textura.getRGB();
-                                g2.drawImage(imagem, (-(mapa[0].getLimite()/2) + i) *bloco + x[0], (-(mapa[0].getLimite()/2) + j)*bloco + y[0], bloco, bloco, null);
+                                g2.drawImage(imagem, xi + x[0] + i*bloco, yi  + y[0] + j*bloco, bloco, bloco, null);
                             }
                     }
                 }
@@ -128,18 +130,20 @@ public class MapEditorMenu {
                 
                 g2.setColor(Color.WHITE);
                 for(int i = 0; i <= mapa[0].getLimite(); i++){
-                    path.moveTo((-(mapa[0].getLimite()/2) + i)*bloco + x[0], (-(mapa[0].getLimite()/2)*bloco) + y[0]);
-                    path.lineTo((-(mapa[0].getLimite()/2) + i)*bloco + x[0], ((mapa[0].getLimite()/2)*bloco) + y[0]);
+                    path.moveTo(xi + x[0] + i*bloco, yi  + y[0]);
+                    path.lineTo(xi + x[0] + i*bloco, -yi  + y[0]);
                     path.closePath();
                 }
                 
                 for(int i = 0; i <= mapa[0].getLimite() ; i++){
-                    path.moveTo((-(mapa[0].getLimite()/2)*bloco) + x[0], (-(mapa[0].getLimite()/2) + i)*bloco + y[0]);
-                    path.lineTo(((mapa[0].getLimite()/2)*bloco) + x[0], (-(mapa[0].getLimite()/2) + i)*bloco + y[0]);
+                    path.moveTo(xi + x[0], yi  + y[0] + i*bloco);
+                    path.lineTo(-xi + x[0], yi  + y[0] + i*bloco);
                     path.closePath();
                 }
                 
                 g2.draw(path);
+                g2.setColor(Color.BLUE);
+                g2.fillOval(xi + x[0] + mapa[0].getSpawnX() * bloco, yi + mapa[0].getSpawnY() * bloco, bloco, bloco);
                 
                 
             }
@@ -154,7 +158,8 @@ public class MapEditorMenu {
 
             public ListPanel() {
                 super(new GridLayout());
-                dlm.addElement("00 - limpar");
+                dlm.addElement("Player Spawn Point");
+                dlm.addElement("0 - limpar");
                 for (Textura t: texturas){
                     dlm.addElement(t.toString());
                 }
@@ -173,14 +178,20 @@ public class MapEditorMenu {
                 public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                     JLabel label = (JLabel) super.getListCellRendererComponent( list, value, index, isSelected, cellHasFocus);
                     label.setBorder(BorderFactory.createEmptyBorder(N, N, N, N));
-                    String[] s = label.getText().split(" - ");
-                    int id = Integer.parseInt(s[0]);
-                    for(Textura aux: texturas){
-                        if(aux.getID() == id){
-                            label.setIcon(new ImageIcon(aux.getRGB()));
-                            break;
-                        }
+                    if(label.getText().equals("Player Spawn Point")){
+                        
                     }
+                    else{
+                       String[] s = label.getText().split(" - ");
+                        int id = Integer.parseInt(s[0]);
+                        for(Textura aux: texturas){
+                            if(aux.getID() == id){
+                                label.setIcon(new ImageIcon(aux.getRGB()));
+                                break;
+                            }
+                        } 
+                    }
+                    
                     
                     label.setHorizontalTextPosition(JLabel.CENTER);
                     label.setVerticalTextPosition(JLabel.BOTTOM);
@@ -200,8 +211,14 @@ public class MapEditorMenu {
                 public void valueChanged(ListSelectionEvent e) {
                     if (!e.getValueIsAdjusting()) {
                         String label = (String) dlm.getElementAt(list.getSelectedIndex());
-                        String[] s = label.split(" - ");
-                        selecionado[0] = Integer.parseInt(s[0]);
+                        if(label.equals("Player Spawn Point")){
+                            selecionado[0] = -1;
+                        }
+                        else{
+                            String[] s = label.split(" - ");
+                            selecionado[0] = Integer.parseInt(s[0]);
+                        }
+                        
                     }
                     
                 }
@@ -288,8 +305,23 @@ public class MapEditorMenu {
                 int bloco = (int) (64 * zoomFactor[0]);
                 //JOptionPane.showMessageDialog(null, "X = " + (x[1] -x[0] +(mapa.getLimite()/2) * bloco)/bloco + ", y = " + (y[1] -y[0] +(mapa.getLimite()/2) * bloco)/bloco);
                 int aux = selecionado[0];
-                    
-                mapa[0].setValor((x[1] -x[0] +(mapa[0].getLimite()/2) * bloco)/bloco, (y[1] -y[0] +(mapa[0].getLimite()/2) * bloco)/bloco, aux);
+                int xi = (x[1] -x[0] +(mapa[0].getLimite()/2) * bloco)/bloco;
+                int yi = (y[1] -y[0] +(mapa[0].getLimite()/2) * bloco)/bloco;
+                if(xi > mapa[0].getLimite() || xi < 0 || yi > mapa[0].getLimite() || yi < 0){
+                    return;
+                }
+                if(aux == -1){
+                    if(mapa[0].getID(xi, yi) == 0)
+                        mapa[0].setSpawn(xi, yi);
+                    else
+                        JOptionPane.showMessageDialog(null, "vc não pode colocar o Player na parede");
+                }
+                else{
+                    if(xi == mapa[0].getSpawnX()  &&  yi == mapa[0].getSpawnY())
+                        JOptionPane.showMessageDialog(null, "vc não pode colocar uma parede em cima do player");
+                    else
+                        mapa[0].setValor(xi, yi, aux);
+                }
                 grid.repaint();
             }
             
@@ -322,6 +354,15 @@ public class MapEditorMenu {
             }
             grid.repaint();
         });
+        
+        JButton salvar = new JButton("salvar");
+        salvar.addActionListener((ActionEvent e) -> {
+            for(Mapa aux: mapas){
+                try {aux.salvar();}
+                catch(IOException exe){}
+            }
+        });
+        barra.add(salvar);
         
         barra.add(mapSelector);
         grid.addMouseListener(adaptador);

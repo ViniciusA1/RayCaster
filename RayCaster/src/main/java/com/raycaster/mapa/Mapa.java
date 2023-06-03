@@ -198,7 +198,7 @@ public class Mapa{
         
         for(int i = 0, j; i < limite; i++) {
             for(j = 0; j < limite; j++)
-                aux.setValor(i, j, leitor.nextInt());
+                aux.setValor(j, i, leitor.nextInt());
         }
         
         aux.setSpawn(leitor.nextInt(), leitor.nextInt());
@@ -229,7 +229,7 @@ public class Mapa{
         
         for(int i = 0, j; i < limite; i++) {
             for(j = 0; j < limite; j++)
-                grid[i][j] = leitor.nextInt();
+                grid[j][i] = leitor.nextInt();
         }
         this.setSpawn(leitor.nextInt(), leitor.nextInt());
         
@@ -256,7 +256,7 @@ public class Mapa{
         buffout.flush();
         for(int i = 0; i < this.limite; i++){
             for(int j = 0; j < this.limite; j++){
-                buffout.write(Integer.toString(grid[i][j]));
+                buffout.write(Integer.toString(grid[j][i]));
                 buffout.write(" ");
             }
             buffout.newLine();
