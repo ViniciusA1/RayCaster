@@ -8,6 +8,7 @@ import com.raycaster.mapa.MapGroup.ListData;
 import com.raycaster.mapa.Mapa;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -34,6 +35,9 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -44,7 +48,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.PlainDocument;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  * Classe que cria e executa as intefaces grafica referentes ao editor de mapas 
@@ -128,37 +135,75 @@ public class MapEditorMenu {
         };
         
         
-        class TextureBox extends JPanel{
-            Textura tex;
+        class ListPanel extends JPanel {
 
-            TextureBox(Textura t){
-                tex = t;
-                this.setLayout(new BorderLayout());
-                this.setSize(66, 70);
-                this.add(Box.createRigidArea(new Dimension(66, 66)));
-                this.add(new JLabel(tex.toString()), BorderLayout.PAGE_END);
+            private static final int N = 5;
+            private DefaultListModel dlm = new DefaultListModel();
+            private JList list = new JList(dlm);
 
-                this.repaint();
-
+            public ListPanel() {
+                super(new GridLayout());
+                dlm.addElement("00 - limpar");
+                for (Textura t: texturas){
+                    dlm.addElement(t.toString());
+                }
+                list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+                list.setVisibleRowCount(N);
+                list.setCellRenderer(new ListRenderer());
+                list.addListSelectionListener(new SelectionHandler());
+                this.add(list);
             }
 
-            @Override
-            public void paintComponent(Graphics g){
+            private class ListRenderer extends DefaultListCellRenderer {
+
                 
-                g.drawImage(tex.getRGB(), 1, 1, 65, 64, this);
+                @Override
+                public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                    JLabel label = (JLabel) super.getListCellRendererComponent( list, value, index, isSelected, cellHasFocus);
+                    label.setBorder(BorderFactory.createEmptyBorder(N, N, N, N));
+                    String[] s = label.getText().split(" - ");
+                    int id = Integer.parseInt(s[0]);
+                    for(Textura aux: texturas){
+                        if(aux.getID() == id){
+                            label.setIcon(new ImageIcon(aux.getRGB()));
+                            break;
+                        }
+                    }
+                    
+                    label.setHorizontalTextPosition(JLabel.CENTER);
+                    label.setVerticalTextPosition(JLabel.BOTTOM);
+                    return label;
+//                    TextureBox tb = (TextureBox) super.getListCellRendererComponent( list, value, index, isSelected, cellHasFocus);;
+//                    return tb;
+                }
+                
+                
             }
+            
+            
 
+            private class SelectionHandler implements ListSelectionListener {
+
+                @Override
+                public void valueChanged(ListSelectionEvent e) {
+                    if (!e.getValueIsAdjusting()) {
+                        String label = (String) dlm.getElementAt(e.getLastIndex());
+                        String[] s = label.split(" - ");
+                        selecionado[0] = Integer.parseInt(s[0]);
+                    }
+                    
+                }
+            }
         }
         
         
         
-        JPanel textureList = new JPanel();
-        for(Textura aux : texturas){
-            textureList.add(new TextureBox(aux));
-        }
-        JPanel texturePanel = new JPanel();
-        texturePanel.setSize(editor.getWidth()/5, editor.getHeight());
-        texturePanel.add(textureList);
+        ListPanel lista = new ListPanel();
+        
+        JSplitPane jsp = new JSplitPane();
+        jsp.setLeftComponent(new JScrollPane(lista));
+        jsp.setRightComponent(grid);
         
         // método novo para mover a grid
         MouseAdapter adaptador = new MouseAdapter() {
@@ -203,15 +248,22 @@ public class MapEditorMenu {
             public void mouseClicked(MouseEvent e){
                 x[1] = e.getX();
                 y[1] = e.getY();
+                
                 Dimension d = grid.getSize();
                 Point p = grid.getLocation();
-                x[1] = (x[1] - p.x) ;
+                x[1] = (x[1] - p.x) + jsp.getDividerLocation() +10;
                 y[1] = (y[1] - p.y) ;
                 x[1] = x[1] -d.width/2;
                 y[1] = y[1] -d.height/2;
                 int bloco = (int) (64 * zoomFactor[0]);
-                JOptionPane.showMessageDialog(null, "X = " + (x[1] -x[0] +(mapa.getLimite()/2) * bloco)/bloco + ", y = " + (y[1] -y[0] +(mapa.getLimite()/2) * bloco)/bloco);
-                mapa.setValor((x[1] -x[0] +(mapa.getLimite()/2) * bloco)/bloco, (y[1] -y[0] +(mapa.getLimite()/2) * bloco)/bloco, idSelec[0]);
+                //JOptionPane.showMessageDialog(null, "X = " + (x[1] -x[0] +(mapa.getLimite()/2) * bloco)/bloco + ", y = " + (y[1] -y[0] +(mapa.getLimite()/2) * bloco)/bloco);
+                int aux;
+                if(e.getButton() == 3)
+                    aux = 0;
+                else
+                    aux = selecionado[0];
+                    
+                mapa.setValor((x[1] -x[0] +(mapa.getLimite()/2) * bloco)/bloco, (y[1] -y[0] +(mapa.getLimite()/2) * bloco)/bloco, aux);
                 grid.repaint();
             }
         };
@@ -222,9 +274,7 @@ public class MapEditorMenu {
         grid.addMouseWheelListener(adaptador);
         grid.addMouseMotionListener(adaptador);
         
-        editor.setLayout(new GridLayout(1,3,20,0));
-        editor.add(texturePanel);
-        editor.add(grid);
+        editor.add(jsp);
         editor.addWindowListener(new event(f));
         editor.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         editor.setVisible(true);
@@ -479,6 +529,8 @@ public class MapEditorMenu {
         exclui.add(painelEx);
         exclui.setVisible(true);
     }
+    
+    
     
     
     /**
