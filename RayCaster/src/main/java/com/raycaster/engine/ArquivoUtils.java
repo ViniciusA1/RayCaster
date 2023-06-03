@@ -21,15 +21,32 @@ import javax.swing.ImageIcon;
  */
 public class ArquivoUtils {
 
+    /**
+     * Formato de imagem utilizado no programa.
+     */
     public final static String FORMATO_IMAGEM = ".png";
+
+    /**
+     * Formato de sons utilizado no programa.
+     */ 
     public final static String FORMATO_SOM = ".wav";
+
+    /**
+     * Formato de arquivos de dados utilizados no programa.
+     */
     public final static String FORMATO_DADOS = ".properties";
     
     
     /**
-     * 
+     * Classe que herda de Properties e sobrescreve seu método de busca em arquivo.
      */
     private static class StripProperties extends Properties {
+        
+        /**
+         * Retorna uma string com o valor da propriedade já formatado com o "strip".
+         * @param key Chave para busca do valor
+         * @return Retorna a string gerada
+         */
         @Override
         public String getProperty(String key) {
             String valor = super.getProperty(key);
@@ -42,9 +59,9 @@ public class ArquivoUtils {
     }
 
     /**
-     *
-     * @param nomeArquivo
-     * @return
+     * Lê e carrega um arquivo de propriedades.
+     * @param nomeArquivo Nome do arquivo que deve ser carregado
+     * @return Retorna o arquivo carregado
      */
     public static Properties lePropriedade(String nomeArquivo) {
         StripProperties propriedades = new StripProperties();
@@ -63,6 +80,11 @@ public class ArquivoUtils {
         return propriedades;
     }
 
+    /**
+     * Lê e carrega uma imagem.
+     * @param nomeImagem Nome da imagem a ser carregada
+     * @return Retorna a imagem carregada
+     */
     public static ImageIcon leImagem(String nomeImagem) {
         nomeImagem += FORMATO_IMAGEM;
 
@@ -75,6 +97,13 @@ public class ArquivoUtils {
         return new ImageIcon(nomeImagem);
     }
 
+    /**
+     * Lê e carrega uma lista de objetos genéricos.
+     * @param <T> Tipo do objeto a ser carregado
+     * @param nomeArquivo Nome do arquivo contendo os dados do objeto
+     * @param classeObjeto Classe a qual o objeto pertence
+     * @return Retorna a lista de objetos criados
+     */
     public static <T> List<T> leObjetos(String nomeArquivo, Class<T> classeObjeto) {
         List<T> listaItens = new ArrayList<>();
         nomeArquivo += classeObjeto.getSimpleName();
@@ -105,6 +134,14 @@ public class ArquivoUtils {
         return listaItens;
     }
 
+    /**
+     * Lê dados de um item e cria-o.
+     * @param <T> Tipo do item a ser criado
+     * @param dado Arquivo de propriedades que contém os dados
+     * @param tipo Tipo do item
+     * @param id ID do item na lista
+     * @return Retorna o item criado
+     */
     private static <T extends Item> T criaItem(Properties dado, String tipo, int id) {
         T itemCriado;
 
@@ -143,6 +180,14 @@ public class ArquivoUtils {
         return itemCriado;
     }
     
+    /**
+     * Lê dados de uma entidade e cria-a.
+     * @param <T> Tipo da entidade a ser criada
+     * @param dado Arquivo de propriedades contendo os dados da entidade
+     * @param tipo Tipo da entidade
+     * @param id ID da entidade na lista
+     * @return Retorna a entidade criada
+     */
     private static <T extends Entidade> T criaEntidade(Properties dado, String tipo, int id) {
         T entidadeCriada;
         
@@ -151,7 +196,6 @@ public class ArquivoUtils {
         double y = Double.parseDouble(dado.getProperty("y" + id));
         double largura = Double.parseDouble(dado.getProperty("largura" + id));
         double velocidade = Double.parseDouble(dado.getProperty("velocidade" + id)); 
-        int fov = Integer.parseInt(dado.getProperty("fov" + id));
         double FOG = Double.parseDouble(dado.getProperty("FOG" + id));
         
         String[] estados = dado.getProperty("estados" + id).split(",");
@@ -164,6 +208,7 @@ public class ArquivoUtils {
         
         switch(tipo) {
             case "Player" -> {
+                int fov = Integer.parseInt(dado.getProperty("fov" + id));
                 entidadeCriada = (T) new Player(vidaMaxima, x, y, largura, velocidade, fov, FOG, possiveisEstados);
             }
             default -> entidadeCriada = null;

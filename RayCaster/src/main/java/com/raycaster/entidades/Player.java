@@ -21,6 +21,7 @@ public class Player extends Entidade {
 
     private double angulo;
     private double pitch;
+    private double FOV;
     private double taxaPitch;
     private long tempoAnterior;
     private Inventario<Arma> mochila;
@@ -46,10 +47,11 @@ public class Player extends Entidade {
     public Player(double vidaMaxima, double x, double y, double largura, double velocidade,
             int fov, double FOG, EnumSet<Estado> possiveisEstados) {
 
-        super(vidaMaxima, x, y, largura, velocidade, fov, FOG, possiveisEstados);
+        super(vidaMaxima, x, y, largura, velocidade, FOG, possiveisEstados);
 
         angulo = 0;
         pitch = 0;
+        FOV = Math.toRadians(fov);
         taxaPitch = 0.5;
         mochila = new Inventario<>();
         estadoAtual = Estado.OCIOSO;
@@ -91,6 +93,15 @@ public class Player extends Entidade {
     public double getAngulo() {
         return angulo;
     }
+    
+    /**
+     * Disponibiliza o FOV do jogador para código externo.
+     * 
+     * @return Retorna o FOV do jogador
+     */
+    public double getFOV() {
+        return FOV;
+    }
 
     /**
      * Disponibiliza o "pitch" do jogador para código externo.
@@ -127,7 +138,7 @@ public class Player extends Entidade {
             taxaPitch *= -1;
         }
 
-        trataColisao(mapaAtual, dx, dy);
+        trataColisao(mapaAtual, getX() + dx, getY() + dy);
     }
 
     /**
@@ -149,51 +160,29 @@ public class Player extends Entidade {
     public void trataColisao(Mapa mapaAtual, double posX, double posY) {
         boolean colidiuX = false;
         boolean colidiuY = false;
-        double novoX = posX + getX();
-        double novoY = posY + getY();
         double tamanho = getLargura();
-        
-        for (double i = novoX - tamanho; i <= novoX + tamanho; i++) {
-            for (double j = novoY - tamanho; j <= novoY + tamanho; j++) {
+
+        for (double i = posX - tamanho; i <= posX + tamanho; i += tamanho) {
+            for (double j = posY - tamanho; j <= posY + tamanho; j += tamanho) {
                 if (mapaAtual.checaColisao(i, j)) {
                     colidiuY |= !mapaAtual.checaColisao(i, getY());
                     colidiuX |= !mapaAtual.checaColisao(getX(), j);
                 }
             }
         }
-        
-        
-        if(!colidiuX)
+
+        if (colidiuX && colidiuY) {
+            
+        }
+
+        if (!colidiuX) {
             moveX(posX);
-        
-        if(!colidiuY)
+        }
+
+        if (!colidiuY) {
             moveY(posY);
+        }
     }
-    
-    /*public void trataColisao(Mapa mapaAtual, double posX, double posY) {
-        double xMin = posX;
-        double yMin = posY;
-
-        double xMax = xMin + getLargura();
-        double yMax = yMin + getLargura();
-        
-        boolean colidiu = false;
-
-        // Verifica a colisão com os blocos do mapa
-        for (double i = xMin; i < xMax; i++) {
-            for (double j = yMin; j < yMax; j++) {
-                if(mapaAtual.checaColisao(i, j)) {
-                    System.out.println("passou");
-                    colidiu = true;
-                }
-            }
-        }
-        
-        if(!colidiu) {
-            moveX(posX);
-            moveY(posY);
-        }
-    }*/
 
     /**
      * Adiciona uma nova arma no inventário do jogador.
@@ -204,6 +193,11 @@ public class Player extends Entidade {
         mochila.guardaObjeto(novaArma);
     }
 
+    /**
+     * Adiciona uma lista de novas armas ao inventário do jogador.
+     *
+     * @param novasArmas Novas armas para serem adicionadas
+     */
     public void adicionaArma(List<Arma> novasArmas) {
         mochila.guardaObjeto(novasArmas);
     }

@@ -12,20 +12,27 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
- *
- * @author vinicius
+ * Classe que conteḿ os atributos e métodos dos efeitos sonoros do jogo.
+ * @author Vinicius Augusto
+ * @author Bruno Zara
  */
 public class EfeitosSonoros {
 
     private final Map<Estado, Clip> sons;
 
+    /**
+     * Construtor da classe que recebe o nome do objeto e um conjunto de seus
+     * possíveis estados.
+     * @param nome Nome do objeto associado ao som
+     * @param possiveisEstados Possíveis estados que o objeto pode assumir
+     */
     public EfeitosSonoros(String nome, EnumSet<Estado> possiveisEstados) {
         sons = new HashMap<>();
         carregarSons(nome, possiveisEstados);
     }
 
     /**
-     * Carrega todos os sons associados aos estados do objeto
+     * Carrega todos os sons associados aos estados do objeto.
      * @param nome Nome do objeto
      * @param possiveisEstados Possíveis estados associados ao objeto
      */
@@ -51,7 +58,7 @@ public class EfeitosSonoros {
     }
 
     /**
-     * Emite o som de acordo com o estado recebido
+     * Emite o som de acordo com o estado recebido.
      * @param estadoAtual Estado recebido pelo método
      */
     public void emiteSom(Estado estadoAtual) {

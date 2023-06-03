@@ -38,6 +38,7 @@ public class Engine extends JPanel implements ActionListener {
     private int SCREENWIDTH;
     private int SCREENHEIGHT;
     private final Timer gameTimer;
+    private long tempoAnterior;
     private Player jogador;
     private Mapa mapaAtual;
     private KeyInput keyHandler;
@@ -186,7 +187,7 @@ public class Engine extends JPanel implements ActionListener {
         double playerAngulo = jogador.getAngulo();
         double playerX = jogador.getX();
         double playerY = jogador.getY();
-        double playerFOV = jogador.getFov();
+        double playerFOV = jogador.getFOV();
 
         // Distancia de visão máxima permitida pelo jogo
         double distanciaMaxima = jogador.getFOG();
@@ -451,6 +452,14 @@ public class Engine extends JPanel implements ActionListener {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
+        long tempoAtual = System.currentTimeMillis();
+        
+        long deltaTime = tempoAtual - tempoAnterior;
+        
+        System.out.println(deltaTime);
+        
+        tempoAnterior = tempoAtual;
+        
         update();
         repaint();
     }

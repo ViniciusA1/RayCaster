@@ -1,8 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.raycaster.interfaces;
+
+
 import com.raycaster.engine.Textura;
 import com.raycaster.mapa.MapGroup.ListData;
 import com.raycaster.mapa.Mapa;
@@ -188,7 +186,7 @@ public class MapEditorMenu {
                 @Override
                 public void valueChanged(ListSelectionEvent e) {
                     if (!e.getValueIsAdjusting()) {
-                        String label = (String) dlm.getElementAt(e.getLastIndex());
+                        String label = (String) dlm.getElementAt(list.getSelectedIndex());
                         String[] s = label.split(" - ");
                         selecionado[0] = Integer.parseInt(s[0]);
                     }

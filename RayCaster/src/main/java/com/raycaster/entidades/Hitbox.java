@@ -27,11 +27,11 @@ public class Hitbox {
         return largura;
     }
 
-    public void setX(double dx) {
-        this.x += dx;
+    public void setX(double x) {
+        this.x = x;
     }
 
-    public void setY(double dy) {
-        this.y += dy;
+    public void setY(double y) {
+        this.y = y;
     }
 }

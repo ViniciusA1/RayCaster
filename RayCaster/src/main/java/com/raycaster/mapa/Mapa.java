@@ -22,7 +22,7 @@ public class Mapa{
     private MapGroup grupo;
     
     /**
-     * Construtor de intacias do tipo mapa
+     * Construtor de instâncias do tipo mapa
      * @param nomeMapa Nome associado ao mapa e também o nome do arquivo no qual o mapa será salvo
      * @param limite Tamanho do mapa = LimitexLimete
      * @author Vinicius Augusto
