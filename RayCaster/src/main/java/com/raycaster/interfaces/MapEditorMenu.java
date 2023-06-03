@@ -15,6 +15,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -35,10 +36,12 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -47,6 +50,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.PlainDocument;
 import javax.swing.JList;
+import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
@@ -84,12 +88,11 @@ public class MapEditorMenu {
         selecionado[0] = -1;
         int[] constJSP = new int[1];
         constJSP[0] = 0;
-        Mapa mapa = mapas.get(0);
+        Mapa[] mapa = new Mapa[1];
+        mapa[0] = null;
                 
         int[] x = new int[2];
         int[] y = new int[2];
-        int[] idSelec = new int[1];
-        idSelec[0] = 0;
         JFrame editor = new JFrame("Editor de mapas");
         editor.setSize(800, 600);
         
@@ -101,16 +104,22 @@ public class MapEditorMenu {
                 g2.setColor(Color.BLACK);
                 g2.fillRect(0, 0, this.getWidth(), this.getHeight());
                 g2.translate(this.getWidth()/2, this.getHeight()/2);
+                if(mapa[0] == null){
+                    g2.setColor(Color.WHITE);
+                    g2.drawString("Selecione um Mapa!!", 0, 0);
+                    return;
+                }
+                
                 Path2D path = new Path2D.Double();
                 int bloco = (int) (64 * zoomFactor[0]);
-                for(int i = 0; i<mapa.getLimite(); i++){
-                    for(int j = 0 ; j<mapa.getLimite(); j++){
-                        int id = mapa.getID(i, j);
-                        if((this.getWidth()/2 <= ((Math.abs(mapa.getLimite())/2) + i + constJSP[0])*bloco + x[0]  && this.getHeight()/2 <= ((Math.abs(mapa.getLimite()/2) + j) *bloco + y[0])))
+                for(int i = 0; i<mapa[0].getLimite(); i++){
+                    for(int j = 0 ; j<mapa[0].getLimite(); j++){
+                        int id = mapa[0].getID(i, j);
+                        if((this.getWidth()/2 <= ((Math.abs(mapa[0].getLimite())/2) + i + constJSP[0])*bloco + x[0]  && this.getHeight()/2 <= ((Math.abs(mapa[0].getLimite()/2) + j) *bloco + y[0])))
                             if(id > 0){
                                 Textura textura = Textura.getTextura(texturas, id);
                                 BufferedImage imagem = textura.getRGB();
-                                g2.drawImage(imagem, (-(mapa.getLimite()/2) + i) *bloco + x[0], (-(mapa.getLimite()/2) + j)*bloco + y[0], bloco, bloco, null);
+                                g2.drawImage(imagem, (-(mapa[0].getLimite()/2) + i) *bloco + x[0], (-(mapa[0].getLimite()/2) + j)*bloco + y[0], bloco, bloco, null);
                             }
                     }
                 }
@@ -118,15 +127,15 @@ public class MapEditorMenu {
                 
                 
                 g2.setColor(Color.WHITE);
-                for(int i = 0; i <= mapa.getLimite(); i++){
-                    path.moveTo((-(mapa.getLimite()/2) + i)*bloco + x[0], (-(mapa.getLimite()/2)*bloco) + y[0]);
-                    path.lineTo((-(mapa.getLimite()/2) + i)*bloco + x[0], ((mapa.getLimite()/2)*bloco) + y[0]);
+                for(int i = 0; i <= mapa[0].getLimite(); i++){
+                    path.moveTo((-(mapa[0].getLimite()/2) + i)*bloco + x[0], (-(mapa[0].getLimite()/2)*bloco) + y[0]);
+                    path.lineTo((-(mapa[0].getLimite()/2) + i)*bloco + x[0], ((mapa[0].getLimite()/2)*bloco) + y[0]);
                     path.closePath();
                 }
                 
-                for(int i = 0; i <= mapa.getLimite() ; i++){
-                    path.moveTo((-(mapa.getLimite()/2)*bloco) + x[0], (-(mapa.getLimite()/2) + i)*bloco + y[0]);
-                    path.lineTo(((mapa.getLimite()/2)*bloco) + x[0], (-(mapa.getLimite()/2) + i)*bloco + y[0]);
+                for(int i = 0; i <= mapa[0].getLimite() ; i++){
+                    path.moveTo((-(mapa[0].getLimite()/2)*bloco) + x[0], (-(mapa[0].getLimite()/2) + i)*bloco + y[0]);
+                    path.lineTo(((mapa[0].getLimite()/2)*bloco) + x[0], (-(mapa[0].getLimite()/2) + i)*bloco + y[0]);
                     path.closePath();
                 }
                 
@@ -265,6 +274,8 @@ public class MapEditorMenu {
             
             @Override
             public void mouseClicked(MouseEvent e){
+                if(mapa[0] == null)
+                    return;
                 x[1] = e.getX();
                 y[1] = e.getY();
                 
@@ -278,7 +289,7 @@ public class MapEditorMenu {
                 //JOptionPane.showMessageDialog(null, "X = " + (x[1] -x[0] +(mapa.getLimite()/2) * bloco)/bloco + ", y = " + (y[1] -y[0] +(mapa.getLimite()/2) * bloco)/bloco);
                 int aux = selecionado[0];
                     
-                mapa.setValor((x[1] -x[0] +(mapa.getLimite()/2) * bloco)/bloco, (y[1] -y[0] +(mapa.getLimite()/2) * bloco)/bloco, aux);
+                mapa[0].setValor((x[1] -x[0] +(mapa[0].getLimite()/2) * bloco)/bloco, (y[1] -y[0] +(mapa[0].getLimite()/2) * bloco)/bloco, aux);
                 grid.repaint();
             }
             
@@ -293,13 +304,32 @@ public class MapEditorMenu {
             }
         };
         
+        JMenuBar barra = new JMenuBar();
         
+        DefaultComboBoxModel dcm = new DefaultComboBoxModel<Mapa>();
+        dcm.addElement("-- Selecione um Mapa --");
+        for(Mapa aux : mapas){
+            dcm.addElement(aux);
+        }
         
+        JComboBox mapSelector = new JComboBox(dcm);
+        mapSelector.addActionListener((ActionEvent e) -> {
+            if(mapSelector.getSelectedItem() instanceof String){
+                mapa[0] = null;
+            }
+            else{
+                mapa[0] = mapas.get(mapSelector.getSelectedIndex() - 1);
+            }
+            grid.repaint();
+        });
+        
+        barra.add(mapSelector);
         grid.addMouseListener(adaptador);
         grid.addMouseWheelListener(adaptador);
         grid.addMouseMotionListener(adaptador);
         
         editor.add(jsp);
+        editor.setJMenuBar(barra);
         editor.addWindowListener(new event(f));
         editor.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         editor.setVisible(true);

@@ -20,6 +20,9 @@ public class Mapa{
     private int limite;
     private final int tamanhoBloco = 32;
     private MapGroup grupo;
+    private int playerSpawnX;
+    private int playerSpawnY;
+    
     
     /**
      * Construtor de instâncias do tipo mapa
