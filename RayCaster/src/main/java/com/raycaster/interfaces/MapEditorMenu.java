@@ -24,6 +24,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -80,6 +82,8 @@ public class MapEditorMenu {
         zoomFactor[0] = 1;
         int[] selecionado = new int[1];
         selecionado[0] = -1;
+        int[] constJSP = new int[1];
+        constJSP[0] = 0;
         Mapa mapa = mapas.get(0);
                 
         int[] x = new int[2];
@@ -102,7 +106,7 @@ public class MapEditorMenu {
                 for(int i = 0; i<mapa.getLimite(); i++){
                     for(int j = 0 ; j<mapa.getLimite(); j++){
                         int id = mapa.getID(i, j);
-                        if((this.getWidth()/2 <= ((Math.abs(mapa.getLimite())/2) + i)*bloco + x[0] && this.getHeight()/2 <= ((Math.abs(mapa.getLimite()/2) + j) *bloco + y[0])))
+                        if((this.getWidth()/2 <= ((Math.abs(mapa.getLimite())/2) + i + constJSP[0])*bloco + x[0]  && this.getHeight()/2 <= ((Math.abs(mapa.getLimite()/2) + j) *bloco + y[0])))
                             if(id > 0){
                                 Textura textura = Textura.getTextura(texturas, id);
                                 BufferedImage imagem = textura.getRGB();
@@ -152,7 +156,7 @@ public class MapEditorMenu {
                 list.addListSelectionListener(new SelectionHandler());
                 this.add(list);
             }
-
+            
             private class ListRenderer extends DefaultListCellRenderer {
 
                 
@@ -199,25 +203,42 @@ public class MapEditorMenu {
         
         ListPanel lista = new ListPanel();
         
+        
         JSplitPane jsp = new JSplitPane();
         jsp.setLeftComponent(new JScrollPane(lista));
         jsp.setRightComponent(grid);
+        constJSP[0] = jsp.getDividerLocation() +10;
+        jsp.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent pce) {
+                constJSP[0] = jsp.getDividerLocation() +10;
+                }
+        });
         
         // método novo para mover a grid
         MouseAdapter adaptador = new MouseAdapter() {
             private int anteriorX;
             private int anteriorY;
+            private int botao;
             
             @Override
             public void mouseDragged(MouseEvent e) {
-                int atualX = e.getX();
-                int atualY = e.getY();
-                             
-                x[0] += (atualX - anteriorX);
-                y[0] += (atualY - anteriorY);
+                if(botao == 3){
+                    int atualX = e.getX();
+                    int atualY = e.getY();
+
+                    x[0] += (atualX - anteriorX);
+                    y[0] += (atualY - anteriorY);
+
+                    anteriorX = atualX;
+                    anteriorY = atualY;
+                }
+                else if(botao== 1){
+                    mouseClicked(e);
+                }
+
                 
-                anteriorX = atualX;
-                anteriorY = atualY;
+                
                 
                 grid.repaint();
             }
@@ -255,14 +276,20 @@ public class MapEditorMenu {
                 y[1] = y[1] -d.height/2;
                 int bloco = (int) (64 * zoomFactor[0]);
                 //JOptionPane.showMessageDialog(null, "X = " + (x[1] -x[0] +(mapa.getLimite()/2) * bloco)/bloco + ", y = " + (y[1] -y[0] +(mapa.getLimite()/2) * bloco)/bloco);
-                int aux;
-                if(e.getButton() == 3)
-                    aux = 0;
-                else
-                    aux = selecionado[0];
+                int aux = selecionado[0];
                     
                 mapa.setValor((x[1] -x[0] +(mapa.getLimite()/2) * bloco)/bloco, (y[1] -y[0] +(mapa.getLimite()/2) * bloco)/bloco, aux);
                 grid.repaint();
+            }
+            
+            @Override
+            public void mousePressed(MouseEvent e){
+                botao = e.getButton();
+            }
+            
+            @Override
+            public void mouseReleased(MouseEvent e){
+                botao = 0;
             }
         };
         
