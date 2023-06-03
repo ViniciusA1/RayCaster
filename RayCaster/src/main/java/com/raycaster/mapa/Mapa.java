@@ -42,6 +42,42 @@ public class Mapa{
         } 
         grupo = null;
     }
+    
+    /**
+     * Metodo que define o ponto de Spawn do player
+     * @param x coordenada X
+     * @param y coordenada Y
+     * 
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
+    public void setSpawn(int x, int y){
+        this.playerSpawnX = x;
+        this.playerSpawnY = y;
+    }
+    
+    /**
+     * Metodo que define o ponto de Spawn do player
+     * @return int com a coordenada X
+     * 
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
+    public int getSpawnX(){
+        return playerSpawnX;
+    }
+    
+    /**
+     * Metodo que define o ponto de Spawn do player
+     * @return int com a coordenada Y
+     * 
+     * @author Vinicius Augusto
+     * @author Bruno Zara
+     */
+    public int getSpawnY(){
+        return playerSpawnY;
+    }
+    
 
     /**
      * Metodo de Get para pegar o limite
@@ -163,6 +199,8 @@ public class Mapa{
                 aux.setValor(i, j, leitor.nextInt());
         }
         
+        aux.setSpawn(leitor.nextInt(), leitor.nextInt());
+        
         leitor.close();
         return aux;
     }
@@ -191,6 +229,7 @@ public class Mapa{
             for(j = 0; j < limite; j++)
                 grid[i][j] = leitor.nextInt();
         }
+        this.setSpawn(leitor.nextInt(), leitor.nextInt());
         
         leitor.close();
     }
@@ -221,7 +260,7 @@ public class Mapa{
             buffout.newLine();
             buffout.flush();
         }
-        
+        buffout.write(Integer.toString(playerSpawnX) + " " + Integer.toString(playerSpawnX));
         buffout.close();
         out.close();       
     }
@@ -263,11 +302,12 @@ public class Mapa{
                 }
                 int tamanho = leitor.nextInt();
                 Mapa mapaCarregado = new Mapa(aux.getName(), tamanho);
-
-                for(int i = 0, j; i < tamanho; i++) {
-                    for(j = 0; j < tamanho; j++)
-                        mapaCarregado.setValor(j, i, leitor.nextInt());
-                }
+                
+                mapaCarregado.carregar();
+//                for(int i = 0, j; i < tamanho; i++) {
+//                    for(j = 0; j < tamanho; j++)
+//                        mapaCarregado.setValor(j, i, leitor.nextInt());
+//                }
                 mapas.add(mapaCarregado);
                 leitor.close();
             }
