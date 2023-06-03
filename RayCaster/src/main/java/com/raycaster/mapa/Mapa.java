@@ -263,6 +263,7 @@ public class Mapa{
             buffout.flush();
         }
         buffout.write(Integer.toString(playerSpawnX) + " " + Integer.toString(playerSpawnX));
+        buffout.flush();
         buffout.close();
         out.close();       
     }
