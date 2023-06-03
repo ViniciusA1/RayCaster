@@ -143,7 +143,7 @@ public class MapEditorMenu {
                 
                 g2.draw(path);
                 g2.setColor(Color.BLUE);
-                g2.fillOval(xi + x[0] + mapa[0].getSpawnX() * bloco, yi + mapa[0].getSpawnY() * bloco, bloco, bloco);
+                g2.fillOval(xi + x[0] + mapa[0].getSpawnX() * bloco, yi + y[0] + mapa[0].getSpawnY() * bloco, bloco, bloco);
                 
                 
             }
