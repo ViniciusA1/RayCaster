@@ -41,6 +41,8 @@ public class Mapa{
             }
         } 
         grupo = null;
+        playerSpawnX = 0;
+        playerSpawnY = 0;
     }
     
     /**
