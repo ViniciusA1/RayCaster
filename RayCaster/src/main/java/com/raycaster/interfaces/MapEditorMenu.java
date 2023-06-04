@@ -2,6 +2,7 @@ package com.raycaster.interfaces;
 
 
 import com.raycaster.engine.Textura;
+import static com.raycaster.interfaces.MenuInicial.lerImagem;
 import com.raycaster.mapa.MapGroup.ListData;
 import com.raycaster.mapa.Mapa;
 import java.awt.BorderLayout;
@@ -54,6 +55,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -64,6 +66,7 @@ import javax.swing.event.ListSelectionListener;
  */
 public class MapEditorMenu {
     private static ArrayList<Mapa> mapas;
+    private static Mapa novoMapa;
     
     /**
      * Metodo que carrega os mapas salvos e inicia o Editor de Mapas em uma thread especifica
@@ -73,9 +76,11 @@ public class MapEditorMenu {
      */
     public static void inicia(JFrame f){
         mapas = Mapa.carregarMapList();
+        novoMapa = null;
         SwingUtilities.invokeLater(() -> {
             mapEditorOp(f);
         });
+        
         
     }
     
@@ -234,11 +239,8 @@ public class MapEditorMenu {
         jsp.setLeftComponent(new JScrollPane(lista));
         jsp.setRightComponent(grid);
         constJSP[0] = jsp.getDividerLocation() +10;
-        jsp.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent pce) {
-                constJSP[0] = jsp.getDividerLocation() +10;
-                }
+        jsp.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, (PropertyChangeEvent pce) -> {
+            constJSP[0] = jsp.getDividerLocation() +10;
         });
         
         // método novo para mover a grid
@@ -357,7 +359,7 @@ public class MapEditorMenu {
             grid.repaint();
         });
         
-        JButton salvar = new JButton("Salvar");
+        JButton salvar = new JButton(UIManager.getIcon("FileView.floppyDriveIcon"));
         salvar.addActionListener((ActionEvent e) -> {
             for(Mapa aux: mapas){
                 try {
@@ -373,9 +375,30 @@ public class MapEditorMenu {
             JOptionPane.showMessageDialog(null, 
                     "Mapas salvos com sucesso!");
         });
+        BufferedImage plus;
+        BufferedImage trash;
+        try{
+            plus = lerImagem("modelos" + File.separator + "icones" + File.separator + "plus.png");
+            trash = lerImagem("modelos" + File.separator + "icones" + File.separator + "trash.png");
+        }
+        catch(IOException ex){
+            JOptionPane.showMessageDialog(null, "Erro ao ler os icones");
+            plus = null; trash = null;
+        }
+        JButton criarMapa = new JButton(new ImageIcon(plus));
+        criarMapa.addActionListener(((e) ->{
+            criarMapa();
+            if(novoMapa != null){
+                dcm.addElement(novoMapa);
+                dcm.setSelectedItem(novoMapa);
+            }
+        }));
+
+        
+        barra.add(criarMapa);
+        barra.add(mapSelector);
         barra.add(salvar);
         
-        barra.add(mapSelector);
         grid.addMouseListener(adaptador);
         grid.addMouseWheelListener(adaptador);
         grid.addMouseMotionListener(adaptador);
@@ -400,7 +423,7 @@ public class MapEditorMenu {
         b1 = new JButton("Criar Novo Mapa");
         b1.addActionListener((ActionEvent e) -> {
             inicial.setVisible(false);
-            criarMapa(inicial);
+            criarMapa();
         });
         linha1.setLayout(new BoxLayout(linha1, BoxLayout.X_AXIS));
         linha1.add(Box.createVerticalGlue());
@@ -454,9 +477,8 @@ public class MapEditorMenu {
     }
     
     
-    private static void criarMapa(JFrame f){
+    private static void criarMapa(){
         JFrame janela = new JFrame("Criar novo mapa");
-        janela.addWindowListener(new event(f));
         janela.setDefaultCloseOperation(janela.DISPOSE_ON_CLOSE);
         janela.setSize(300, 200);
         janela.setLocationRelativeTo(null);
@@ -505,13 +527,12 @@ public class MapEditorMenu {
             else{
                 Mapa map = new Mapa(nomeCampo.getText(), Integer.parseInt((String)(tamanhoCampo.getText())));
                 mapas.add(map);
+                novoMapa = map;
                 try {
                     map.salvar();
                 } catch (IOException ex) {
                     Logger.getLogger(MapEditorMenu.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                //mapEditor(f);
-                f.setVisible(true);
                 janela.dispose();
             }
         });
@@ -520,7 +541,7 @@ public class MapEditorMenu {
 //            janela.setVisible(false);
 //            nomeCampo.setText("");
 //            tamanhoCampo.setText("");
-            f.setVisible(true);
+            novoMapa = null;
             janela.dispose();
         });
         linha4 = new JPanel();
@@ -549,6 +570,7 @@ public class MapEditorMenu {
         janela.setResizable(false);
         janela.add(coluna);
         janela.setVisible(true);
+        
         
         
         

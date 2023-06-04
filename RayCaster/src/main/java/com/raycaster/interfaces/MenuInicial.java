@@ -191,7 +191,7 @@ public class MenuInicial {
      * @author Vinicius Augusto
      * @author Bruno Zara
      */
-    private static BufferedImage lerImagem(String s) throws FileNotFoundException, IOException {
+    public static BufferedImage lerImagem(String s) throws FileNotFoundException, IOException {
         return lerImagem(new File(s));
     }
 
