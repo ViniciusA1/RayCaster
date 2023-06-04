@@ -1,14 +1,10 @@
 package com.raycaster.interfaces;
 
-import com.raycaster.engine.Diretorio;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.FontFormatException;
 import java.awt.LayoutManager;
-import java.io.File;
-import java.io.IOException;
 
 /**
  * Classe que guarda os métodos do layout personalizado para a HUD.
@@ -20,10 +16,10 @@ public class LayoutHUD implements LayoutManager {
     
     /**
      * Construtor do layout da HUD.
-     * @param nomeFonte Nome da fonte que será utilizada
+     * @param fontePersonalizada Fonte personalizada para a HUD
      */
-    public LayoutHUD(String nomeFonte) {
-        carregaFonte(nomeFonte);
+    public LayoutHUD(Font fontePersonalizada) {
+        this.fontePersonalizada = fontePersonalizada;
     }
     
     /**
@@ -94,18 +90,4 @@ public class LayoutHUD implements LayoutManager {
         }
 
     }
-
-    /**
-     * Carrega a fonte personalizada que será aplicada nos componentes.
-     * @param nomeFonte Nome da fonte a ser carregada
-     */
-    private void carregaFonte(String nomeFonte) {
-        try {
-            File fontFile = new File(Diretorio.SPRITE_HUD + nomeFonte);
-            fontePersonalizada = Font.createFont(Font.TRUETYPE_FONT, fontFile);
-        } catch (IOException | FontFormatException e) {
-            System.err.println("Fonte não existe!");
-        }
-    }
-
 }

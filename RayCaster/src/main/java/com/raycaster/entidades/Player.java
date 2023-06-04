@@ -136,8 +136,8 @@ public class Player extends Entidade {
         double dy = sinal * getVelocidade() * 
                 Math.sin(angulo + anguloRelativo) * deltaTime;
 
-        pitch += taxaPitch * deltaTime;
-
+        pitch += (taxaPitch * deltaTime);
+        
         if (pitch >= 16 || pitch <= -16) {
             taxaPitch *= -1;
         }
@@ -278,13 +278,5 @@ public class Player extends Entidade {
         }
 
         return itemAtual.getAtributoConsumivel();
-    }
-
-    /**
-     * Chama os métodos de redesenho dos componenetes de janela do player.
-     */
-    public void desenhaComponentes() {
-        hudJogador.repaint();
-        painelAnimacao.repaint();
     }
 }

@@ -3,6 +3,7 @@ package com.raycaster.interfaces;
 import com.raycaster.engine.Diretorio;
 import com.raycaster.entidades.Player;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +28,8 @@ public class HUD extends JPanel {
      * associada.
      * @param jogador Jogador ao qual a HUD está associada
      */
-    public HUD(Player jogador) {
-        setLayout(new LayoutHUD("font.ttf"));
+    public HUD(Player jogador, Font fontePersonalizada) {
+        setLayout(new LayoutHUD(fontePersonalizada));
         sprite = new ArrayList<>();
         this.jogador = jogador;
 

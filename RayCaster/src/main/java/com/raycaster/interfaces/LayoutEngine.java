@@ -9,41 +9,51 @@ import java.awt.LayoutManager;
 /**
  * Classe que contém os atributos e métodos do layout manager personalizado da
  * engine.
+ *
  * @author Vinicius Augusto
  * @author Bruno Zara
  */
 public class LayoutEngine implements LayoutManager {
+
     private Component hudPanel;
     private Component animacaoPanel;
+    private Component miraPanel;
+    private Component infoPanel;
+    private long infoCooldown;
 
     /**
      * Adiciona um componente ao layout manager.
+     *
      * @param name Nome do componente
      * @param comp Referência ao componente
      */
     @Override
     public void addLayoutComponent(String name, Component comp) {
         switch (name) {
-            case "hud" -> hudPanel = comp;
-            case "animacao" -> animacaoPanel = comp;
+            case "hud" ->
+                hudPanel = comp;
+            case "animacao" ->
+                animacaoPanel = comp;
+            case "mira" ->
+                miraPanel = comp;
+            case "info" ->
+                infoPanel = comp;
         }
     }
 
     /**
      * Remove um componente do layout manager.
+     *
      * @param comp Componente a ser removido
      */
     @Override
     public void removeLayoutComponent(Component comp) {
-        if (comp == hudPanel) {
-            hudPanel = null;
-        } else if (comp == animacaoPanel) {
-            animacaoPanel = null;
-        }
+        
     }
 
     /**
      * Devolve o tamanho de layout preferido.
+     *
      * @param parent "Parent" associado ao layout manager
      * @return Retorna a dimensão de espaço preferida pelo layout
      */
@@ -60,6 +70,7 @@ public class LayoutEngine implements LayoutManager {
 
     /**
      * Devolve o tamanho mínimo que o layout deve conter.
+     *
      * @param parent "Parent" associado ao layout manager
      * @return Retorna a dimensão mínima de tamanho do layout
      */
@@ -69,7 +80,9 @@ public class LayoutEngine implements LayoutManager {
     }
 
     /**
-     * Estipula a regra geral de comportamento dos componentes nesse layout manager.
+     * Estipula a regra geral de comportamento dos componentes nesse layout
+     * manager.
+     *
      * @param parent "Parent" associado ao layout manager
      */
     @Override
@@ -83,13 +96,38 @@ public class LayoutEngine implements LayoutManager {
         int animacaoWidth = parentSize.width / 2;
         int animacaoHeight = parentSize.height / 2;
 
+        int miraWidth = parentSize.width / 40;
+        int miraHeight = parentSize.width / 40;
+
+        int infoWidth = parentSize.width / 5;
+        int infoHeight = parentSize.height / 5;
+
         int hudX = insets.left;
         int hudY = parentSize.height - insets.bottom - hudHeight;
 
         int animacaoX = parentSize.width - insets.right - animacaoWidth;
         int animacaoY = parentSize.height - insets.bottom - animacaoHeight;
 
+        int miraX = (parentSize.width - insets.left - insets.right - miraWidth) / 2;
+        int miraY = (parentSize.height - insets.top - insets.bottom - miraHeight) / 2;
+
+        int infoX = insets.left;
+        int infoY = insets.top;
+
         hudPanel.setBounds(hudX, hudY, hudWidth, hudHeight);
         animacaoPanel.setBounds(animacaoX, animacaoY, animacaoWidth, animacaoHeight);
+        miraPanel.setBounds(miraX, miraY, miraWidth, miraHeight);
+        infoPanel.setBounds(infoX, infoY, infoWidth, infoHeight);
+    }
+    
+    public void toggleInformacoes() {
+        long tempoAtual = System.currentTimeMillis();
+
+        if (tempoAtual - infoCooldown >= 200) {
+            boolean toggle = infoPanel.isVisible();
+            infoPanel.setVisible(!toggle);
+
+            infoCooldown = tempoAtual;
+        }
     }
 }

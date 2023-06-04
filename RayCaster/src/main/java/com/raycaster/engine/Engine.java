@@ -4,10 +4,13 @@ import com.raycaster.interfaces.LayoutEngine;
 import com.raycaster.interfaces.AnimacaoPlayer;
 import com.raycaster.interfaces.HUD;
 import com.raycaster.entidades.Player;
+import com.raycaster.interfaces.PainelInformacao;
+import com.raycaster.interfaces.PainelMira;
 import com.raycaster.itens.Arma;
 import com.raycaster.mapa.Mapa;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -37,15 +40,17 @@ import javax.swing.Timer;
  */
 public class Engine extends JPanel implements ActionListener {
 
-    private int SCREENWIDTH;
-    private int SCREENHEIGHT;
+    private int screenWidth;
+    private int screenHeight;
 
-    private final Timer gameTimer;
+    private static final int fpsMaximo = 60;
+    private Timer gameTimer;
     private long tempoAnterior;
     private double deltaTime;
     private long tempoFrame;
-    private int fps;
     private int frameCounter;
+
+    private PainelInformacao painelInfo;
 
     private Player jogador;
     private Mapa mapaAtual;
@@ -53,7 +58,7 @@ public class Engine extends JPanel implements ActionListener {
     private MouseInput mouseHandler;
     private int[][] textura;
     private Clip musicaBackground;
-    private JFrame janela;
+    private final JFrame janela;
 
     /**
      * Construtor da engine, recebe o tamanho horizontal e vertical da JFrame
@@ -63,63 +68,93 @@ public class Engine extends JPanel implements ActionListener {
      * @param janela a janela a que esse componente esta associado
      */
     public Engine(int width, int height, JFrame janela) {
-        this.SCREENWIDTH = width;
-        this.SCREENHEIGHT = height;
+        this.screenWidth = width;
+        this.screenHeight = height;
+        this.janela = janela;
+
         setLayout(new LayoutEngine());
 
-        configInicial();
+        start();
+    }
+
+    /**
+     * Aplica e inicia todas as configurações principais da engine.
+     */
+    private void start() {
+        initMapa();
+        initPlayer();
+        initArmas();
+        initPanels();
+        initHandlers();
+        initMusica();
+        initTimer();
+        initTexturas();
+    }
+
+    /**
+     * Carrega e inicia o mapa inicial que será jogado.
+     */
+    private void initMapa() {
+        mapaAtual = new Mapa("lobby.txt", 20);
+        mapaAtual.carregar();
+    }
+
+    /**
+     * Carrega e inicia todos os players associados ao jogo.
+     */
+    private void initPlayer() {
+        List<Player> jogadores = ArquivoUtils.leObjetos(Diretorio.DADOS_ENTIDADES,
+                Player.class);
+
+        jogador = jogadores.get(0);
+
+        jogador.moveX(mapaAtual.getBlockSpawnX());
+        jogador.moveY(mapaAtual.getBlockSpawnY());
+    }
+
+    /**
+     * Carrega e inicia todas as armas possuídas pelo player.
+     */
+    private void initArmas() {
+        List<Arma> armas = ArquivoUtils.leObjetos(Diretorio.DADOS_ITENS,
+                Arma.class);
+
+        jogador.adicionaArma(armas);
+    }
+
+    /**
+     * Inicia todos os painéis do jogo que dependem da engine.
+     */
+    private void initPanels() {
+        Font fonte = carregaFonte();
+
+        HUD hudJogador = new HUD(jogador, fonte);
+        AnimacaoPlayer painelAnimacao = new AnimacaoPlayer(jogador);
+        PainelMira painelMira = new PainelMira();
+        painelInfo = new PainelInformacao(fonte);
+
+        this.add(hudJogador, "hud");
+        this.add(painelAnimacao, "animacao");
+        this.add(painelMira, "mira");
+        this.add(painelInfo, "info");
+
+        jogador.setPainelAnimacao(painelAnimacao);
+        jogador.setHUD(hudJogador);
+        jogador.sacaItem(0);
+    }
+
+    /**
+     * Inicia os "handlers" de teclado e mouse do jogo.
+     */
+    private void initHandlers() {
+        mouseHandler = new MouseInput(jogador, 0.001);
+        keyHandler = new KeyInput();
+        keyBindings();
 
         addKeyListener(keyHandler);
         addMouseListener(mouseHandler);
         addMouseMotionListener(mouseHandler);
         setFocusable(true);
-
-        carregaMusicaPrincipal();
-
-        this.janela = janela;
-        janela.addWindowListener(new desligaSom(musicaBackground));
-
-        int fpsDesejado = 60;
-        gameTimer = new Timer(Math.round(1000f / fpsDesejado), this);
-        gameTimer.start();
-    }
-
-    /**
-     * Aplica as configurações iniciais ao jogo, incluindo configurações do
-     * player, armas e keybindings.
-     */
-    private void configInicial() {
-        List<Player> jogadores = ArquivoUtils.leObjetos(Diretorio.DADOS_ENTIDADES,
-                Player.class);
-        jogador = jogadores.get(0);
-
-        mapaAtual = new Mapa("lobby.txt", 20);
-        mapaAtual.carregar();
-
-        jogador.moveX(mapaAtual.getBlockSpawnX());
-        jogador.moveY(mapaAtual.getBlockSpawnY());
-
-        mouseHandler = new MouseInput(jogador, 0.001);
-
-        List<Arma> armas = ArquivoUtils.leObjetos(Diretorio.DADOS_ITENS, Arma.class);
-
-        jogador.adicionaArma(armas);
-
-        HUD hudJogador = new HUD(jogador);
-        AnimacaoPlayer painelAnimacao = new AnimacaoPlayer(jogador);
-
-        this.add(hudJogador, "hud");
-        this.add(painelAnimacao, "animacao");
-
-        jogador.setPainelAnimacao(painelAnimacao);
-        jogador.setHUD(hudJogador);
-
-        jogador.sacaItem(0);
-
-        keyHandler = new KeyInput();
-        keyBindings();
-
-        carregaTexturas();
     }
 
     /**
@@ -152,27 +187,9 @@ public class Engine extends JPanel implements ActionListener {
     }
 
     /**
-     * Carrega todas as texturas das paredes do jogo armazenadas no grid.
-     */
-    private void carregaTexturas() {
-        textura = new int[3][128 * 128];
-        try {
-            BufferedImage parede = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "01 - wall.png"));
-            BufferedImage chao = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "02 - floor.png"));
-            BufferedImage teto = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "03 - ceil.png"));
-
-            parede.getRGB(0, 0, 128, 128, textura[0], 0, 128);
-            chao.getRGB(0, 0, 128, 128, textura[1], 0, 128);
-            teto.getRGB(0, 0, 128, 128, textura[2], 0, 128);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * Carrega a música principal do jogo que ficará em loop durante a execução.
      */
-    private void carregaMusicaPrincipal() {
+    private void initMusica() {
         File arquivoAudio = new File(Diretorio.SONS + "background.wav");
         AudioInputStream audioStream;
 
@@ -196,6 +213,50 @@ public class Engine extends JPanel implements ActionListener {
 
         musicaBackground.start();
         musicaBackground.loop(Clip.LOOP_CONTINUOUSLY);
+
+        janela.addWindowListener(new DesligaSom(musicaBackground));
+    }
+
+    /**
+     * Inicia o timer do jogo para controlar o output de frames.
+     */
+    private void initTimer() {
+        gameTimer = new Timer(Math.round(1000f / fpsMaximo), this);
+        gameTimer.start();
+    }
+
+    /**
+     * Carrega todas as texturas das paredes do jogo armazenadas no grid.
+     */
+    private void initTexturas() {
+        textura = new int[3][128 * 128];
+        try {
+            BufferedImage parede = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "01 - wall.png"));
+            BufferedImage chao = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "02 - floor.png"));
+            BufferedImage teto = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "03 - ceil.png"));
+
+            parede.getRGB(0, 0, 128, 128, textura[0], 0, 128);
+            chao.getRGB(0, 0, 128, 128, textura[1], 0, 128);
+            teto.getRGB(0, 0, 128, 128, textura[2], 0, 128);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Carrega a fonte personalizada que será aplicada nos componentes.
+     */
+    private Font carregaFonte() {
+        Font fontePersonalizada = null;
+
+        try {
+            File fontFile = new File(Diretorio.SPRITE_HUD + "font.ttf");
+            fontePersonalizada = Font.createFont(Font.TRUETYPE_FONT, fontFile);
+        } catch (IOException | FontFormatException e) {
+            System.err.println("Fonte não existe!");
+        }
+
+        return fontePersonalizada;
     }
 
     /**
@@ -224,13 +285,13 @@ public class Engine extends JPanel implements ActionListener {
         int eixo;
 
         // Protótipo de "framebuffer" utilizado para acelerar a renderização
-        int[] frameBuffer = new int[SCREENHEIGHT * SCREENWIDTH];
+        int[] frameBuffer = new int[screenHeight * screenWidth];
 
         // Classe filha de Graphics que inclui métodos adicionais para gráficos 2D
         Graphics2D render2D = (Graphics2D) g;
 
         // Fator de projeção utilizado para adequar as paredes ao monitor
-        double fatorProjecao = (SCREENWIDTH / (2 * Math.tan(playerFOV / 2.0)));
+        double fatorProjecao = (screenWidth / (2 * Math.tan(playerFOV / 2.0)));
 
         // Tamanho das texturas para renderização
         int tamanhoTextura = 128;
@@ -240,9 +301,9 @@ public class Engine extends JPanel implements ActionListener {
                 tamanhoTextura, tamanhoBloco);
 
         // Cálculo e renderização de todas as colunas de pixel da tela
-        for (int i = 0; i < SCREENWIDTH; i++) {
+        for (int i = 0; i < screenWidth; i++) {
             double anguloRaio = (playerAngulo - playerFOV / 2.0)
-                    + ((double) i / SCREENWIDTH) * playerFOV;
+                    + ((double) i / screenWidth) * playerFOV;
 
             int posX, posY;
             int direcaoX, direcaoY;
@@ -325,7 +386,7 @@ public class Engine extends JPanel implements ActionListener {
 
             // Calcula os valores da altura da parede, seu começo e fim no eixo y
             int alturaParede = (int) ((tamanhoBloco / distanciaFinal) * fatorProjecao);
-            int comecoParede = (int) (SCREENHEIGHT - alturaParede) / 2;
+            int comecoParede = (int) (screenHeight - alturaParede) / 2;
 
             // Verifica se o indice da parede sai do limite da tela
             if (comecoParede < 0) {
@@ -335,8 +396,8 @@ public class Engine extends JPanel implements ActionListener {
             int fimParede = alturaParede + comecoParede;
 
             // Verifica se o indice da parede sai do limite da tela
-            if (fimParede >= SCREENHEIGHT) {
-                fimParede = SCREENHEIGHT - 1;
+            if (fimParede >= screenHeight) {
+                fimParede = screenHeight - 1;
             }
 
             // Busca o id da textura com base no seu valor no mapa
@@ -352,7 +413,7 @@ public class Engine extends JPanel implements ActionListener {
 
             // Calcula o fator de escala que deve ser usado para andar na imagem da textura
             double variacao = 1.0 * tamanhoTextura / alturaParede;
-            double posicaoTextura = (comecoParede - SCREENHEIGHT / 2 + alturaParede / 2) * variacao;
+            double posicaoTextura = (comecoParede - screenHeight / 2 + alturaParede / 2) * variacao;
 
             // Percorre todo os pixels da coluna atribuindo a cor da textura a eles
             for (int y = comecoParede; y < fimParede; y++) {
@@ -361,24 +422,20 @@ public class Engine extends JPanel implements ActionListener {
 
                 int corPixel = textura[idTextura][tamanhoTextura * texturaY + texturaX];
 
-                frameBuffer[y * SCREENWIDTH + i] = transformaCor(corPixel, fatorFOG);
+                frameBuffer[y * screenWidth + i] = transformaCor(corPixel, fatorFOG);
             }
         }
 
         // Usa as cores RGB acumuladas no frameBuffer para criar uma imagem e renderiza-la
-        BufferedImage frame = new BufferedImage(SCREENWIDTH, SCREENHEIGHT,
+        BufferedImage frame = new BufferedImage(screenWidth, screenHeight,
                 BufferedImage.TYPE_INT_RGB);
 
         // "Seta" os valores das cores do frame
-        frame.setRGB(0, 0, SCREENWIDTH, SCREENHEIGHT, frameBuffer,
-                0, SCREENWIDTH);
+        frame.setRGB(0, 0, screenWidth, screenHeight, frameBuffer,
+                0, screenWidth);
 
         // Renderiza o frame todo
         render2D.drawImage(frame, 0, 0, this.getWidth(), this.getHeight(), null);
-
-        render2D.setColor(Color.WHITE);
-        render2D.setFont(new Font("Arial", Font.BOLD, 16));
-        render2D.drawString("FPS: " + fps, 10, 20);
     }
 
     /**
@@ -408,10 +465,10 @@ public class Engine extends JPanel implements ActionListener {
         double playerFOG = jogador.getFOG() / 50;
 
         // Posição central da visão do jogador (meio da tela)
-        double centroDeVisao = SCREENHEIGHT / 2;
+        double centroDeVisao = screenHeight / 2;
 
         // Percorre todas linhas necessárias da tela para renderizar a imagem
-        for (int y = 0; y < SCREENHEIGHT; y++) {
+        for (int y = 0; y < screenHeight; y++) {
 
             // Posição relativa da linha sendo desenhada e da posição
             // central da tela.
@@ -423,25 +480,24 @@ public class Engine extends JPanel implements ActionListener {
 
             // Calcula os incrementos necessários para a posição real do
             // teto/chão em x e y
-            double incrementoX = distanciaLinha * (cosRaioMaximo - cosRaioMinimo) / SCREENWIDTH;
-            double incrementoY = distanciaLinha * (sinRaioMaximo - sinRaioMinimo) / SCREENWIDTH;
+            double incrementoX = distanciaLinha * (cosRaioMaximo - cosRaioMinimo) / screenWidth;
+            double incrementoY = distanciaLinha * (sinRaioMaximo - sinRaioMinimo) / screenWidth;
 
             // Posições nas coordenadas x e y da posição atual no teto e chão
             double posX = (playerX / (tamanhoBloco * 1.5)) + distanciaLinha * cosRaioMinimo;
             double posY = (playerY / (tamanhoBloco * 1.5)) + distanciaLinha * sinRaioMinimo;
 
             double distanciaFOG = Math.abs(distanciaLinha);
-            
-            if(distanciaFOG > playerFOG)
+
+            if (distanciaFOG > playerFOG) {
                 distanciaFOG = playerFOG;
-            
+            }
+
             double fatorFOG = 1 - distanciaFOG / playerFOG;
-            
-            System.out.println(fatorFOG);
 
             // Percorre, em cada linha, os pixels da coluna para aplicar
             // a cor da textura adequada
-            for (int x = 0; x < SCREENWIDTH; x++) {
+            for (int x = 0; x < screenWidth; x++) {
 
                 // Posições das coordenadas reais convertidas em posições
                 // dentro da própria imagem da textura
@@ -462,10 +518,10 @@ public class Engine extends JPanel implements ActionListener {
 
                 // Aplica as cores das texturas em ambas as figuras
                 corPixel = textura[chaoID][tamanhoTextura * texturaY + texturaX];
-                frameBuffer[y * SCREENWIDTH + x] = transformaCor(corPixel, fatorFOG);
+                frameBuffer[y * screenWidth + x] = transformaCor(corPixel, fatorFOG);
 
                 corPixel = textura[tetoID][tamanhoTextura * texturaY + texturaX];
-                frameBuffer[(SCREENHEIGHT - y - 1) * SCREENWIDTH + x] = transformaCor(corPixel, fatorFOG);
+                frameBuffer[(screenHeight - y - 1) * screenWidth + x] = transformaCor(corPixel, fatorFOG);
             }
         }
     }
@@ -501,15 +557,15 @@ public class Engine extends JPanel implements ActionListener {
      */
     private void update() {
         long tempoAtual = System.currentTimeMillis();
-        double deltaFrame = (tempoAtual - tempoFrame) / 1000.0;
 
+        double deltaFrame = (tempoAtual - tempoFrame) / 1000.0;
         deltaTime = (tempoAtual - tempoAnterior) / 1000.0;
         tempoAnterior = tempoAtual;
 
         frameCounter++;
 
         if (deltaFrame >= 1.0) {
-            fps = frameCounter;
+            painelInfo.setFPS(frameCounter);
             frameCounter = 0;
             tempoFrame = tempoAtual;
         }
@@ -517,34 +573,38 @@ public class Engine extends JPanel implements ActionListener {
         keyHandler.executaMetodo();
     }
 
+    /**
+     * Fecha as janelas e paineis dependentes da engine.
+     */
     private void fechaJogo() {
-        //musicaBackground.stop();
         janela.dispose();
-        //função pra fechar o painel
-
     }
 
-    static class desligaSom extends WindowAdapter {
+    /**
+     * Classe que ouve uma série de eventos da janela para encerrar o som do
+     * jogo.
+     */
+    private static class DesligaSom extends WindowAdapter {
 
-        Clip c;
+        Clip som;
 
-        desligaSom(Clip c) {
-            this.c = c;
+        public DesligaSom(Clip som) {
+            this.som = som;
         }
 
         @Override
         public void windowOpened(WindowEvent e) {
-            if (c != null) {
-                c.start();
+            if (som != null) {
+                som.start();
             }
         }
 
         @Override
         public void windowClosed(WindowEvent e) {
-            if (c == null) {
+            if (som == null) {
                 System.exit(0);
             }
-            c.stop();
+            som.stop();
         }
     }
 }
