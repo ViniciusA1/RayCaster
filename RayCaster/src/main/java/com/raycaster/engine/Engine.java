@@ -6,6 +6,8 @@ import com.raycaster.interfaces.HUD;
 import com.raycaster.entidades.Player;
 import com.raycaster.itens.Arma;
 import com.raycaster.mapa.Mapa;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -37,8 +39,14 @@ public class Engine extends JPanel implements ActionListener {
 
     private int SCREENWIDTH;
     private int SCREENHEIGHT;
+
     private final Timer gameTimer;
     private long tempoAnterior;
+    private double deltaTime;
+    private long tempoFrame;
+    private int fps;
+    private int frameCounter;
+
     private Player jogador;
     private Mapa mapaAtual;
     private KeyInput keyHandler;
@@ -61,10 +69,6 @@ public class Engine extends JPanel implements ActionListener {
 
         configInicial();
 
-        int intervalo = 8;
-        gameTimer = new Timer(intervalo, this);
-        gameTimer.start();
-
         addKeyListener(keyHandler);
         addMouseListener(mouseHandler);
         addMouseMotionListener(mouseHandler);
@@ -74,6 +78,10 @@ public class Engine extends JPanel implements ActionListener {
 
         this.janela = janela;
         janela.addWindowListener(new desligaSom(musicaBackground));
+
+        int fpsDesejado = 60;
+        gameTimer = new Timer(Math.round(1000f / fpsDesejado), this);
+        gameTimer.start();
     }
 
     /**
@@ -88,15 +96,18 @@ public class Engine extends JPanel implements ActionListener {
         mapaAtual = new Mapa("lobby.txt", 20);
         mapaAtual.carregar();
 
+        jogador.moveX(mapaAtual.getBlockSpawnX());
+        jogador.moveY(mapaAtual.getBlockSpawnY());
+
         mouseHandler = new MouseInput(jogador, 0.001);
 
         List<Arma> armas = ArquivoUtils.leObjetos(Diretorio.DADOS_ITENS, Arma.class);
 
         jogador.adicionaArma(armas);
 
-        HUD hudJogador = new HUD(jogador);        
+        HUD hudJogador = new HUD(jogador);
         AnimacaoPlayer painelAnimacao = new AnimacaoPlayer(jogador);
-        
+
         this.add(hudJogador, "hud");
         this.add(painelAnimacao, "animacao");
 
@@ -115,15 +126,29 @@ public class Engine extends JPanel implements ActionListener {
      * Inclui todas as keybindings no controlador de evento das teclas.
      */
     private void keyBindings() {
-        keyHandler.adicionaKey(KeyEvent.VK_W, () -> jogador.move(0, 1, mapaAtual));
-        keyHandler.adicionaKey(KeyEvent.VK_A, () -> jogador.move(-Math.PI / 2, 1, mapaAtual));
-        keyHandler.adicionaKey(KeyEvent.VK_S, () -> jogador.move(0, -1, mapaAtual));
-        keyHandler.adicionaKey(KeyEvent.VK_D, () -> jogador.move(Math.PI / 2, 1, mapaAtual));
-        keyHandler.adicionaKey(KeyEvent.VK_R, () -> jogador.recarregaItem());
-        keyHandler.adicionaKey(KeyEvent.VK_ESCAPE, () -> this.fechaJogo());
+        keyHandler.adicionaKey(KeyEvent.VK_W, ()
+                -> jogador.move(0, 1, mapaAtual, deltaTime));
 
-        keyHandler.adicionaKey(KeyEvent.VK_1, () -> jogador.sacaItem(0));
-        keyHandler.adicionaKey(KeyEvent.VK_2, () -> jogador.sacaItem(1));
+        keyHandler.adicionaKey(KeyEvent.VK_A, ()
+                -> jogador.move(-Math.PI / 2, 1, mapaAtual, deltaTime));
+
+        keyHandler.adicionaKey(KeyEvent.VK_S, ()
+                -> jogador.move(0, -1, mapaAtual, deltaTime));
+
+        keyHandler.adicionaKey(KeyEvent.VK_D, ()
+                -> jogador.move(Math.PI / 2, 1, mapaAtual, deltaTime));
+
+        keyHandler.adicionaKey(KeyEvent.VK_R, ()
+                -> jogador.recarregaItem());
+
+        keyHandler.adicionaKey(KeyEvent.VK_ESCAPE, ()
+                -> this.fechaJogo());
+
+        keyHandler.adicionaKey(KeyEvent.VK_1, ()
+                -> jogador.sacaItem(0));
+
+        keyHandler.adicionaKey(KeyEvent.VK_2, ()
+                -> jogador.sacaItem(1));
     }
 
     /**
@@ -350,6 +375,10 @@ public class Engine extends JPanel implements ActionListener {
 
         // Renderiza o frame todo
         render2D.drawImage(frame, 0, 0, this.getWidth(), this.getHeight(), null);
+
+        render2D.setColor(Color.WHITE);
+        render2D.setFont(new Font("Arial", Font.BOLD, 16));
+        render2D.drawString("FPS: " + fps, 10, 20);
     }
 
     /**
@@ -376,6 +405,8 @@ public class Engine extends JPanel implements ActionListener {
         double cosRaioMaximo = Math.cos(angle + playerFOV);
         double sinRaioMaximo = Math.sin(angle + playerFOV);
 
+        double playerFOG = jogador.getFOG() / 50;
+
         // Posição central da visão do jogador (meio da tela)
         double centroDeVisao = SCREENHEIGHT / 2;
 
@@ -398,6 +429,15 @@ public class Engine extends JPanel implements ActionListener {
             // Posições nas coordenadas x e y da posição atual no teto e chão
             double posX = (playerX / (tamanhoBloco * 1.5)) + distanciaLinha * cosRaioMinimo;
             double posY = (playerY / (tamanhoBloco * 1.5)) + distanciaLinha * sinRaioMinimo;
+
+            double distanciaFOG = Math.abs(distanciaLinha);
+            
+            if(distanciaFOG > playerFOG)
+                distanciaFOG = playerFOG;
+            
+            double fatorFOG = 1 - distanciaFOG / playerFOG;
+            
+            System.out.println(fatorFOG);
 
             // Percorre, em cada linha, os pixels da coluna para aplicar
             // a cor da textura adequada
@@ -422,10 +462,10 @@ public class Engine extends JPanel implements ActionListener {
 
                 // Aplica as cores das texturas em ambas as figuras
                 corPixel = textura[chaoID][tamanhoTextura * texturaY + texturaX];
-                frameBuffer[y * SCREENWIDTH + x] = corPixel;
+                frameBuffer[y * SCREENWIDTH + x] = transformaCor(corPixel, fatorFOG);
 
                 corPixel = textura[tetoID][tamanhoTextura * texturaY + texturaX];
-                frameBuffer[(SCREENHEIGHT - y - 1) * SCREENWIDTH + x] = corPixel;
+                frameBuffer[(SCREENHEIGHT - y - 1) * SCREENWIDTH + x] = transformaCor(corPixel, fatorFOG);
             }
         }
     }
@@ -452,14 +492,6 @@ public class Engine extends JPanel implements ActionListener {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        long tempoAtual = System.currentTimeMillis();
-        
-        long deltaTime = tempoAtual - tempoAnterior;
-        
-        System.out.println(deltaTime);
-        
-        tempoAnterior = tempoAtual;
-        
         update();
         repaint();
     }
@@ -468,6 +500,20 @@ public class Engine extends JPanel implements ActionListener {
      * Atualiza os eventos do jogo associados ao player
      */
     private void update() {
+        long tempoAtual = System.currentTimeMillis();
+        double deltaFrame = (tempoAtual - tempoFrame) / 1000.0;
+
+        deltaTime = (tempoAtual - tempoAnterior) / 1000.0;
+        tempoAnterior = tempoAtual;
+
+        frameCounter++;
+
+        if (deltaFrame >= 1.0) {
+            fps = frameCounter;
+            frameCounter = 0;
+            tempoFrame = tempoAtual;
+        }
+
         keyHandler.executaMetodo();
     }
 

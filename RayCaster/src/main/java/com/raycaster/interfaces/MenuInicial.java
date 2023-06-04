@@ -43,7 +43,7 @@ public class MenuInicial {
      */
     public static void inicia(){
         try {
-            imagem = lerImagem("ImgemInicial.png");
+            imagem = lerImagem("ImagemInicial.png");
         }
         catch (FileNotFoundException e) {
             JOptionPane.showMessageDialog(null, "Não foi possível encontrar o arquivo " + "parede.JPG" + ".", "Visualizador", JOptionPane.ERROR_MESSAGE);
@@ -75,7 +75,7 @@ public class MenuInicial {
         JPanel imagemPane = new JPanel() {
             @Override
             public void paintComponent(Graphics g){
-                g.drawImage(imagem, 0, 0, imagem.getWidth(), imagem.getHeight(), null);
+                g.drawImage(imagem, 0, 0, this.getWidth(), this.getHeight(), null);
             }
         };
         imagemPane.setSize(800, 500);

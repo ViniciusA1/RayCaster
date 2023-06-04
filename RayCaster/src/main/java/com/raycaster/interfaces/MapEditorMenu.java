@@ -314,11 +314,13 @@ public class MapEditorMenu {
                     if(mapa[0].getID(xi, yi) == 0)
                         mapa[0].setSpawn(xi, yi);
                     else
-                        JOptionPane.showMessageDialog(null, "vc não pode colocar o Player na parede");
+                        JOptionPane.showMessageDialog(null, 
+                                "Você não pode colocar o player na parede!");
                 }
                 else{
                     if(xi == mapa[0].getSpawnX()  &&  yi == mapa[0].getSpawnY())
-                        JOptionPane.showMessageDialog(null, "vc não pode colocar uma parede em cima do player");
+                        JOptionPane.showMessageDialog(null, 
+                                "Você não pode colocar uma parede em cima do player!");
                     else
                         mapa[0].setValor(xi, yi, aux);
                 }
@@ -355,12 +357,21 @@ public class MapEditorMenu {
             grid.repaint();
         });
         
-        JButton salvar = new JButton("salvar");
+        JButton salvar = new JButton("Salvar");
         salvar.addActionListener((ActionEvent e) -> {
             for(Mapa aux: mapas){
-                try {aux.salvar();}
-                catch(IOException exe){}
+                try {
+                    aux.salvar();
+                }
+                catch(IOException exe){
+                    JOptionPane.showMessageDialog(null, 
+                            "Erro ao salvar os mapas!");
+                    return;
+                }
             }
+            
+            JOptionPane.showMessageDialog(null, 
+                    "Mapas salvos com sucesso!");
         });
         barra.add(salvar);
         

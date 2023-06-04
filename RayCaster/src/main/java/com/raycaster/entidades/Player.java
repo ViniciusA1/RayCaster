@@ -52,7 +52,7 @@ public class Player extends Entidade {
         angulo = 0;
         pitch = 0;
         FOV = Math.toRadians(fov);
-        taxaPitch = 0.5;
+        taxaPitch = 64;
         mochila = new Inventario<>();
         estadoAtual = Estado.OCIOSO;
         som = new EfeitosSonoros("player", possiveisEstados);
@@ -127,12 +127,16 @@ public class Player extends Entidade {
      * @param anguloRelativo Angulo relativo ao movimento desejado (W,A,S,D)
      * @param sinal Sinal relativo ao movimento desejado (frente ou trás)
      * @param mapaAtual Mapa atual em que o jogador será movido
+     * @param deltaTime Fator de diferença entre o tempo de cada frame
      */
-    public void move(double anguloRelativo, int sinal, Mapa mapaAtual) {
-        double dx = sinal * super.getVelocidade() * Math.cos(angulo + anguloRelativo);
-        double dy = sinal * super.getVelocidade() * Math.sin(angulo + anguloRelativo);
+    public void move(double anguloRelativo, int sinal, Mapa mapaAtual, double deltaTime) {
+        double dx = sinal * getVelocidade() * 
+                Math.cos(angulo + anguloRelativo) * deltaTime;
+        
+        double dy = sinal * getVelocidade() * 
+                Math.sin(angulo + anguloRelativo) * deltaTime;
 
-        pitch += taxaPitch;
+        pitch += taxaPitch * deltaTime;
 
         if (pitch >= 16 || pitch <= -16) {
             taxaPitch *= -1;
@@ -169,10 +173,6 @@ public class Player extends Entidade {
                     colidiuX |= !mapaAtual.checaColisao(getX(), j);
                 }
             }
-        }
-
-        if (colidiuX && colidiuY) {
-            
         }
 
         if (!colidiuX) {

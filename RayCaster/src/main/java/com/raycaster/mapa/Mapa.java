@@ -70,6 +70,14 @@ public class Mapa{
     }
     
     /**
+     * Devolve a coordenada X do spawn proporcional à escala do mapa.
+     * @return Retorna a coordenada transformada
+     */
+    public double getBlockSpawnX() {
+        return playerSpawnX * tamanhoBloco;
+    }
+    
+    /**
      * Metodo que define o ponto de Spawn do player
      * @return int com a coordenada Y
      * 
@@ -78,6 +86,14 @@ public class Mapa{
      */
     public int getSpawnY(){
         return playerSpawnY;
+    }
+    
+    /**
+     * Devolve a coordenada Y do spawn proporcional à escala do mapa.
+     * @return Retorna a coordenada transformada
+     */
+    public double getBlockSpawnY() {
+        return playerSpawnY * tamanhoBloco;
     }
     
 
