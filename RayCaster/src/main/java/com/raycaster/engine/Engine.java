@@ -1,5 +1,6 @@
 package com.raycaster.engine;
 
+import com.raycaster.interfaces.MenuPause;
 import com.raycaster.interfaces.LayoutEngine;
 import com.raycaster.interfaces.AnimacaoPlayer;
 import com.raycaster.interfaces.HUD;
@@ -9,6 +10,7 @@ import com.raycaster.interfaces.PainelMira;
 import com.raycaster.itens.Arma;
 import com.raycaster.mapa.Mapa;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Graphics;
@@ -42,13 +44,15 @@ public class Engine extends JPanel implements ActionListener {
 
     private int screenWidth;
     private int screenHeight;
-
-    private static final int fpsMaximo = 60;
+    
+    private int fpsMaximo = 60;
     private Timer gameTimer;
     private long tempoAnterior;
     private double deltaTime;
     private long tempoFrame;
     private int frameCounter;
+    
+    private long pauseCooldown;
 
     private PainelInformacao painelInfo;
 
@@ -59,6 +63,8 @@ public class Engine extends JPanel implements ActionListener {
     private int[][] textura;
     private Clip musicaBackground;
     private final JFrame janela;
+    
+    private Font fontePersonalizada;
 
     /**
      * Construtor da engine, recebe o tamanho horizontal e vertical da JFrame
@@ -80,7 +86,7 @@ public class Engine extends JPanel implements ActionListener {
     /**
      * Aplica e inicia todas as configurações principais da engine.
      */
-    private void start() {
+    private void start() {        
         initMapa();
         initPlayer();
         initArmas();
@@ -126,12 +132,12 @@ public class Engine extends JPanel implements ActionListener {
      * Inicia todos os painéis do jogo que dependem da engine.
      */
     private void initPanels() {
-        Font fonte = carregaFonte();
+        carregaFonte();
 
-        HUD hudJogador = new HUD(jogador, fonte);
+        HUD hudJogador = new HUD(jogador, fontePersonalizada);
         AnimacaoPlayer painelAnimacao = new AnimacaoPlayer(jogador);
         PainelMira painelMira = new PainelMira();
-        painelInfo = new PainelInformacao(fonte);
+        painelInfo = new PainelInformacao(fontePersonalizada);
 
         this.add(hudJogador, "hud");
         this.add(painelAnimacao, "animacao");
@@ -175,9 +181,9 @@ public class Engine extends JPanel implements ActionListener {
 
         keyHandler.adicionaKey(KeyEvent.VK_R, ()
                 -> jogador.recarregaItem());
-
-        keyHandler.adicionaKey(KeyEvent.VK_ESCAPE, ()
-                -> this.fechaJogo());
+        
+        keyHandler.adicionaKey(KeyEvent.VK_ESCAPE, () 
+                -> this.pausaJogo());
 
         keyHandler.adicionaKey(KeyEvent.VK_1, ()
                 -> jogador.sacaItem(0));
@@ -246,8 +252,8 @@ public class Engine extends JPanel implements ActionListener {
     /**
      * Carrega a fonte personalizada que será aplicada nos componentes.
      */
-    private Font carregaFonte() {
-        Font fontePersonalizada = null;
+    private void carregaFonte() {
+        fontePersonalizada = null;
 
         try {
             File fontFile = new File(Diretorio.SPRITE_HUD + "font.ttf");
@@ -255,8 +261,6 @@ public class Engine extends JPanel implements ActionListener {
         } catch (IOException | FontFormatException e) {
             System.err.println("Fonte não existe!");
         }
-
-        return fontePersonalizada;
     }
 
     /**
@@ -547,7 +551,7 @@ public class Engine extends JPanel implements ActionListener {
      * @param e Evento ocorrido
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {        
         update();
         repaint();
     }
@@ -572,11 +576,49 @@ public class Engine extends JPanel implements ActionListener {
 
         keyHandler.executaMetodo();
     }
+    
+    private void pausaJogo() {
+        if(!gameTimer.isRunning())
+            return;
+        
+        gameTimer.stop();
+        musicaBackground.stop();
+        
+        janela.remove(this);
+
+        MenuPause menu = new MenuPause(this, fontePersonalizada);
+        menu.setFocusable(true);
+        menu.requestFocus();
+        menu.setVisible(true);
+        menu.setBackground(Color.DARK_GRAY);
+                
+        janela.add(menu);
+        janela.revalidate();
+        janela.repaint();
+    }
+    
+    public void voltaJogo(MenuPause menu) {
+        if(gameTimer.isRunning())
+            return;
+        
+        keyHandler.limpaMetodos();
+        
+        gameTimer.start();
+        musicaBackground.start();
+        
+        janela.remove(menu);
+        janela.add(this);
+        
+        this.requestFocus();
+        
+        janela.revalidate();
+        janela.repaint();
+    }
 
     /**
      * Fecha as janelas e paineis dependentes da engine.
      */
-    private void fechaJogo() {
+    public void fechaJogo() {
         janela.dispose();
     }
 

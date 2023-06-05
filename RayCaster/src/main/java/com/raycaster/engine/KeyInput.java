@@ -73,4 +73,8 @@ public class KeyInput extends KeyAdapter {
             action.run();
         }
     }
+    
+    public void limpaMetodos() {
+        pressedKeys.clear();
+    }
 }
