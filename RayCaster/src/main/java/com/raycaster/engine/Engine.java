@@ -115,8 +115,8 @@ public class Engine extends JPanel implements ActionListener {
 
         jogador = jogadores.get(0);
 
-        jogador.moveX(mapaAtual.getBlockSpawnX() + 1);
-        jogador.moveY(mapaAtual.getBlockSpawnY() + 1);
+        jogador.moveX(mapaAtual.getBlockSpawnX());
+        jogador.moveY(mapaAtual.getBlockSpawnY());
     }
 
     /**
