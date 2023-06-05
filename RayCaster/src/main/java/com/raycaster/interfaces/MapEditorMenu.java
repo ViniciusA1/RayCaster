@@ -398,9 +398,9 @@ public class MapEditorMenu {
         apagarMapa.setIcon(new ImageIcon(trash));
         apagarMapa.addActionListener((e)->{
             if(JOptionPane.showConfirmDialog(null, "Voce tem certeza que deseja continuar?") == 0){
+                mapa[0].excluir();
                 mapas.remove(mapa[0]);
                 dcm.removeElement(mapa[0]);
-                mapa[0].excluir();
                 mapa[0] = null;
                 mapSelector.setSelectedIndex(0);
             }
