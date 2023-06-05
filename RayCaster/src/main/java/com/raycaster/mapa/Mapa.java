@@ -278,7 +278,7 @@ public class Mapa{
             buffout.newLine();
             buffout.flush();
         }
-        buffout.write(Integer.toString(playerSpawnX) + " " + Integer.toString(playerSpawnX));
+        buffout.write(Integer.toString(playerSpawnX) + " " + Integer.toString(playerSpawnY));
         buffout.flush();
         buffout.close();
         out.close();       
