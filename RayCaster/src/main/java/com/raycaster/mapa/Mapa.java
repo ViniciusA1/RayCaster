@@ -74,7 +74,7 @@ public class Mapa{
      * @return Retorna a coordenada transformada
      */
     public double getBlockSpawnX() {
-        return playerSpawnX * tamanhoBloco;
+        return (playerSpawnX + 0.5) * tamanhoBloco;
     }
     
     /**
@@ -93,7 +93,7 @@ public class Mapa{
      * @return Retorna a coordenada transformada
      */
     public double getBlockSpawnY() {
-        return playerSpawnY * tamanhoBloco;
+        return (playerSpawnY + 0.5) * tamanhoBloco;
     }
     
 

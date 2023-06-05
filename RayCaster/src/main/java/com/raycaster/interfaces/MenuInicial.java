@@ -5,7 +5,10 @@
 package com.raycaster.interfaces;
 
 import com.raycaster.engine.Engine;
+import com.raycaster.interfaces.MapEditorMenu.event;
+import com.raycaster.mapa.MapGroup.ListData;
 import com.raycaster.mapa.Mapa;
+import static com.raycaster.mapa.Mapa.carregarMapList;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -21,8 +24,11 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 
 /**
@@ -102,7 +108,7 @@ public class MenuInicial {
         
         b2 = new JButton("Jogar");
         b2.addActionListener((ActionEvent e) ->{
-            jogar(inicial);
+            selecionaMapa(inicial);
             inicial.setVisible(false);
         });
 //        linha2.setLayout(new BoxLayout(linha2, BoxLayout.X_AXIS));
@@ -151,19 +157,84 @@ public class MenuInicial {
      * @author Vinicius Augusto
      * @author Bruno Zara
      */
-    private static void jogar(JFrame f){
+    private static void jogar(JFrame f, Mapa map){
         JFrame janela = new JFrame();
             janela.setTitle("RayCaster");
-            janela.setSize(300, 200);
+            janela.setSize(800, 600);
             janela.addWindowListener(new MapEditorMenu.event(f));
             janela.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             janela.setResizable(true);
 
-            Engine game = new Engine(300, 200, janela);
+            Engine game = new Engine(800, 600, janela, map);
 
             janela.add(game);
             janela.setLocationRelativeTo(null);
             janela.setVisible(true);
+    }
+    
+    private static void selecionaMapa(JFrame f){
+        ArrayList<Mapa> mapas = carregarMapList(); 
+        JList<Mapa> listaMapa = new JList<>(new ListData<>(mapas));
+        listaMapa.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JFrame selec = new JFrame("Excluir Mapa");
+        selec.addWindowListener(new event(f));
+        selec.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        selec.setLocationRelativeTo(null);
+        JPanel linha1, linha2, linha3;
+        linha1 = new JPanel();
+        linha1.setLayout(new BoxLayout(linha1, BoxLayout.X_AXIS));
+        linha1.add(Box.createHorizontalGlue());
+        linha1.add(new JLabel("Selecione o mapa a ser excluido"));
+        linha1.add(Box.createHorizontalGlue());
+        
+//        lista = new JPanel();
+//        lista.setLayout(new BoxLayout(lista, BoxLayout.Y_AXIS));
+//        lista.add(new JLabel("ID - Nome - tamanho"));
+//        lista.add(Box.createVerticalStrut(10));
+//        lista.add(new JScrollPane(listaMapa));
+        
+        linha2 = new JPanel();
+        linha2.setBorder(BorderFactory.createTitledBorder("ID - Nome - tamanho"));
+        linha2.setLayout(new BoxLayout(linha2, BoxLayout.X_AXIS));
+        linha2.add(Box.createHorizontalGlue());
+        linha2.add(new JScrollPane(listaMapa));
+        linha2.add(Box.createHorizontalGlue());
+        selec.setSize(200, 300);
+        
+        
+        JButton ok, cancel;
+        ok = new JButton("OK");
+        ok.addActionListener((ActionEvent e) ->{
+            if(listaMapa.isSelectionEmpty()){
+                JOptionPane.showMessageDialog(null, "Voce deve selecionar um mapa para Jogar!");
+            }
+            else {
+                jogar(selec, mapas.get(listaMapa.getSelectedIndex()));
+            }
+            
+        });
+        cancel = new JButton("CANCELAR");
+        cancel.addActionListener((ActionEvent e) ->{
+            f.setVisible(true);
+            selec.dispose();
+        });
+        linha3 = new JPanel();
+        linha3.setLayout(new BoxLayout(linha3, BoxLayout.X_AXIS));
+        linha3.add(Box.createHorizontalGlue());
+        linha3.add(ok);
+        linha3.add(Box.createHorizontalStrut(10));
+        linha3.add(cancel);
+        linha3.add(Box.createHorizontalGlue());
+        
+        JPanel painelEx = new JPanel();
+        painelEx.setLayout(new BoxLayout(painelEx, BoxLayout.Y_AXIS));
+        painelEx.add(linha1);
+        painelEx.add(linha2);
+        painelEx.add(linha3);
+        
+        selec.setLocationRelativeTo(null);
+        selec.add(painelEx);
+        selec.setVisible(true);
     }
     
 //    private static void carregarTexturas(){

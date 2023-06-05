@@ -73,10 +73,11 @@ public class Engine extends JPanel implements ActionListener {
      * @param height Comprimento vertical da tela
      * @param janela a janela a que esse componente esta associado
      */
-    public Engine(int width, int height, JFrame janela) {
+    public Engine(int width, int height, JFrame janela, Mapa map) {
         this.screenWidth = width;
         this.screenHeight = height;
         this.janela = janela;
+        this.mapaAtual = map;
 
         setLayout(new LayoutEngine());
 
@@ -101,7 +102,7 @@ public class Engine extends JPanel implements ActionListener {
      * Carrega e inicia o mapa inicial que será jogado.
      */
     private void initMapa() {
-        mapaAtual = new Mapa("lobby.txt", 20);
+//        mapaAtual = new Mapa("lobby.txt", 20);
         mapaAtual.carregar();
     }
 
@@ -114,8 +115,8 @@ public class Engine extends JPanel implements ActionListener {
 
         jogador = jogadores.get(0);
 
-        jogador.moveX(mapaAtual.getBlockSpawnX());
-        jogador.moveY(mapaAtual.getBlockSpawnY());
+        jogador.moveX(mapaAtual.getBlockSpawnX() + 1);
+        jogador.moveY(mapaAtual.getBlockSpawnY() + 1);
     }
 
     /**
