@@ -10,7 +10,6 @@ import com.raycaster.interfaces.PainelMira;
 import com.raycaster.itens.Arma;
 import com.raycaster.mapa.Mapa;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Graphics;
@@ -82,6 +81,11 @@ public class Engine extends JPanel implements ActionListener {
         setLayout(new LayoutEngine());
 
         start();
+    }
+    
+    public void setResolution(int screenWidth, int screenHeight) {
+        this.screenWidth = screenWidth;
+        this.screenHeight = screenHeight;
     }
 
     /**
@@ -309,7 +313,7 @@ public class Engine extends JPanel implements ActionListener {
         for (int i = 0; i < screenWidth; i++) {
             double anguloRaio = (playerAngulo - playerFOV / 2.0)
                     + ((double) i / screenWidth) * playerFOV;
-
+            
             int posX, posY;
             int direcaoX, direcaoY;
             double deltaX, deltaY;
@@ -585,10 +589,18 @@ public class Engine extends JPanel implements ActionListener {
         gameTimer.stop();
         musicaBackground.stop();
         
+        BufferedImage imagemBackground = new BufferedImage(this.getWidth(), 
+                this.getHeight(), BufferedImage.TYPE_INT_RGB);
+        
+        Graphics2D render = imagemBackground.createGraphics();
+        this.paint(render);
+        
+        render.dispose();
+        
         janela.remove(this);
 
-        MenuPause menu = new MenuPause(this, fontePersonalizada);
-        menu.setFocusable(true);
+        MenuPause menu = new MenuPause(this, fontePersonalizada, imagemBackground);
+        //menu.setFocusable(true);
         menu.requestFocus();
         menu.setVisible(true);
         menu.setBackground(Color.DARK_GRAY);

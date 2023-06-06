@@ -93,10 +93,10 @@ public class Player extends Entidade {
     public double getAngulo() {
         return angulo;
     }
-    
+
     /**
      * Disponibiliza o FOV do jogador para código externo.
-     * 
+     *
      * @return Retorna o FOV do jogador
      */
     public double getFOV() {
@@ -130,19 +130,20 @@ public class Player extends Entidade {
      * @param deltaTime Fator de diferença entre o tempo de cada frame
      */
     public void move(double anguloRelativo, int sinal, Mapa mapaAtual, double deltaTime) {
-        double dx = sinal * getVelocidade() * 
-                Math.cos(angulo + anguloRelativo) * deltaTime;
-        
-        double dy = sinal * getVelocidade() * 
-                Math.sin(angulo + anguloRelativo) * deltaTime;
+        double dx = sinal * getVelocidade()
+                * Math.cos(angulo + anguloRelativo) * deltaTime;
+
+        double dy = sinal * getVelocidade()
+                * Math.sin(angulo + anguloRelativo) * deltaTime;
 
         pitch += (taxaPitch * deltaTime);
-        
+
         if (pitch >= 16 || pitch <= -16) {
             taxaPitch *= -1;
         }
 
-        trataColisao(mapaAtual, getX() + dx, getY() + dy);
+        trataColisao(mapaAtual, dx, 0);
+        trataColisao(mapaAtual, 0, dy);
     }
 
     /**
@@ -152,36 +153,6 @@ public class Player extends Entidade {
      */
     public void rotaciona(double deltaX) {
         angulo = angulo + deltaX;
-    }
-
-    /**
-     * Verifica e trata a colisão da hitbox do jogador com os objetos do mapa
-     *
-     * @param mapaAtual Mapa em que a colisão ocorre
-     * @param posX Posição em x do jogador
-     * @param posY Posição em y do jogador
-     */
-    public void trataColisao(Mapa mapaAtual, double posX, double posY) {
-        boolean colidiuX = false;
-        boolean colidiuY = false;
-        double tamanho = getLargura();
-
-        for (double i = posX - tamanho; i <= posX + tamanho; i += tamanho) {
-            for (double j = posY - tamanho; j <= posY + tamanho; j += tamanho) {
-                if (mapaAtual.checaColisao(i, j)) {
-                    colidiuY |= !mapaAtual.checaColisao(i, getY());
-                    colidiuX |= !mapaAtual.checaColisao(getX(), j);
-                }
-            }
-        }
-
-        if (!colidiuX) {
-            moveX(posX);
-        }
-
-        if (!colidiuY) {
-            moveY(posY);
-        }
     }
 
     /**

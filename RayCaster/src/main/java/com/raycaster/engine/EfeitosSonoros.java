@@ -13,6 +13,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
  * Classe que conteḿ os atributos e métodos dos efeitos sonoros do jogo.
+ *
  * @author Vinicius Augusto
  * @author Bruno Zara
  */
@@ -23,6 +24,7 @@ public class EfeitosSonoros {
     /**
      * Construtor da classe que recebe o nome do objeto e um conjunto de seus
      * possíveis estados.
+     *
      * @param nome Nome do objeto associado ao som
      * @param possiveisEstados Possíveis estados que o objeto pode assumir
      */
@@ -33,6 +35,7 @@ public class EfeitosSonoros {
 
     /**
      * Carrega todos os sons associados aos estados do objeto.
+     *
      * @param nome Nome do objeto
      * @param possiveisEstados Possíveis estados associados ao objeto
      */
@@ -59,22 +62,20 @@ public class EfeitosSonoros {
 
     /**
      * Emite o som de acordo com o estado recebido.
+     *
      * @param estadoAtual Estado recebido pelo método
      */
-    public void emiteSom(Estado estadoAtual) {
+    public synchronized void emiteSom(Estado estadoAtual) {
         Clip somDesejado = sons.get(estadoAtual);
 
-        if (somDesejado == null) {
+        if (somDesejado == null)
             return;
-        }
-
-        if (somDesejado.isRunning()) {
+        
+        if(somDesejado.isRunning()) {
             somDesejado.stop();
-            System.out.println("Parou o som anterior");
         }
 
         somDesejado.setFramePosition(0);
         somDesejado.start();
-        System.out.println("Chamou o som\n");
     }
 }
