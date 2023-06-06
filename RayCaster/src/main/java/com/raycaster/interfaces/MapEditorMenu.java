@@ -376,8 +376,8 @@ public class MapEditorMenu {
                     "Mapas salvos com sucesso!");
         });
         salvar.setToolTipText("Salvar Mapas");
-        BufferedImage plus;
-        BufferedImage trash;
+        BufferedImage plus = null;
+        BufferedImage trash = null;
         BufferedImage play = null;
         try{
             plus = lerImagem("modelos" + File.separator + "icones" + File.separator + "plus.png");
@@ -411,7 +411,7 @@ public class MapEditorMenu {
         playButton.addActionListener((e)->{
             JFrame jj = new JFrame("RayCaster");
             jj.setSize(800, 600);
-            Engine jogo = new Engine(800, 600, editor, mapa[0]);
+            Engine jogo = new Engine(800, 600, jj, mapa[0]);
             jj.add(jogo);
             jj.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             jj.setLocationRelativeTo(null);

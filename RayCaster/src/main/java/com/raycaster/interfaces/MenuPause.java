@@ -1,5 +1,6 @@
 package com.raycaster.interfaces;
 
+import com.raycaster.engine.EfeitosSonoros;
 import com.raycaster.engine.Engine;
 import java.awt.Font;
 import javax.swing.JButton;
@@ -16,6 +17,7 @@ public class MenuPause extends JPanel {
     private JButton botaoSair;
     
     private Font fontePersonalizada;
+    private EfeitosSonoros somBotao;
     
     public MenuPause(Engine painelPrincipal, Font fontePersonalizada) {
         this.painelPrincipal = painelPrincipal;
@@ -26,13 +28,12 @@ public class MenuPause extends JPanel {
     
     private void carregaComponentes() {
         botaoVoltar = new JButton("Voltar");
-        
         botaoSair = new JButton("Sair");
         
-        Font fonte = fontePersonalizada.deriveFont(Font.BOLD, 100f);
+        fontePersonalizada = fontePersonalizada.deriveFont(Font.BOLD, 100f);
         
-        botaoVoltar.setFont(fonte);
-        botaoSair.setFont(fonte);        
+        botaoVoltar.setFont(fontePersonalizada);
+        botaoSair.setFont(fontePersonalizada);        
         
         botaoVoltar.addActionListener(e -> voltar());
         botaoSair.addActionListener(e -> sair());
@@ -49,6 +50,11 @@ public class MenuPause extends JPanel {
         botaoSair.setContentAreaFilled(false);
         botaoSair.setBorderPainted(false);
         botaoSair.setFocusPainted(false);
+    }
+
+    private void initSom() {
+        
+        //somBotao = new EfeitosSonoros();
     }
 
     
