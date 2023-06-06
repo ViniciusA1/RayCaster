@@ -618,6 +618,7 @@ public class Engine extends JPanel implements ActionListener {
         
         gameTimer.start();
         musicaBackground.start();
+        musicaBackground.loop(Clip.LOOP_CONTINUOUSLY);
         
         janela.remove(menu);
         janela.add(this);
