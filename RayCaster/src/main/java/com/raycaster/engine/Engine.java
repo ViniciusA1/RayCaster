@@ -43,14 +43,14 @@ public class Engine extends JPanel implements ActionListener {
 
     private int screenWidth;
     private int screenHeight;
-    
+
     private int fpsMaximo = 60;
     private Timer gameTimer;
     private long tempoAnterior;
     private double deltaTime;
     private long tempoFrame;
     private int frameCounter;
-    
+
     private long pauseCooldown;
 
     private PainelInformacao painelInfo;
@@ -62,7 +62,7 @@ public class Engine extends JPanel implements ActionListener {
     private int[][] textura;
     private Clip musicaBackground;
     private final JFrame janela;
-    
+
     private Font fontePersonalizada;
 
     /**
@@ -82,7 +82,7 @@ public class Engine extends JPanel implements ActionListener {
 
         start();
     }
-    
+
     public void setResolution(int screenWidth, int screenHeight) {
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
@@ -91,7 +91,7 @@ public class Engine extends JPanel implements ActionListener {
     /**
      * Aplica e inicia todas as configurações principais da engine.
      */
-    private void start() {        
+    private void start() {
         initMapa();
         initPlayer();
         initArmas();
@@ -186,8 +186,8 @@ public class Engine extends JPanel implements ActionListener {
 
         keyHandler.adicionaKey(KeyEvent.VK_R, ()
                 -> jogador.recarregaItem());
-        
-        keyHandler.adicionaKey(KeyEvent.VK_ESCAPE, () 
+
+        keyHandler.adicionaKey(KeyEvent.VK_ESCAPE, ()
                 -> this.pausaJogo());
 
         keyHandler.adicionaKey(KeyEvent.VK_1, ()
@@ -300,20 +300,20 @@ public class Engine extends JPanel implements ActionListener {
         Graphics2D render2D = (Graphics2D) g;
 
         // Fator de projeção utilizado para adequar as paredes ao monitor
-        double fatorProjecao = (screenWidth / (2 * Math.tan(playerFOV / 2.0)));
+        double fatorProjecao = screenWidth / (2 * Math.tan(playerFOV / 2.0));
 
         // Tamanho das texturas para renderização
         int tamanhoTextura = 128;
 
         // Renderiza o teto e o chão do mapa
         renderizaExtremidades(frameBuffer, playerX, playerY, playerAngulo, playerFOV,
-                tamanhoTextura, tamanhoBloco);
+                fatorProjecao, tamanhoTextura, tamanhoBloco);
 
         // Cálculo e renderização de todas as colunas de pixel da tela
         for (int i = 0; i < screenWidth; i++) {
-            double anguloRaio = (playerAngulo - playerFOV / 2.0)
-                    + ((double) i / screenWidth) * playerFOV;
-            
+            double anguloRaio = Math.atan2(i - screenWidth / 2, fatorProjecao)
+                    + playerAngulo;
+
             int posX, posY;
             int direcaoX, direcaoY;
             double deltaX, deltaY;
@@ -460,12 +460,14 @@ public class Engine extends JPanel implements ActionListener {
      * @param tamanhoBloco Tamanho de cada bloco do mapa
      */
     private void renderizaExtremidades(int[] frameBuffer, double playerX, double playerY,
-            double playerAngulo, double playerFOV,
+            double playerAngulo, double playerFOV, double fatorProjecao,
             int tamanhoTextura, int tamanhoBloco) {
 
         // Posições do raio mínimo (mais a esquerda) e do raio máximo (mais a direita).
         // Ambos representam os limites mínimos e máximos do teto/chão a ser renderizado
-        double angle = playerAngulo - playerFOV / 2;
+        double angle = Math.atan2(-screenWidth / 2, fatorProjecao)
+                + playerAngulo;
+
         double cosRaioMinimo = Math.cos(angle);
         double sinRaioMinimo = Math.sin(angle);
         double cosRaioMaximo = Math.cos(angle + playerFOV);
@@ -493,8 +495,8 @@ public class Engine extends JPanel implements ActionListener {
             double incrementoY = distanciaLinha * (sinRaioMaximo - sinRaioMinimo) / screenWidth;
 
             // Posições nas coordenadas x e y da posição atual no teto e chão
-            double posX = (playerX / (tamanhoBloco * 1.5)) + distanciaLinha * cosRaioMinimo;
-            double posY = (playerY / (tamanhoBloco * 1.5)) + distanciaLinha * sinRaioMinimo;
+            double posX = (playerX / (tamanhoBloco * (1.5 / playerFOV))) + distanciaLinha * cosRaioMinimo;
+            double posY = (playerY / (tamanhoBloco * (1.5 / playerFOV))) + distanciaLinha * sinRaioMinimo;
 
             double distanciaFOG = Math.abs(distanciaLinha);
 
@@ -556,7 +558,7 @@ public class Engine extends JPanel implements ActionListener {
      * @param e Evento ocorrido
      */
     @Override
-    public void actionPerformed(ActionEvent e) {        
+    public void actionPerformed(ActionEvent e) {
         update();
         repaint();
     }
@@ -581,22 +583,23 @@ public class Engine extends JPanel implements ActionListener {
 
         keyHandler.executaMetodo();
     }
-    
+
     private void pausaJogo() {
-        if(!gameTimer.isRunning())
+        if (!gameTimer.isRunning()) {
             return;
-        
+        }
+
         gameTimer.stop();
         musicaBackground.stop();
-        
-        BufferedImage imagemBackground = new BufferedImage(this.getWidth(), 
+
+        BufferedImage imagemBackground = new BufferedImage(this.getWidth(),
                 this.getHeight(), BufferedImage.TYPE_INT_RGB);
-        
+
         Graphics2D render = imagemBackground.createGraphics();
         this.paint(render);
-        
+
         render.dispose();
-        
+
         janela.remove(this);
 
         MenuPause menu = new MenuPause(this, fontePersonalizada, imagemBackground);
@@ -604,27 +607,28 @@ public class Engine extends JPanel implements ActionListener {
         menu.requestFocus();
         menu.setVisible(true);
         menu.setBackground(Color.DARK_GRAY);
-                
+
         janela.add(menu);
         janela.revalidate();
         janela.repaint();
     }
-    
+
     public void voltaJogo(MenuPause menu) {
-        if(gameTimer.isRunning())
+        if (gameTimer.isRunning()) {
             return;
-        
+        }
+
         keyHandler.limpaMetodos();
-        
+
         gameTimer.start();
         musicaBackground.start();
         musicaBackground.loop(Clip.LOOP_CONTINUOUSLY);
-        
+
         janela.remove(menu);
         janela.add(this);
-        
+
         this.requestFocus();
-        
+
         janela.revalidate();
         janela.repaint();
     }

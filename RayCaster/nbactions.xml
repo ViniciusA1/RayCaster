@@ -15,6 +15,7 @@
                 <exec.appArgs></exec.appArgs>
                 <exec.mainClass>com.raycaster.engine.RayCaster</exec.mainClass>
                 <exec.executable>java</exec.executable>
+                <exec.workingdir>/home/vinicius/Documentos/Projeto_Final/RayCaster</exec.workingdir>
             </properties>
         </action>
         <action>
@@ -33,6 +34,7 @@
                 <exec.mainClass>com.raycaster.engine.RayCaster</exec.mainClass>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
+                <exec.workingdir>/home/vinicius/Documentos/Projeto_Final/RayCaster</exec.workingdir>
             </properties>
         </action>
         <action>
@@ -50,6 +52,7 @@
                 <exec.mainClass>com.raycaster.engine.RayCaster</exec.mainClass>
                 <exec.executable>java</exec.executable>
                 <exec.appArgs></exec.appArgs>
+                <exec.workingdir>/home/vinicius/Documentos/Projeto_Final/RayCaster</exec.workingdir>
             </properties>
         </action>
     </actions>

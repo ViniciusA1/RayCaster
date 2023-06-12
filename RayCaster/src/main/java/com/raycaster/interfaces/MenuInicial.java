@@ -2,18 +2,22 @@ package com.raycaster.interfaces;
 
 import com.raycaster.engine.Diretorio;
 import com.raycaster.engine.Engine;
+import com.raycaster.interfaces.LabelAnimado.Animacao;
 import com.raycaster.interfaces.MapEditorMenu.event;
 import com.raycaster.mapa.MapGroup.ListData;
 import com.raycaster.mapa.Mapa;
 import static com.raycaster.mapa.Mapa.carregarMapList;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import static java.awt.Component.CENTER_ALIGNMENT;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -24,6 +28,8 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -50,6 +56,8 @@ public class MenuInicial {
 
     private static double direcao;
     private static int posicaoY;
+
+    private static int indiceMapa;
 
     /**
      * Método para iniciar o jogo em uma thread apropriada
@@ -93,18 +101,31 @@ public class MenuInicial {
 
         Font fonte = carregaFonte().deriveFont(Font.PLAIN, 100f);
 
-        JLabel logo = new JLabel("RayCaster");
-        logo.setFont(fonte.deriveFont(Font.BOLD, 150f));
-        logo.setAlignmentX(CENTER_ALIGNMENT);
-        logo.setForeground(Color.RED);
+        LabelAnimado logo = new LabelAnimado("RayCaster", 
+                fonte.deriveFont(Font.PLAIN, 150f), Animacao.FLOAT);
 
         BotaoCustom botaoJogar = new BotaoCustom("Jogar", fonte);
         BotaoCustom botaoMapa = new BotaoCustom("Editor de mapas", fonte);
         BotaoCustom botaoSair = new BotaoCustom("Sair", fonte);
 
+        JPanel panelPrincipal = new JPanel() {
+            @Override
+            public void paintComponent(Graphics g) {
+                super.paintComponents(g);
+
+                g.drawImage(imagemBackground, 0, 0,
+                        getWidth(), getHeight(), this);
+            }
+        };
+
+        panelPrincipal.setLayout(new BoxLayout(panelPrincipal,
+                BoxLayout.Y_AXIS));
+
         botaoJogar.addActionListener((ActionEvent) -> {
-            frameInicial.setVisible(false);
-            selecionaMapa(frameInicial);
+            panelPrincipal.removeAll();
+            panelPrincipal.repaint();
+            panelPrincipal.revalidate();
+            selecionaMapa(frameInicial, panelPrincipal, fonte);
         });
 
         botaoMapa.addActionListener((ActionEvent) -> {
@@ -117,48 +138,13 @@ public class MenuInicial {
             System.exit(0);
         });
 
-        direcao = 1;
-        posicaoY = logo.getY();
-        
-        JPanel panelPrincipal = new JPanel() {
-            @Override
-            public void paintComponent(Graphics g) {
-                super.paintComponent(g);
-
-                logo.setLocation((this.getWidth() - logo.getWidth()) / 2, posicaoY);
-
-                g.drawImage(imagemBackground, 0, 0,
-                        getWidth(), getHeight(), this);
-            }
-        };
-
-        panelPrincipal.setLayout(new BoxLayout(panelPrincipal,
-                BoxLayout.Y_AXIS));
-
         panelPrincipal.add(logo);
         panelPrincipal.add(botaoJogar);
         panelPrincipal.add(botaoMapa);
         panelPrincipal.add(botaoSair);
 
-        Timer timer = new Timer(60, e -> mudaLogo(panelPrincipal, logo));
-        timer.start();
-
         frameInicial.add(panelPrincipal);
         frameInicial.setVisible(true);
-    }
-
-    private static void mudaLogo(JPanel panel, JLabel logo) {
-        posicaoY += direcao;
-
-        if (posicaoY <= 0) {
-            posicaoY = 0;
-            direcao = 1;
-        } else if (posicaoY + logo.getHeight() >= 200) {
-            posicaoY = 200 - logo.getHeight();
-            direcao = -1;
-        }
-
-        logo.setLocation((panel.getWidth() - logo.getWidth()) / 2, posicaoY);
     }
 
     /**
@@ -199,81 +185,61 @@ public class MenuInicial {
         janela.setVisible(true);
     }
 
-    private static void selecionaMapa(JFrame f) {
+    private static void selecionaMapa(JFrame frame, JPanel panel, Font font) {
         ArrayList<Mapa> mapas = carregarMapList();
-        JList<Mapa> listaMapa = new JList<>(new ListData<>(mapas));
-        listaMapa.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JFrame selec = new JFrame("Excluir Mapa");
-        selec.addWindowListener(new event(f));
-        selec.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        selec.setLocationRelativeTo(null);
-        JPanel linha1, linha2, linha3;
-        linha1 = new JPanel();
-        linha1.setLayout(new BoxLayout(linha1, BoxLayout.X_AXIS));
-        linha1.add(Box.createHorizontalGlue());
-        linha1.add(new JLabel("Selecione o mapa a ser excluido"));
-        linha1.add(Box.createHorizontalGlue());
+        indiceMapa = 0;
 
-//        lista = new JPanel();
-//        lista.setLayout(new BoxLayout(lista, BoxLayout.Y_AXIS));
-//        lista.add(new JLabel("ID - Nome - tamanho"));
-//        lista.add(Box.createVerticalStrut(10));
-//        lista.add(new JScrollPane(listaMapa));
-        linha2 = new JPanel();
-        linha2.setBorder(BorderFactory.createTitledBorder("ID - Nome - tamanho"));
-        linha2.setLayout(new BoxLayout(linha2, BoxLayout.X_AXIS));
-        linha2.add(Box.createHorizontalGlue());
-        linha2.add(new JScrollPane(listaMapa));
-        linha2.add(Box.createHorizontalGlue());
-        selec.setSize(200, 300);
+        LabelAnimado textoMapa = new LabelAnimado("Selecione um mapa",
+                font.deriveFont(Font.PLAIN, 150f), Animacao.FLOAT);
 
-        JButton ok, cancel;
-        ok = new JButton("OK");
-        ok.addActionListener((ActionEvent e) -> {
-            if (listaMapa.isSelectionEmpty()) {
-                JOptionPane.showMessageDialog(null, "Voce deve selecionar um mapa para Jogar!");
-            } else {
-                jogar(selec, mapas.get(listaMapa.getSelectedIndex()));
+        LabelAnimado mapaAtual = new LabelAnimado(mapas.get(indiceMapa).toString(),
+                font.deriveFont(Font.PLAIN, 100f), Animacao.FADE);
+
+        panel.addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyPressed(KeyEvent event) {
+                int keyCode = event.getKeyCode();
+
+                switch (keyCode) {
+                    case KeyEvent.VK_UP:
+                    case KeyEvent.VK_W:
+                        indiceMapa = (indiceMapa - 1 + mapas.size()) % mapas.size();
+                        mapaAtual.setText(mapas.get(indiceMapa).toString());
+                        break;
+                    case KeyEvent.VK_DOWN:
+                    case KeyEvent.VK_S:
+                        indiceMapa = (indiceMapa + 1) % mapas.size();
+                        mapaAtual.setText(mapas.get(indiceMapa).toString());
+
+                        break;
+                    case KeyEvent.VK_ENTER:
+                        jogar(frame, mapas.get(indiceMapa));
+                }
             }
-
         });
-        cancel = new JButton("CANCELAR");
-        cancel.addActionListener((ActionEvent e) -> {
-            f.setVisible(true);
-            selec.dispose();
+                
+        BotaoCustom botaoVoltar = new BotaoCustom("Voltar", font);
+        
+        botaoVoltar.addActionListener((ActionEvent) -> {
+            panel.removeAll();
+            frame.dispose();
+            MenuInicial();
         });
-        linha3 = new JPanel();
-        linha3.setLayout(new BoxLayout(linha3, BoxLayout.X_AXIS));
-        linha3.add(Box.createHorizontalGlue());
-        linha3.add(ok);
-        linha3.add(Box.createHorizontalStrut(10));
-        linha3.add(cancel);
-        linha3.add(Box.createHorizontalGlue());
+        
+        panel.setFocusable(true);
+        panel.requestFocus();
 
-        JPanel painelEx = new JPanel();
-        painelEx.setLayout(new BoxLayout(painelEx, BoxLayout.Y_AXIS));
-        painelEx.add(linha1);
-        painelEx.add(linha2);
-        painelEx.add(linha3);
+        textoMapa.setAlignmentX(CENTER_ALIGNMENT);
+        mapaAtual.setAlignmentX(CENTER_ALIGNMENT);
 
-        selec.setLocationRelativeTo(null);
-        selec.add(painelEx);
-        selec.setVisible(true);
+        panel.add(textoMapa);
+        panel.add(Box.createVerticalStrut(100));
+        panel.add(mapaAtual);
+        panel.add(Box.createVerticalStrut(50));
+        panel.add(botaoVoltar);
     }
 
-//    private static void carregarTexturas(){
-//        texturas = new ArrayList<>();
-//        File f = new File("modelos" + File.separator + "paredes");
-//        File[] imageFiles = f.listFiles();
-//        for(File aux: imageFiles){
-//            try{
-//                texturas.add(lerImagem(aux));
-//            }
-//            catch(IOException e){
-//                System.exit(1);
-//            }
-//        }
-//    }
     /**
      * Metodo para Abrir uma imagem
      *

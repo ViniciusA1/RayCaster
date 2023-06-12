@@ -323,10 +323,6 @@ public class Mapa{
                 Mapa mapaCarregado = new Mapa(aux.getName(), tamanho);
                 
                 mapaCarregado.carregar();
-//                for(int i = 0, j; i < tamanho; i++) {
-//                    for(j = 0; j < tamanho; j++)
-//                        mapaCarregado.setValor(j, i, leitor.nextInt());
-//                }
                 mapas.add(mapaCarregado);
                 leitor.close();
             }
@@ -400,6 +396,6 @@ public class Mapa{
      */
     @Override
     public String toString(){
-        return (getNomeMapa()  + " - " + getLimite());
+        return (getNomeMapa().replaceAll("\\.txt$", ""));
     }
 }

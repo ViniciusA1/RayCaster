@@ -152,7 +152,7 @@ public class Player extends Entidade {
      * @param deltaX Variação do angulo que deve ser somada
      */
     public void rotaciona(double deltaX) {
-        angulo = angulo + deltaX;
+        angulo += deltaX;
     }
 
     /**
