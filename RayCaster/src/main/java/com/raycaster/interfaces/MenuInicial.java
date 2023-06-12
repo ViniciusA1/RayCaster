@@ -78,12 +78,8 @@ public class MenuInicial {
 
         Font fonte = carregaFonte().deriveFont(Font.PLAIN, 100f);
 
-        LabelAnimado logo = new LabelAnimado("RayCaster", 
+        LabelAnimado logo = new LabelAnimado("RayCaster",
                 fonte.deriveFont(Font.PLAIN, 150f), Animacao.FLOAT);
-
-        BotaoCustom botaoJogar = new BotaoCustom("Jogar", fonte);
-        BotaoCustom botaoMapa = new BotaoCustom("Editor de mapas", fonte);
-        BotaoCustom botaoSair = new BotaoCustom("Sair", fonte);
 
         JPanel panelPrincipal = new JPanel() {
             @Override
@@ -98,22 +94,40 @@ public class MenuInicial {
         panelPrincipal.setLayout(new BoxLayout(panelPrincipal,
                 BoxLayout.Y_AXIS));
 
-        botaoJogar.addActionListener((ActionEvent) -> {
-            panelPrincipal.removeAll();
-            panelPrincipal.repaint();
-            panelPrincipal.revalidate();
-            selecionaMapa(frameInicial, panelPrincipal, fonte);
-        });
+        Runnable acaoJogar = new Runnable() {
+            @Override
+            public void run() {
+                panelPrincipal.removeAll();
+                panelPrincipal.repaint();
+                panelPrincipal.revalidate();
+                selecionaMapa(frameInicial, panelPrincipal, fonte);
+            }
+        };
 
-        botaoMapa.addActionListener((ActionEvent) -> {
-            frameInicial.setVisible(false);
-            MapEditorMenu.inicia(frameInicial);
-        });
+        Runnable acaoMapa = new Runnable() {
+            @Override
+            public void run() {
+                frameInicial.setVisible(false);
+                MapEditorMenu.inicia(frameInicial);
+            }
 
-        botaoSair.addActionListener((ActionEvent) -> {
-            frameInicial.dispose();
-            System.exit(0);
-        });
+        };
+
+        Runnable acaoSair = new Runnable() {
+
+            @Override
+            public void run() {
+                frameInicial.dispose();
+                System.exit(0);
+            }
+        };
+
+        BotaoCustom botaoJogar = new BotaoCustom("Jogar", 
+                fonte, acaoJogar);
+        BotaoCustom botaoMapa = new BotaoCustom("Editor de mapas", 
+                fonte, acaoMapa);
+        BotaoCustom botaoSair = new BotaoCustom("Sair", 
+                fonte, acaoSair);
 
         panelPrincipal.add(logo);
         panelPrincipal.add(botaoJogar);
@@ -179,31 +193,28 @@ public class MenuInicial {
                 int keyCode = event.getKeyCode();
 
                 switch (keyCode) {
-                    case KeyEvent.VK_UP:
-                    case KeyEvent.VK_W:
+                    case KeyEvent.VK_UP, KeyEvent.VK_W -> {
                         indiceMapa = (indiceMapa - 1 + mapas.size()) % mapas.size();
                         mapaAtual.setText(mapas.get(indiceMapa).toString());
-                        break;
-                    case KeyEvent.VK_DOWN:
-                    case KeyEvent.VK_S:
+                    }
+                    case KeyEvent.VK_DOWN, KeyEvent.VK_S -> {
                         indiceMapa = (indiceMapa + 1) % mapas.size();
                         mapaAtual.setText(mapas.get(indiceMapa).toString());
-
-                        break;
-                    case KeyEvent.VK_ENTER:
+                    }
+                    case KeyEvent.VK_ENTER ->
                         jogar(frame, mapas.get(indiceMapa));
                 }
             }
         });
-                
+
         BotaoCustom botaoVoltar = new BotaoCustom("Voltar", font);
-        
+
         botaoVoltar.addActionListener((ActionEvent) -> {
             panel.removeAll();
             frame.dispose();
             MenuInicial();
         });
-        
+
         panel.setFocusable(true);
         panel.requestFocus();
 

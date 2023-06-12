@@ -35,16 +35,8 @@ public class MenuPause extends JPanel {
     private void carregaComponentes(Font fonte) {
         fonte = fonte.deriveFont(Font.PLAIN, 100f);
 
-        botaoVoltar = new BotaoCustom("Voltar", fonte);
-        botaoSair = new BotaoCustom("Sair", fonte);
-
-        botaoVoltar.addActionListener((ActionEvent e) -> {
-            voltar();
-        });
-        
-        botaoSair.addActionListener((ActionEvent e) -> {
-            sair();
-        });
+        botaoVoltar = new BotaoCustom("Voltar", fonte, () -> voltar());
+        botaoSair = new BotaoCustom("Sair", fonte, () -> sair());
 
         this.add(botaoVoltar);
         this.add(botaoSair);

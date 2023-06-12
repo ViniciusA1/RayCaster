@@ -4,13 +4,18 @@ import java.awt.AWTKeyStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashSet;
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 
 /**
  *
@@ -42,6 +47,12 @@ public class BotaoCustom extends JButton {
 
         this.setFont(fonteCustomizada);
     }
+    
+    public BotaoCustom(String texto, Font fonteCustomizada, Runnable action) {
+        this(texto, fonteCustomizada);
+        
+        actionKeybinding(action);
+    }
 
     private void focusKeybinding() {
         HashSet<AWTKeyStroke> backwardKeys = new HashSet<>();
@@ -55,7 +66,27 @@ public class BotaoCustom extends JButton {
         fowardKeys.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_S, 0));
 
         setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, fowardKeys);
+    }
+    
+    private void actionKeybinding(Runnable action) {
+        ActionListener ouvinte = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                action.run();
+            }
+        };
+        
+        addActionListener(ouvinte);
+        
+        KeyStroke enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
 
+        getInputMap(JComponent.WHEN_FOCUSED).put(enterKeyStroke, "enter");
+        getActionMap().put("enter", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                action.run();
+            }
+        });
     }
 
     private class FocusListener extends FocusAdapter {
