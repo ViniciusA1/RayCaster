@@ -3,45 +3,26 @@ package com.raycaster.interfaces;
 import com.raycaster.engine.Diretorio;
 import com.raycaster.engine.Engine;
 import com.raycaster.interfaces.LabelAnimado.Animacao;
-import com.raycaster.interfaces.MapEditorMenu.event;
-import com.raycaster.mapa.MapGroup.ListData;
 import com.raycaster.mapa.Mapa;
 import static com.raycaster.mapa.Mapa.carregarMapList;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import static java.awt.Component.CENTER_ALIGNMENT;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-import javax.swing.border.Border;
 
 /**
  * Classe que cria o menu inicial
@@ -52,10 +33,6 @@ import javax.swing.border.Border;
 public class MenuInicial {
 
     private static BufferedImage imagemBackground;
-    //private static ArrayList<BufferedImage> texturas;
-
-    private static double direcao;
-    private static int posicaoY;
 
     private static int indiceMapa;
 

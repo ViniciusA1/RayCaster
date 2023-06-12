@@ -473,7 +473,7 @@ public class Engine extends JPanel implements ActionListener {
         double cosRaioMaximo = Math.cos(angle + playerFOV);
         double sinRaioMaximo = Math.sin(angle + playerFOV);
 
-        double playerFOG = jogador.getFOG() / 50;
+        double playerFOG = playerFOV * jogador.getFOG() / 50;
 
         // Posição central da visão do jogador (meio da tela)
         double centroDeVisao = screenHeight / 2;
