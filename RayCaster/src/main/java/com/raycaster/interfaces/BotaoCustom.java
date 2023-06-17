@@ -18,14 +18,20 @@ import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 /**
- *
- * @author vinicius
+ * Classe que contém os métodos e atributos do botão customizado feito para o
+ * jogo.
+ * @author Vinicius Augusto
+ * @author Bruno Zara
  */
 public class BotaoCustom extends JButton {
 
     private static final Color COR_FOCO = Color.RED;
     private static final Color COR_ORIGINAL = Color.WHITE;
 
+    /**
+     * Construtor principal do botão, recebe o texto a ser exibido.
+     * @param texto Texto exibido no botão
+     */
     public BotaoCustom(String texto) {
         super(texto);
 
@@ -42,18 +48,32 @@ public class BotaoCustom extends JButton {
         focusKeybinding();
     }
 
+    /**
+     * Construtor auxiliar do botão, recebe também uma fonte customizada.
+     * @param texto Texto exibido no botão
+     * @param fonteCustomizada Fonte customizada do botão
+     */
     public BotaoCustom(String texto, Font fonteCustomizada) {
         this(texto);
 
         this.setFont(fonteCustomizada);
     }
     
+    /**
+     * Construtor auxiliar do botão, recebe também uma "action".
+     * @param texto Texto exibido no botão
+     * @param fonteCustomizada Fonte customizada do botão
+     * @param action Ação específica do botão
+     */
     public BotaoCustom(String texto, Font fonteCustomizada, Runnable action) {
         this(texto, fonteCustomizada);
         
         actionKeybinding(action);
     }
 
+    /**
+     * Seta as keybindings padrão do botão.
+     */
     private void focusKeybinding() {
         HashSet<AWTKeyStroke> backwardKeys = new HashSet<>();
         backwardKeys.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_UP, 0));
@@ -68,6 +88,10 @@ public class BotaoCustom extends JButton {
         setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, fowardKeys);
     }
     
+    /**
+     * Seta o action listener e a tecla de ação.
+     * @param action Ação vinculada ao botão
+     */
     private void actionKeybinding(Runnable action) {
         ActionListener ouvinte = new ActionListener() {
             @Override
@@ -89,6 +113,9 @@ public class BotaoCustom extends JButton {
         });
     }
 
+    /**
+     * Classe que guarda o ouvinte de foco do botão.
+     */
     private class FocusListener extends FocusAdapter {
 
         @Override
@@ -104,6 +131,9 @@ public class BotaoCustom extends JButton {
         }
     }
 
+    /**
+     * Classe que guarda o ouvinte de mouse do botão.
+     */
     private class MouseListener extends MouseAdapter {
 
         @Override

@@ -1,6 +1,7 @@
 package com.raycaster.interfaces;
 
 
+import com.raycaster.engine.Diretorio;
 import com.raycaster.engine.Engine;
 import com.raycaster.engine.Textura;
 import static com.raycaster.interfaces.MenuInicial.lerImagem;
@@ -76,7 +77,7 @@ public class MapEditorMenu {
     
     
     private static void mapEditor(JFrame f){
-        ArrayList<Textura> texturas = Textura.carregaTexturas(new File("modelos" + File.separator + "paredes"));
+        ArrayList<Textura> texturas = Textura.carregaTexturas(new File(Diretorio.TEXTURA_PAREDE));
         double[] zoomFactor = new double[1];
         zoomFactor[0] = 1;
         int[] selecionado = new int[1];

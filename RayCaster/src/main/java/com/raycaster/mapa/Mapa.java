@@ -116,7 +116,14 @@ public class Mapa{
      * @author Bruno Zara
      */
     public int getValor(int linha, int coluna) {
-        return grid[linha / tamanhoBloco][coluna / tamanhoBloco];
+        linha /= tamanhoBloco;
+        coluna /= tamanhoBloco;
+        
+        if(linha < 0 || coluna < 0 || 
+           linha >= limite || coluna >= limite)
+            return 0;
+        
+        return grid[linha][coluna];
     }
     
     /**

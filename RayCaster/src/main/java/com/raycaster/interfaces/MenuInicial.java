@@ -176,6 +176,12 @@ public class MenuInicial {
         janela.setVisible(true);
     }
 
+    /**
+     * Cria o menu de seleção de mapas.
+     * @param frame Janela atual do jogo
+     * @param panel Painel atual do jogo
+     * @param font Fonte personalizada do menu
+     */
     private static void selecionaMapa(JFrame frame, JPanel panel, Font font) {
         ArrayList<Mapa> mapas = carregarMapList();
         indiceMapa = 0;

@@ -23,7 +23,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -59,7 +58,7 @@ public class Engine extends JPanel implements ActionListener {
     private Mapa mapaAtual;
     private KeyInput keyHandler;
     private MouseInput mouseHandler;
-    private int[][] textura;
+    private List<Textura> texturas;
     private Clip musicaBackground;
     private final JFrame janela;
 
@@ -71,12 +70,14 @@ public class Engine extends JPanel implements ActionListener {
      * @param width Comprimento horizontal da tela
      * @param height Comprimento vertical da tela
      * @param janela a janela a que esse componente esta associado
+     * @param map Mapa que será jogado
      */
     public Engine(int width, int height, JFrame janela, Mapa map) {
         this.screenWidth = width;
         this.screenHeight = height;
         this.janela = janela;
         this.mapaAtual = map;
+        this.texturas = Textura.carregaTexturas(new File(Diretorio.TEXTURA_PAREDE));
 
         setLayout(new LayoutEngine());
 
@@ -99,7 +100,6 @@ public class Engine extends JPanel implements ActionListener {
         initHandlers();
         initMusica();
         initTimer();
-        initTexturas();
     }
 
     /**
@@ -195,6 +195,7 @@ public class Engine extends JPanel implements ActionListener {
 
         keyHandler.adicionaKey(KeyEvent.VK_2, ()
                 -> jogador.sacaItem(1));
+
     }
 
     /**
@@ -234,24 +235,6 @@ public class Engine extends JPanel implements ActionListener {
     private void initTimer() {
         gameTimer = new Timer(Math.round(1000f / fpsMaximo), this);
         gameTimer.start();
-    }
-
-    /**
-     * Carrega todas as texturas das paredes do jogo armazenadas no grid.
-     */
-    private void initTexturas() {
-        textura = new int[3][128 * 128];
-        try {
-            BufferedImage parede = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "01 - wall.png"));
-            BufferedImage chao = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "02 - floor.png"));
-            BufferedImage teto = ImageIO.read(new File(Diretorio.TEXTURA_PAREDE + "03 - ceil.png"));
-
-            parede.getRGB(0, 0, 128, 128, textura[0], 0, 128);
-            chao.getRGB(0, 0, 128, 128, textura[1], 0, 128);
-            teto.getRGB(0, 0, 128, 128, textura[2], 0, 128);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -303,7 +286,7 @@ public class Engine extends JPanel implements ActionListener {
         double fatorProjecao = screenWidth / (2 * Math.tan(playerFOV / 2.0));
 
         // Tamanho das texturas para renderização
-        int tamanhoTextura = 128;
+        int tamanhoTextura = texturas.get(0).getTamanho();
 
         // Renderiza o teto e o chão do mapa
         renderizaExtremidades(frameBuffer, playerX, playerY, playerAngulo, playerFOV,
@@ -411,6 +394,7 @@ public class Engine extends JPanel implements ActionListener {
 
             // Busca o id da textura com base no seu valor no mapa
             int idTextura = mapaAtual.getValor(posX, posY) - 1;
+            idTextura = Math.max(idTextura, 0);
 
             // Valor real da coluna de textura que deve ser percorrida
             int texturaX = (int) (paredeX * tamanhoTextura);
@@ -427,9 +411,10 @@ public class Engine extends JPanel implements ActionListener {
             // Percorre todo os pixels da coluna atribuindo a cor da textura a eles
             for (int y = comecoParede; y < fimParede; y++) {
                 int texturaY = (int) posicaoTextura & (tamanhoTextura - 1);
+                
                 posicaoTextura += variacao;
-
-                int corPixel = textura[idTextura][tamanhoTextura * texturaY + texturaX];
+                
+                int corPixel = texturas.get(idTextura).getPixel(tamanhoTextura * texturaY + texturaX);
 
                 frameBuffer[y * screenWidth + i] = transformaCor(corPixel, fatorFOG);
             }
@@ -528,10 +513,10 @@ public class Engine extends JPanel implements ActionListener {
                 int corPixel;
 
                 // Aplica as cores das texturas em ambas as figuras
-                corPixel = textura[chaoID][tamanhoTextura * texturaY + texturaX];
+                corPixel = texturas.get(chaoID).getPixel(tamanhoTextura * texturaY + texturaX);
                 frameBuffer[y * screenWidth + x] = transformaCor(corPixel, fatorFOG);
 
-                corPixel = textura[tetoID][tamanhoTextura * texturaY + texturaX];
+                corPixel = texturas.get(tetoID).getPixel(tamanhoTextura * texturaY + texturaX);
                 frameBuffer[(screenHeight - y - 1) * screenWidth + x] = transformaCor(corPixel, fatorFOG);
             }
         }

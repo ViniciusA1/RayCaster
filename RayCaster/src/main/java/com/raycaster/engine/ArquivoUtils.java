@@ -192,8 +192,6 @@ public class ArquivoUtils {
         T entidadeCriada;
         
         double vidaMaxima = Double.parseDouble(dado.getProperty("vidaMaxima" + id)); 
-        double x = Double.parseDouble(dado.getProperty("x" + id)); 
-        double y = Double.parseDouble(dado.getProperty("y" + id));
         double largura = Double.parseDouble(dado.getProperty("largura" + id));
         double velocidade = Double.parseDouble(dado.getProperty("velocidade" + id)); 
         double FOG = Double.parseDouble(dado.getProperty("FOG" + id));
@@ -209,7 +207,7 @@ public class ArquivoUtils {
         switch(tipo) {
             case "Player" -> {
                 int fov = Integer.parseInt(dado.getProperty("fov" + id));
-                entidadeCriada = (T) new Player(vidaMaxima, x, y, largura, velocidade, fov, FOG, possiveisEstados);
+                entidadeCriada = (T) new Player(vidaMaxima, 0, 0, largura, velocidade, fov, FOG, possiveisEstados);
             }
             default -> entidadeCriada = null;
         }

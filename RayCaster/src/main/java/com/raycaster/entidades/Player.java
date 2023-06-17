@@ -22,7 +22,7 @@ public class Player extends Entidade {
     private double angulo;
     private double pitch;
     private double FOV;
-    private double taxaPitch;
+    private double pitchAcumulado;
     private long tempoAnterior;
     private Inventario<Arma> mochila;
     private Item itemAtual;
@@ -51,8 +51,8 @@ public class Player extends Entidade {
 
         angulo = 0;
         pitch = 0;
+        pitchAcumulado = 0;
         FOV = Math.toRadians(fov);
-        taxaPitch = 64;
         mochila = new Inventario<>();
         estadoAtual = Estado.OCIOSO;
         som = new EfeitosSonoros("player", possiveisEstados);
@@ -136,11 +136,8 @@ public class Player extends Entidade {
         double dy = sinal * getVelocidade()
                 * Math.sin(angulo + anguloRelativo) * deltaTime;
 
-        pitch += (taxaPitch * deltaTime);
-
-        if (pitch >= 16 || pitch <= -16) {
-            taxaPitch *= -1;
-        }
+        pitchAcumulado += 5 * deltaTime;
+        pitch = 16 * Math.sin(pitchAcumulado);
 
         trataColisao(mapaAtual, dx, 0);
         trataColisao(mapaAtual, 0, dy);

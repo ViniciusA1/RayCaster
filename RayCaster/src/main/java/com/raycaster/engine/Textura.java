@@ -1,15 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.raycaster.engine;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.imageio.ImageIO;
 
 /**
@@ -54,6 +49,10 @@ public class Textura {
      */
     public int[] getTextura() {
         return textura;
+    }
+    
+    public int getPixel(int index) {
+        return textura[index];
     }
 
     /**
@@ -126,16 +125,19 @@ public class Textura {
     public static ArrayList<Textura> carregaTexturas(File diretorio) {
         File[] imagens = diretorio.listFiles();
         ArrayList<Textura> texturas = new ArrayList<>();
+        
+        Arrays.sort(imagens);
+        
         try {
             for(File aux: imagens){
                 if(aux.exists()  && !aux.isDirectory()){
-                    String[] dados = aux.getName().split(" - ");
+                    String[] dados = aux.getName().split("-");
                     int id = Integer.parseInt(dados[0]);
                     String nome = dados[1];
                     BufferedImage imagem = ImageIO.read(aux);
                     int size = imagem.getWidth();
                     if(imagem.getHeight() != size){
-                        System.err.println("só pondem existir imagens quadradas NxN");
+                        System.err.println("Só podem existir imagens quadradas NxN");
                         System.exit(1);
                     }
                     int[] cor = new int[size * size];
@@ -170,7 +172,7 @@ public class Textura {
     
     @Override
     public String toString(){
-        return (this.getID() + " - " + this.getNome());
+        return (ID + " - " + nome);
     }
     
 }

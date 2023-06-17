@@ -8,8 +8,11 @@ import javax.swing.JLabel;
 import javax.swing.Timer;
 
 /**
- *
- * @author vinicius
+ * Classe que guarda os atributos e métodos de um 
+ * label com animação customizável.
+ * 
+ * @author Vinicius Augusto
+ * @author Bruno Zara
  */
 public class LabelAnimado extends JLabel {
 
@@ -23,11 +26,21 @@ public class LabelAnimado extends JLabel {
     
     private Runnable ajuste;
     
+    /**
+     * Enum que representa os tipos de animação disponíveis.
+     */
     public enum Animacao {
         FLOAT,
         FADE
     }
 
+    /**
+     * Construtor principal do label, recebe o texto e tipo de animação
+     * desejado.
+     * 
+     * @param texto Texto do label
+     * @param tipo Tipo de animação para ser reproduzido
+     */
     public LabelAnimado(String texto, Animacao tipo) {
         super(texto);
         this.setForeground(Color.RED);
@@ -36,18 +49,40 @@ public class LabelAnimado extends JLabel {
         escolheAnimacao(tipo);
     }
 
+    /**
+     * Construtor auxiliar do label, recebe também uma fonte personalizada para
+     * o texto.
+     * 
+     * @param texto Texto do label
+     * @param fonteCustomizada Fonte customizada para o texto
+     * @param tipo Tipo de animação para ser reproduzido
+     */
     public LabelAnimado(String texto, Font fonteCustomizada, Animacao tipo) {
         this(texto, tipo);
 
         this.setFont(fonteCustomizada);
     }
 
+    /**
+     * Construtor auxiliar do label, recebe também uma cor personalizada para o
+     * texto.
+     * 
+     * @param texto Texto do label
+     * @param fonteCustomizada Fonte customizada para o texto
+     * @param tipo Tipo de animação a ser reproduzido
+     * @param corTexto Cor customizada para o texto
+     */
     public LabelAnimado(String texto, Font fonteCustomizada, Animacao tipo, Color corTexto) {
         this(texto, fonteCustomizada, tipo);
 
         this.setForeground(corTexto);
     }
     
+    /**
+     * Determina e carrega a animação de exibição do label com base na escolha
+     * do usuário.
+     * @param tipo Tipo da animação a ser reproduzida
+     */
     private void escolheAnimacao(Animacao tipo) {
         switch(tipo) {
             case FLOAT -> {
@@ -67,6 +102,10 @@ public class LabelAnimado extends JLabel {
         timerAnimacao.start();
     }
 
+    /**
+     * Atualiza a renderização do texto de forma personalizada.
+     * @param g Componente gráfico do texto
+     */
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -74,6 +113,9 @@ public class LabelAnimado extends JLabel {
         ajuste.run();
     }
 
+    /**
+     * Reproduz a animação de "float" do label.
+     */
     private void animacaoFloat() {
         posicaoY = getY() + direcao;
 
@@ -88,6 +130,9 @@ public class LabelAnimado extends JLabel {
         ajusteFloat();
     }
     
+    /**
+     * Determina o ajuste final para a animação do label.
+     */
     private void ajusteFloat() {
         Container parent = getParent();
 
@@ -96,6 +141,9 @@ public class LabelAnimado extends JLabel {
         }
     }
 
+    /**
+     * Reproduz a animação de "fade" do label.
+     */
     private void animacaoFade() {
         alpha += delta;
         if (alpha >= 1f) {
@@ -109,10 +157,16 @@ public class LabelAnimado extends JLabel {
         ajusteFade();
     }
     
+    /**
+     * Determina o ajuste final da animação de "fade" do label.
+     */
     private void ajusteFade() {
         setForeground(new Color(1f, 0f, 0f, alpha));
     }
 
+    /**
+     * Encerra o label e seu timer.
+     */
     public void close() {
         timerAnimacao.stop();
     }

@@ -8,38 +8,66 @@ import java.awt.Insets;
 import java.awt.LayoutManager;
 
 /**
- *
- * @author vinicius
+ * Classe que contém atributos e métodos do layout de gerenciamento do
+ * painel de informações do jogo.
+ * 
+ * @author Vinicius Augusto
+ * @author Bruno Zara
  */
 public class LayoutInformacao implements LayoutManager {
 
     private final Font fontePersonalizada;
 
-    private static final int gap = 10;
 
+    /**
+     * Construtor do layout, recebe a fonte personalizada do painel.
+     * @param fontePersonalizada Fonte personalizada do painel
+     */
     public LayoutInformacao(Font fontePersonalizada) {
         this.fontePersonalizada = fontePersonalizada;
     }
 
+    /**
+     * Adiciona um componente no layout.
+     * @param string Nome do componente
+     * @param cmpnt Referência ao componente
+     */
     @Override
     public void addLayoutComponent(String string, Component cmpnt) {
     }
 
+    /**
+     * Remove um componente do layout.
+     * @param cmpnt Referência ao componente
+     */
     @Override
     public void removeLayoutComponent(Component cmpnt) {
     }
 
+    /**
+     * Seta o tamanho preferido do layout.
+     * @param parent Container que usa o layout
+     * @return Retorna a dimensão preferida
+     */
     @Override
     public Dimension preferredLayoutSize(Container parent) {
         return null;
     }
 
+    /**
+     * Devolve o tamanho mínimo do container com esse layout.
+     * @param parent Conteiner que usa o layout
+     * @return Retorna a dimensão mínima
+     */
     @Override
     public Dimension minimumLayoutSize(Container parent) {
         return preferredLayoutSize(parent);
     }
 
-
+    /**
+     * Define o padrao de distribuição dos componentes no layout.
+     * @param parent Container que usa o layout
+     */
     @Override
     public void layoutContainer(Container parent) {
         synchronized (parent.getTreeLock()) {
