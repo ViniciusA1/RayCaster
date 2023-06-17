@@ -48,6 +48,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -161,8 +162,8 @@ public class MapEditorMenu {
                     dlm.addElement(t.toString());
                 }
                 list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-                list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-                list.setVisibleRowCount(N);
+                list.setLayoutOrientation(JList.VERTICAL_WRAP);
+                list.setVisibleRowCount(dlm.getSize());
                 list.setCellRenderer(new ListRenderer());
                 list.addListSelectionListener(new SelectionHandler());
                 this.add(list);
@@ -225,11 +226,12 @@ public class MapEditorMenu {
         
         
         ListPanel lista = new ListPanel();
-        
-        
+        JScrollPane sp = new JScrollPane(lista);
+        sp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         JSplitPane jsp = new JSplitPane();
-        jsp.setLeftComponent(new JScrollPane(lista));
+        jsp.setLeftComponent(sp);
         jsp.setRightComponent(grid);
+        jsp.setDividerLocation(154);
         constJSP[0] = jsp.getDividerLocation() +10;
         jsp.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, (PropertyChangeEvent pce) -> {
             constJSP[0] = jsp.getDividerLocation() +10;
@@ -451,7 +453,7 @@ public class MapEditorMenu {
         JLabel cabecalho, nomeLabel, tamanhoLabel;
         cabecalho = new JLabel("Criar Novo Mapa");
         nomeLabel = new JLabel("Nome do Mapa: ");
-        tamanhoLabel = new JLabel("Tamanho do Mapa (min: 10): ");
+        tamanhoLabel = new JLabel("Tamanho do Mapa (min: 24): ");
         linha1 = new JPanel();
         linha1.setLayout(new BoxLayout(linha1, BoxLayout.X_AXIS));
         linha1.add(Box.createHorizontalGlue());
@@ -486,7 +488,7 @@ public class MapEditorMenu {
             else if(jaExiste(nomeCampo.getText())){
                 JOptionPane.showMessageDialog(null,"Já existe Mapa com esse nome");
             }
-            else if(Integer.parseInt( (String) (tamanhoCampo.getText()) ) < 10){
+            else if(Integer.parseInt( (String) (tamanhoCampo.getText()) ) < 24){
                 JOptionPane.showMessageDialog(null,"O tamanho deve ser maior ou igual a 10");
             }
             else{
