@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.raycaster.interfaces;
 
 import javax.swing.text.AttributeSet;
@@ -18,14 +14,16 @@ public class IntFilter extends DocumentFilter{
     
     /**
      * Metodo que verifica se a string inserida é um inteiro
-     * @param fb
-     * @param offset
-     * @param string
-     * @param attr
-     * @throws BadLocationException 
+     * @param fb Filtro de string utilizado
+     * @param offset Offset para verificação
+     * @param string String para verificação
+     * @param attr Atributo para verificação
+     * @throws BadLocationException Exception lançada pelo uso do método
      */
     @Override
-    public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+    public void insertString(FilterBypass fb, int offset, String string, 
+            AttributeSet attr) throws BadLocationException 
+    {
         Document doc = fb.getDocument();
         StringBuilder sb = new StringBuilder();
         sb.append(doc.getText(0, doc.getLength()));
@@ -37,10 +35,8 @@ public class IntFilter extends DocumentFilter{
 
     /**
      * Metodo que testa se a String inserida é composta de inteiros ou não
-     * @param text
+     * @param text Texto inserido pelo usuário
      * @return true se a Strig for composta de numeros inteiros e false caso contrario
-     * @author Vinicius Augusto
-     * @author Bruno Zara
      */
     private boolean test(String text) {
         try {
@@ -53,17 +49,17 @@ public class IntFilter extends DocumentFilter{
 
     /**
      * Metodo que sobrescreve alguma parte do documento
-     * @param fb
-     * @param offset
-     * @param length
-     * @param text
-     * @param attrs
-     * @throws BadLocationException 
-     * @author Vinicius Augusto
-     * @author Bruno Zara
+     * @param fb Filtro utilizado no campo
+     * @param offset Offset utilizado na verificação
+     * @param length Tamanho do texto utilizado na verificação
+     * @param text Texto para ser analisado
+     * @param attrs Atributos necessários para verificação
+     * @throws BadLocationException Exception lançado pelo uso do método
      */
     @Override
-    public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+    public void replace(FilterBypass fb, int offset, int length, String text, 
+            AttributeSet attrs) throws BadLocationException 
+    {
         Document doc = fb.getDocument();
         StringBuilder sb = new StringBuilder();
         sb.append(doc.getText(0, doc.getLength()));
@@ -77,15 +73,15 @@ public class IntFilter extends DocumentFilter{
     
     /**
      * Metodo responsavel por apagar uma caractere
-     * @param fb
-     * @param offset
-     * @param length
-     * @throws BadLocationException 
-     * @author Vinicius Augusto
-     * @author Bruno Zara
+     * @param fb Filtro utilizado no campo
+     * @param offset Offset utilizado na verificação
+     * @param length Tamanho do texto utilizado na verificação
+     * @throws BadLocationException Exception lançado pelo uso do método
      */
     @Override
-    public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
+    public void remove(FilterBypass fb, int offset, int length) 
+            throws BadLocationException 
+    {
         Document doc = fb.getDocument();
         StringBuilder sb = new StringBuilder();
         sb.append(doc.getText(0, doc.getLength()));

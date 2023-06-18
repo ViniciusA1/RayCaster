@@ -64,19 +64,18 @@ public class MapEditorMenu {
     /**
      * Metodo que carrega os mapas salvos e inicia o Editor de Mapas em uma thread especifica
      * @param f Frame da janela anterior
-     * @author Vinicius Augusto
-     * @author Bruno Zara
      */
     public static void inicia(JFrame f){
         mapas = Mapa.carregarMapList();
         SwingUtilities.invokeLater(() -> {
             mapEditor(f);
         });
-        
-        
     }
     
-    
+    /**
+     * Menu completo do editor de mapas do jogo.
+     * @param f Frame da janela anterior
+     */
     private static void mapEditor(JFrame f){
         ArrayList<Textura> texturas = Textura.carregaTexturas(new File(Diretorio.TEXTURA_PAREDE));
         double[] zoomFactor = new double[1];
@@ -112,15 +111,21 @@ public class MapEditorMenu {
                 int xi = -(mapa[0].getLimite()/2)*bloco;
                 int yi = -(mapa[0].getLimite()/2)*bloco;
                 int tam = mapa[0].getLimite();
+                
                 for(int i = 0; i<tam; i++){
                     for(int j = 0 ; j<tam; j++){
                         int id = mapa[0].getID(i, j);
-                        if((this.getWidth()/2 <= (tam + i )*bloco + Math.abs(x[0]) + constJSP[0] && this.getHeight()/2 <= ((tam + j) *bloco + Math.abs(y[0]))))
+                        if((this.getWidth() / 2 <= (tam + i) * bloco + Math.abs(x[0]) + 
+                                constJSP[0] && this.getHeight()/2 <= ((tam + j) * 
+                                bloco + Math.abs(y[0]))))
+                        {
                             if(id > 0){
                                 Textura textura = Textura.getTextura(texturas, id);
                                 BufferedImage imagem = textura.getRGB();
-                                g2.drawImage(imagem, xi + x[0] + i*bloco, yi  + y[0] + j*bloco, bloco, bloco, null);
+                                g2.drawImage(imagem, xi + x[0] + i*bloco, 
+                                        yi  + y[0] + j*bloco, bloco, bloco, null);
                             }
+                        }
                     }
                 }
                 
@@ -141,13 +146,17 @@ public class MapEditorMenu {
                 
                 g2.draw(path);
                 g2.setColor(Color.BLUE);
-                g2.fillOval(xi + x[0] + mapa[0].getSpawnX() * bloco, yi + y[0] + mapa[0].getSpawnY() * bloco, bloco, bloco);
+                g2.fillOval(xi + x[0] + mapa[0].getSpawnX() * bloco, 
+                        yi + y[0] + mapa[0].getSpawnY() * bloco, bloco, bloco);
                 
                 
             }
         };
         
-        
+        /**
+         * Classe que guarda os atributos e métodos do painel da interface do
+         * editor de mapas.
+         */
         class ListPanel extends JPanel {
 
             private static final int N = 5;
@@ -173,15 +182,19 @@ public class MapEditorMenu {
 
                 
                 @Override
-                public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                    JLabel label = (JLabel) super.getListCellRendererComponent( list, value, index, isSelected, cellHasFocus);
-                    label.setBorder(BorderFactory.createEmptyBorder(N, N, N, N));
-                    if(label.getText().equals("Player Spawn Point")){
-                        
-                    }
-                    else{
-                       String[] s = label.getText().split(" - ");
+                public Component getListCellRendererComponent(JList list, Object value,
+                        int index, boolean isSelected, boolean cellHasFocus) 
+                {
+                    JLabel label = (JLabel) super.getListCellRendererComponent(list, 
+                            value, index, isSelected, cellHasFocus);
+                    
+                    label.setBorder(BorderFactory.createEmptyBorder(N, 
+                            N, N, N));
+                    
+                    if(!label.getText().equals("Player Spawn Point")) {
+                        String[] s = label.getText().split(" - ");
                         int id = Integer.parseInt(s[0]);
+                        
                         for(Textura aux: texturas){
                             if(aux.getID() == id){
                                 label.setIcon(new ImageIcon(aux.getRGB()));
@@ -194,14 +207,9 @@ public class MapEditorMenu {
                     label.setHorizontalTextPosition(JLabel.CENTER);
                     label.setVerticalTextPosition(JLabel.BOTTOM);
                     return label;
-//                    TextureBox tb = (TextureBox) super.getListCellRendererComponent( list, value, index, isSelected, cellHasFocus);;
-//                    return tb;
                 }
-                
-                
+  
             }
-            
-            
 
             private class SelectionHandler implements ListSelectionListener {
 
@@ -233,11 +241,13 @@ public class MapEditorMenu {
         jsp.setRightComponent(grid);
         jsp.setDividerLocation(154);
         constJSP[0] = jsp.getDividerLocation() +10;
-        jsp.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, (PropertyChangeEvent pce) -> {
+        
+        jsp.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, 
+                (PropertyChangeEvent pce) -> {
             constJSP[0] = jsp.getDividerLocation() +10;
         });
         
-        // método novo para mover a grid
+        // Método novo para mover a grid.
         MouseAdapter adaptador = new MouseAdapter() {
             private int anteriorX;
             private int anteriorY;
@@ -296,10 +306,7 @@ public class MapEditorMenu {
                 Point p = grid.getLocation();
                 x[1] = (x[1] - p.x) + (jsp.getDividerLocation() +10) -d.width/2;
                 y[1] = (y[1] - p.y) -d.height/2;
-                //x[1] = x[1] -d.width/2;
-                //y[1] = y[1] -d.height/2;
                 int bloco = (int) (64 * zoomFactor[0]);
-                //JOptionPane.showMessageDialog(null, "X = " + (x[1] -x[0] +(mapa.getLimite()/2) * bloco)/bloco + ", y = " + (y[1] -y[0] +(mapa.getLimite()/2) * bloco)/bloco);
                 int aux = selecionado[0];
                 int xi = (x[1] -x[0] +(mapa[0].getLimite()/2) * bloco)/bloco;
                 int yi = (y[1] -y[0] +(mapa[0].getLimite()/2) * bloco)/bloco;
@@ -383,9 +390,12 @@ public class MapEditorMenu {
         BufferedImage trash = null;
         BufferedImage play = null;
         try{
-            plus = lerImagem("modelos" + File.separator + "icones" + File.separator + "plus.png");
-            trash = lerImagem("modelos" + File.separator + "icones" + File.separator + "trash.png");
-            play = lerImagem("modelos" + File.separator + "icones" + File.separator + "play.png");
+            plus = lerImagem("modelos" + File.separator + "icones" + 
+                    File.separator + "plus.png");
+            trash = lerImagem("modelos" + File.separator + "icones" +
+                    File.separator + "trash.png");
+            play = lerImagem("modelos" + File.separator + "icones" + 
+                    File.separator + "play.png");
         }
         catch(IOException ex){
             JOptionPane.showMessageDialog(null, "Erro ao ler os icones");
@@ -398,7 +408,9 @@ public class MapEditorMenu {
         criarMapa.setToolTipText("Criar novo Mapa");
         apagarMapa.setIcon(new ImageIcon(trash));
         apagarMapa.addActionListener((e)->{
-            if(JOptionPane.showConfirmDialog(null, "Voce tem certeza que deseja continuar?") == 0){
+            if(JOptionPane.showConfirmDialog(null, 
+                    "Voce tem certeza que deseja continuar?") == 0)
+            {
                 mapa[0].excluir();
                 mapas.remove(mapa[0]);
                 dcm.removeElement(mapa[0]);
@@ -443,10 +455,13 @@ public class MapEditorMenu {
         
     }
     
-    
+    /**
+     * Cria um novo mapa na lista total de mapas.
+     * @param dcm ComboBox utilizada na interface do mapa
+     */
     private static void criarMapa(DefaultComboBoxModel dcm){
         JFrame janela = new JFrame("Criar novo mapa");
-        janela.setDefaultCloseOperation(janela.DISPOSE_ON_CLOSE);
+        janela.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         janela.setSize(300, 200);
         janela.setLocationRelativeTo(null);
         JPanel coluna, linha1, linha2, linha3, linha4;
@@ -483,16 +498,20 @@ public class MapEditorMenu {
         ok = new JButton("OK");
         ok.addActionListener((ActionEvent e) ->{
             if(nomeCampo.getText().isBlank()  ||  tamanhoCampo.getText().isBlank()){
-                JOptionPane.showMessageDialog(null,"Os parametros não podem estar em branco");
+                JOptionPane.showMessageDialog(null,
+                        "Os parametros não podem estar em branco");
             }
             else if(jaExiste(nomeCampo.getText())){
-                JOptionPane.showMessageDialog(null,"Já existe Mapa com esse nome");
+                JOptionPane.showMessageDialog(null,
+                        "Já existe Mapa com esse nome");
             }
             else if(Integer.parseInt( (String) (tamanhoCampo.getText()) ) < 24){
-                JOptionPane.showMessageDialog(null,"O tamanho deve ser maior ou igual a 10");
+                JOptionPane.showMessageDialog(null,
+                        "O tamanho deve ser maior ou igual a 10");
             }
             else{
-                Mapa map = new Mapa(nomeCampo.getText(), Integer.parseInt((String)(tamanhoCampo.getText())));
+                Mapa map = new Mapa(nomeCampo.getText(), 
+                        Integer.parseInt((String)(tamanhoCampo.getText())));
                 mapas.add(map);
                 dcm.addElement(map);
                 dcm.setSelectedItem(map);
@@ -506,11 +525,9 @@ public class MapEditorMenu {
         });
         cancel = new JButton("CANCELAR");
         cancel.addActionListener((ActionEvent e) ->{
-//            janela.setVisible(false);
-//            nomeCampo.setText("");
-//            tamanhoCampo.setText("");
             janela.dispose();
         });
+        
         linha4 = new JPanel();
         linha4.setLayout(new BoxLayout(linha4, BoxLayout.X_AXIS));
         linha4.add(Box.createHorizontalGlue());
@@ -537,13 +554,13 @@ public class MapEditorMenu {
         janela.setResizable(false);
         janela.add(coluna);
         janela.setVisible(true);
-        
-        
-        
-        
-        
     }
     
+    /**
+     * Verifica se ja existe um mapa na lista de mapas.
+     * @param nomeMapa Nome do mapa a ser verificado
+     * @return Retorna se já existe um mapa com o mesmo nome ou não
+     */
     private static boolean jaExiste(String nomeMapa){
         if(nomeMapa.isBlank())
             return false;
@@ -556,12 +573,9 @@ public class MapEditorMenu {
     }
     
     
-    
-    
     /**
-     * Classe auxiliar que serve para ler os eventos da janela e executar comandos dependendo da ação tomada
-     * @author Vinicius Augusto
-     * @author Bruno Zara
+     * Classe auxiliar que serve para ler os eventos da janela e 
+     * executar comandos dependendo da ação tomada.
      */
     static class event extends WindowAdapter{
         JFrame f;
@@ -569,8 +583,6 @@ public class MapEditorMenu {
         /**
          * Contrutor do evento 
          * @param f referencia da janela anterior
-         * @author Vinicius Augusto
-         * @author Bruno Zara
          */
         event(JFrame f){
             this.f = f;
@@ -578,9 +590,7 @@ public class MapEditorMenu {
         
         /**
          * Metodo executado quando a janela atual é aberta
-         * @param e
-         * @author Vinicius Augusto
-         * @author Bruno Zara
+         * @param e Evento gerado pela janela
          */
         @Override
         public void windowOpened(WindowEvent e){
@@ -590,9 +600,7 @@ public class MapEditorMenu {
 
         /**
          * Metodo executado quando a janela atual é fechada
-         * @param e 
-         * @author Vinicius Augusto
-         * @author Bruno Zara
+         * @param e Evento gerado pela janela
          */
         @Override
         public void windowClosed(WindowEvent e){
@@ -602,8 +610,4 @@ public class MapEditorMenu {
             f.setVisible(true);
         }
     }
-    
-    
-    
-
 }

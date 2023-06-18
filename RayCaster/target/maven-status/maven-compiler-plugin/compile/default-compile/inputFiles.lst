@@ -2,10 +2,8 @@
 /home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java/com/raycaster/engine/Estado.java
 /home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java/com/raycaster/engine/Textura.java
 /home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java/com/raycaster/engine/EfeitosSonoros.java
-/home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java/com/raycaster/mapa/Gate.java
 /home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java/com/raycaster/interfaces/BotaoCustom.java
 /home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java/com/raycaster/interfaces/PainelInformacao.java
-/home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java/com/raycaster/mapa/Coords.java
 /home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java/com/raycaster/interfaces/MenuPause.java
 /home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java/com/raycaster/itens/Arma.java
 /home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java/com/raycaster/interfaces/LayoutInformacao.java
@@ -14,8 +12,6 @@
 /home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java/com/raycaster/itens/ArmaCurta.java
 /home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java/com/raycaster/entidades/Entidade.java
 /home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java/com/raycaster/interfaces/IntFilter.java
-/home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java/com/raycaster/entidades/Inimigo.java
-/home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java/com/raycaster/mapa/MapGroup.java
 /home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java/com/raycaster/interfaces/LayoutEngine.java
 /home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java/com/raycaster/interfaces/LayoutHUD.java
 /home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java/com/raycaster/itens/ArmaLonga.java

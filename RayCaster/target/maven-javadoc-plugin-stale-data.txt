@@ -1,0 +1,51 @@
+@options
+@packages
+-encoding
+'UTF-8'
+-protected
+-source
+'20'
+-sourcepath
+'/home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2023. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'RayCaster 1.0-SNAPSHOT API'
+-use
+-version
+-windowtitle
+'RayCaster 1.0-SNAPSHOT API'
+com.raycaster.interfaces
+com.raycaster.entidades
+com.raycaster.itens
+com.raycaster.mapa
+com.raycaster.engine
+/home/vinicius/Documentos/Projeto_Final/RayCaster/src/main/java = 1685233943671
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/serialized-form.html = 1687112449288
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/tag-search-index.js = 1687112449515
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/member-search-index.js = 1687112449515
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/allclasses-index.html = 1687112449508
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/script.js = 1687112449575
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/module-search-index.js = 1687112449512
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/allpackages-index.html = 1687112449512
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/constant-values.html = 1687112449228
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/index-all.html = 1687112449558
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/search-page.js = 1687112449582
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/type-search-index.js = 1687112449512
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/package-search-index.js = 1687112449512
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/overview-tree.html = 1687112449462
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/index.html = 1687112449468
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/help-doc.html = 1687112449572
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/copy.svg = 1687112449578
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/search.js = 1687112449578
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/search.html = 1687112449562
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/element-list = 1687112449155
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/stylesheet.css = 1687112449575
+/home/vinicius/Documentos/Projeto_Final/RayCaster/target/site/apidocs/overview-summary.html = 1687112449565

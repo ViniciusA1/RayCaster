@@ -1,6 +1,5 @@
 package com.raycaster.mapa;
 
-import com.raycaster.mapa.Coords.Face;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,7 +18,6 @@ public class Mapa{
     private int[][] grid;
     private int limite;
     private final int tamanhoBloco = 32;
-    private MapGroup grupo;
     private int playerSpawnX;
     private int playerSpawnY;
     
@@ -28,8 +26,6 @@ public class Mapa{
      * Construtor de instâncias do tipo mapa
      * @param nomeMapa Nome associado ao mapa e também o nome do arquivo no qual o mapa será salvo
      * @param limite Tamanho do mapa = LimitexLimete
-     * @author Vinicius Augusto
-     * @author Bruno Zara
      */
     public Mapa(String nomeMapa, int limite){
         this.nomeMapa = nomeMapa;
@@ -39,8 +35,8 @@ public class Mapa{
             for(int j = 0; j<limite; j++){
                 grid[i][j] = 0;
             }
-        } 
-        grupo = null;
+        }
+        
         playerSpawnX = 0;
         playerSpawnY = 0;
     }
@@ -49,9 +45,6 @@ public class Mapa{
      * Metodo que define o ponto de Spawn do player
      * @param x coordenada X
      * @param y coordenada Y
-     * 
-     * @author Vinicius Augusto
-     * @author Bruno Zara
      */
     public void setSpawn(int x, int y){
         this.playerSpawnX = x;
@@ -61,9 +54,6 @@ public class Mapa{
     /**
      * Metodo que define o ponto de Spawn do player
      * @return int com a coordenada X
-     * 
-     * @author Vinicius Augusto
-     * @author Bruno Zara
      */
     public int getSpawnX(){
         return playerSpawnX;
@@ -81,8 +71,8 @@ public class Mapa{
      * Metodo que define o ponto de Spawn do player
      * @return int com a coordenada Y
      * 
-     * @author Vinicius Augusto
-     * @author Bruno Zara
+     * 
+     * 
      */
     public int getSpawnY(){
         return playerSpawnY;
@@ -100,8 +90,6 @@ public class Mapa{
     /**
      * Metodo de Get para pegar o limite
      * @return o limite do mapa 
-     * @author Vinicius Augusto
-     * @author Bruno Zara
      */
     public int getLimite() {
         return limite;
@@ -112,8 +100,6 @@ public class Mapa{
      * @param linha coordenada X
      * @param coluna coordenada Y
      * @return o elemento na posição informada dividio pelo tamanho do bloco
-     * @author Vinicius Augusto
-     * @author Bruno Zara
      */
     public int getValor(int linha, int coluna) {
         linha /= tamanhoBloco;
@@ -131,8 +117,6 @@ public class Mapa{
      * @param linha coordenada X
      * @param coluna coordenada Y
      * @return o elemento na posição informada
-     * @author Vinicius Augusto
-     * @author Bruno Zara
      */
     public int getID(int linha, int coluna) {
         return grid[linha][coluna];
@@ -141,8 +125,6 @@ public class Mapa{
     /**
      * Metodo que devolve o nome do mapa
      * @return o nome do mapa
-     * @author Vinicius Augusto
-     * @author Bruno Zara
      */
     public String getNomeMapa() {
         return nomeMapa;
@@ -151,22 +133,9 @@ public class Mapa{
     /**
      * Metodo que devolve o tamanho do bloco
      * @return o tamanho do bloco
-     * @author Vinicius Augusto
-     * @author Bruno Zara
      */
     public int getTamanhoBloco() {
         return tamanhoBloco;
-    }
-    
-    /**
-     * (WIP)
-     * Metodo que retorna o grupo de mapas que este mapa esta associado
-     * @return MapGroup associado
-     * @author Vinicius Augusto
-     * @author Bruno Zara
-     */
-    public MapGroup getGrupo() {
-        return grupo;
     }
     
     /**
@@ -174,36 +143,15 @@ public class Mapa{
      * @param linha coordenada X
      * @param coluna coordenada Y
      * @param valor Valor associado
-     * @author Vinicius Augusto
-     * @author Bruno Zara
      */
     public void setValor(int linha, int coluna, int valor) {
         grid[linha][coluna] = valor;
     }
-
-    /**
-     * (WIP)
-     * Metodo que atribui o mapa atual a um grupo de mapas
-     * @param grupo Grupo de mapas a ser associado
-     * @author Vinicius Augusto
-     * @author Bruno Zara
-     */
-    public void setGrupo(MapGroup grupo) {
-        this.grupo = grupo;
-        grupo.addMapa(this);
-    }
-    
-    
-
-    
-    
     
     /**
      * Metodo responsavel por carregar um mapa na pasta de mapas a partir do nome registrado
      * @param nomeMapa nome do mapa a ser carregado
      * @return uma intancia do Mapa encontrado ou null caso não encrente mapa com esse nome
-     * @author Vinicius Augusto
-     * @author Bruno Zara
      */
     public static Mapa carregaMapa(String nomeMapa) {
         File arquivoMapa = new File("maps" + File.separator + nomeMapa);
@@ -232,9 +180,6 @@ public class Mapa{
     
     /**
      * Metodo que re-carrega o mapa atual a partir da memoria
-     * 
-     * @author Vinicius Augusto
-     * @author Bruno Zara
      */
     public void carregar() {
         File arquivoMapa = new File("maps" + File.separator + nomeMapa);
@@ -260,10 +205,8 @@ public class Mapa{
     }
     
     /**
-     * Metodo para salvar o mapa no arquivo
-     * @author Vinicius Augusto
-     * @author Bruno Zara
-     * @throws java.io.IOException
+     * Método para salvar o mapa no arquivo
+     * @throws java.io.IOException Exception lançado por erro de entrada/saida
      */
     public void salvar() throws IOException{
         FileWriter out;
@@ -292,9 +235,7 @@ public class Mapa{
     }
     
     /**
-     * Metodo que exclui o arquivo associado ao mapa atual
-     * @author Vinicius Augusto
-     * @author Bruno Zara
+     * Método que exclui o arquivo associado ao mapa atual
      */
     public  void excluir(){
         String[] aux = nomeMapa.split(".txt");
@@ -307,9 +248,6 @@ public class Mapa{
     /**
      * Metodo que carrega todos os mapas salvos na memoria
      * @return Um ArrayList com todos os mapas encontrados
-     * 
-     * @author Vinicius Augusto
-     * @author Bruno Zara
      */
     public static ArrayList<Mapa> carregarMapList(){
         File arquivoMapa = new File("maps");
@@ -341,10 +279,7 @@ public class Mapa{
     
     
     /**
-     * metodo que reseta o mapa atual
-     * 
-     * @author Vinicius Augusto
-     * @author Bruno Zara
+     * Método que reseta o mapa atual.
      */
     public void liberaMapa() {
         nomeMapa = "";
@@ -353,12 +288,10 @@ public class Mapa{
     }
     
     /**
-     * Metodo que checa se o ponto atual esta na borda/parede do mapa ou não
+     * Método que checa se o ponto atual esta na borda/parede do mapa ou não
      * @param valorX Coordenada X
      * @param valorY Coordenada Y
      * @return true se o ponto esta na borda/parede do mapa ou false caso contrario
-     * @author Vinicius Augusto
-     * @author Bruno Zara
      */
     public boolean checaColisao(double valorX, double valorY) {
         valorX /= tamanhoBloco;
@@ -369,37 +302,8 @@ public class Mapa{
     }
     
     /**
-     * (WIP)
-     * função que varifica se existe um teletrasporte nesse bloco
-     * @param valorX
-     * @param valorY
-     * @return true se existe um Gate entre mapas e false caso contrario
-     * @author Vinicius Augusto
-     * @author Bruno Zara
-     */
-    public boolean hasGate(int valorX, int valorY) { 
-        return grupo.checaGate(this, (int) valorX, (int) valorY);
-    }
-    
-    /**
-     * (WIP)
-     * metodo que converte as coordenadas atual do mapa para novas coordenados em um novo mapa
-     * @param valorX
-     * @param valorY
-     * @param face a face que esta sendo observada
-     * @return as coordenadas no novo mapa
-     * @author Vinicius Augusto
-     * @author Bruno Zara
-     */
-    public Coords converte(int valorX, int valorY, Face face){
-        return grupo.converte(this, (int) valorX, (int) valorY, face);
-    }
-    
-    /**
      * Metodo que sobrscreve toString() para retornar uma string formatada mostrado as informaçoes do mapa
      * @return uma String Formatada mostando as informações do mapa
-     * @author Vinicius Augusto
-     * @author Bruno Zara
      */
     @Override
     public String toString(){

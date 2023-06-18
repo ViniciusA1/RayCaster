@@ -27,6 +27,7 @@ public class HUD extends JPanel {
      * Construtor da classe que recebe a referência do jogador ao qual a HUD está
      * associada.
      * @param jogador Jogador ao qual a HUD está associada
+     * @param fontePersonalizada Fonte personalizada da HUD
      */
     public HUD(Player jogador, Font fontePersonalizada) {
         setLayout(new LayoutHUD(fontePersonalizada));

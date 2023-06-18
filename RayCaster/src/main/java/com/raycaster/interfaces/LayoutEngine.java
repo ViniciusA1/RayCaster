@@ -119,15 +119,4 @@ public class LayoutEngine implements LayoutManager {
         miraPanel.setBounds(miraX, miraY, miraWidth, miraHeight);
         infoPanel.setBounds(infoX, infoY, infoWidth, infoHeight);
     }
-    
-    public void toggleInformacoes() {
-        long tempoAtual = System.currentTimeMillis();
-
-        if (tempoAtual - infoCooldown >= 200) {
-            boolean toggle = infoPanel.isVisible();
-            infoPanel.setVisible(!toggle);
-
-            infoCooldown = tempoAtual;
-        }
-    }
 }

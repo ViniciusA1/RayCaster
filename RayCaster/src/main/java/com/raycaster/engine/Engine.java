@@ -10,10 +10,14 @@ import com.raycaster.interfaces.PainelMira;
 import com.raycaster.itens.Arma;
 import com.raycaster.mapa.Mapa;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -43,21 +47,21 @@ public class Engine extends JPanel implements ActionListener {
     private int screenWidth;
     private int screenHeight;
 
-    private int fpsMaximo = 60;
+    private final int fpsMaximo;
     private Timer gameTimer;
     private long tempoAnterior;
     private double deltaTime;
     private long tempoFrame;
     private int frameCounter;
 
-    private long pauseCooldown;
-
     private PainelInformacao painelInfo;
 
     private Player jogador;
     private Mapa mapaAtual;
+    
     private KeyInput keyHandler;
     private MouseInput mouseHandler;
+    
     private List<Textura> texturas;
     private Clip musicaBackground;
     private final JFrame janela;
@@ -73,6 +77,7 @@ public class Engine extends JPanel implements ActionListener {
      * @param map Mapa que será jogado
      */
     public Engine(int width, int height, JFrame janela, Mapa map) {
+        this.fpsMaximo = 60;
         this.screenWidth = width;
         this.screenHeight = height;
         this.janela = janela;
@@ -84,6 +89,11 @@ public class Engine extends JPanel implements ActionListener {
         start();
     }
 
+    /**
+     * Seta uma nova resolução para a tela do jogo.
+     * @param screenWidth Nova largura da tela
+     * @param screenHeight Nova altura da tela
+     */
     public void setResolution(int screenWidth, int screenHeight) {
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
@@ -99,6 +109,7 @@ public class Engine extends JPanel implements ActionListener {
         initPanels();
         initHandlers();
         initMusica();
+        initCursor();
         initTimer();
     }
 
@@ -158,7 +169,7 @@ public class Engine extends JPanel implements ActionListener {
      * Inicia os "handlers" de teclado e mouse do jogo.
      */
     private void initHandlers() {
-        mouseHandler = new MouseInput(jogador, 0.001);
+        mouseHandler = new MouseInput(jogador, 0.002);
         keyHandler = new KeyInput();
         keyBindings();
 
@@ -227,6 +238,21 @@ public class Engine extends JPanel implements ActionListener {
         musicaBackground.loop(Clip.LOOP_CONTINUOUSLY);
 
         janela.addWindowListener(new DesligaSom(musicaBackground));
+    }
+    
+    /**
+     * Inicializa a imagem do cursor padrão.
+     */
+    private void initCursor() {
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        
+        Image imagemCursor = toolkit.createImage("");
+        Point pontoCursor = new Point(0,0);
+        
+        Cursor cursorTransparente = toolkit.createCustomCursor(
+                imagemCursor, pontoCursor, "transparente");
+        
+        this.setCursor(cursorTransparente);
     }
 
     /**
@@ -569,6 +595,9 @@ public class Engine extends JPanel implements ActionListener {
         keyHandler.executaMetodo();
     }
 
+    /**
+     * Pausa o jogo quando o usuário desejar.
+     */
     private void pausaJogo() {
         if (!gameTimer.isRunning()) {
             return;
@@ -598,6 +627,10 @@ public class Engine extends JPanel implements ActionListener {
         janela.repaint();
     }
 
+    /**
+     * "Despausa" o jogo quando o usuário desejar.
+     * @param menu Menu de pause que foi criado anteriormente
+     */
     public void voltaJogo(MenuPause menu) {
         if (gameTimer.isRunning()) {
             return;

@@ -42,7 +42,7 @@ public class Player extends Entidade {
      * @param velocidade Velocidade do jogador
      * @param fov Campo de visão do jogador
      * @param FOG Distância máxima de visão do jogador
-     * @param possiveisEstados
+     * @param possiveisEstados Possíveis estados assumidos pelo jogador
      */
     public Player(double vidaMaxima, double x, double y, double largura, double velocidade,
             int fov, double FOG, EnumSet<Estado> possiveisEstados) {

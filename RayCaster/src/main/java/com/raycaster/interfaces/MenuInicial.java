@@ -38,9 +38,6 @@ public class MenuInicial {
 
     /**
      * Método para iniciar o jogo em uma thread apropriada
-     *
-     * @author Vinicius Augusto
-     * @author Bruno Zara
      */
     public static void inicia() {
         try {
@@ -54,7 +51,7 @@ public class MenuInicial {
                     + "parede.JPG" + ".", "Visualizador", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        //carregarTexturas();
+
         SwingUtilities.invokeLater(() -> {
             MenuInicial();
         });
@@ -63,10 +60,7 @@ public class MenuInicial {
 
     /**
      * Metodo que cria e mostra a interface grafica responsavel pelo menu
-     * inicial
-     *
-     * @author Vinicius Augusto
-     * @author Bruno Zara
+     * inicial.
      */
     private static void MenuInicial() {
         JFrame frameInicial = new JFrame("Menu inicial");
@@ -94,32 +88,21 @@ public class MenuInicial {
         panelPrincipal.setLayout(new BoxLayout(panelPrincipal,
                 BoxLayout.Y_AXIS));
 
-        Runnable acaoJogar = new Runnable() {
-            @Override
-            public void run() {
-                panelPrincipal.removeAll();
-                panelPrincipal.repaint();
-                panelPrincipal.revalidate();
-                selecionaMapa(frameInicial, panelPrincipal, fonte);
-            }
+        Runnable acaoJogar = () -> {
+            panelPrincipal.removeAll();
+            panelPrincipal.repaint();
+            panelPrincipal.revalidate();
+            selecionaMapa(frameInicial, panelPrincipal, fonte);
         };
 
-        Runnable acaoMapa = new Runnable() {
-            @Override
-            public void run() {
-                frameInicial.setVisible(false);
-                MapEditorMenu.inicia(frameInicial);
-            }
-
+        Runnable acaoMapa = () -> {
+            frameInicial.setVisible(false);
+            MapEditorMenu.inicia(frameInicial);
         };
 
-        Runnable acaoSair = new Runnable() {
-
-            @Override
-            public void run() {
-                frameInicial.dispose();
-                System.exit(0);
-            }
+        Runnable acaoSair = () -> {
+            frameInicial.dispose();
+            System.exit(0);
         };
 
         BotaoCustom botaoJogar = new BotaoCustom("Jogar", 
@@ -158,8 +141,6 @@ public class MenuInicial {
      * Metodo que inicia o jogo
      *
      * @param f Janela anterior que vai ser reaberta quando o jogo fechar
-     * @author Vinicius Augusto
-     * @author Bruno Zara
      */
     private static void jogar(JFrame f, Mapa map) {
         JFrame janela = new JFrame();
@@ -240,11 +221,8 @@ public class MenuInicial {
      * @param s uma String com o diretorio do arquivo da imagem
      * @return BufferedImage contendo a imagem que esta no diretorio
      * especificado ou null se o diretorio estar vazio
-     * @throws FileNotFoundException
-     * @throws IOException
-     *
-     * @author Vinicius Augusto
-     * @author Bruno Zara
+     * @throws FileNotFoundException Exception lançado por não encontrar arquivo
+     * @throws IOException Exception lançado por erro de entrada/saida
      */
     public static BufferedImage lerImagem(String s) throws FileNotFoundException, IOException {
         return lerImagem(new File(s));
@@ -256,11 +234,8 @@ public class MenuInicial {
      * @param s uma String com o diretorio do arquivo da imagem
      * @return BufferedImage contendo a imagem que esta no diretorio
      * especificado ou null se o diretorio estar vazio
-     * @throws FileNotFoundException
-     * @throws IOException
-     *
-     * @author Vinicius Augusto
-     * @author Bruno Zara
+     * @throws FileNotFoundException Exception lançado por não encontrar arquivo
+     * @throws IOException Exception lançado por erro de entrada/saida
      */
     private static BufferedImage lerImagem(File f) throws FileNotFoundException, IOException {
         if (!f.exists()) {

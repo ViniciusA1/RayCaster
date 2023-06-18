@@ -6,8 +6,23 @@ package com.raycaster.engine;
  * @author Bruno Zara
  */
 public enum Estado {
+    /**
+     * Estado padrão do objeto.
+     */
     OCIOSO,
+    
+    /**
+     * Estado de utilização do objeto.
+     */
     USANDO,
+
+    /**
+     * Estado de recarregamento do objeto.
+     */
     RECARREGANDO,
+
+    /**
+     * Estado de mudança de objeto.
+     */
     SACANDO
 }

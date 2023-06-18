@@ -9,13 +9,44 @@ import java.io.File;
  * @author Bruno Zara
  */
 public class Diretorio {
+    /**
+     * Caminho para os modelos do jogo.
+     */
     public static final String MODELOS = "modelos" + File.separator;
+    
+    /**
+     * Caminho para os sons do jogo.
+     */
     public static final String SONS = "sons" + File.separator;
+    
+    /**
+     * Caminho para os dados do jogo.
+     */
     public static final String DADOS = "dados" + File.separator;
+    
+    /**
+     * Caminho para os modelos de hud do jogo.
+     */
     public static final String SPRITE_HUD = MODELOS + "hud" + File.separator;
+    
+    /**
+     * Caminho para os modelos de itens do jogo.
+     */
     public static final String SPRITE_ITENS = MODELOS + "itens" + File.separator;
+    
+    /**
+     * Caminho para os modelos de parede do jogo.
+     */
     public static final String TEXTURA_PAREDE = MODELOS + "paredes" + File.separator;
+    
+    /**
+     * Caminho para os dados de itens do jogo.
+     */
     public static final String DADOS_ITENS = DADOS + "itens" + File.separator;
+    
+    /**
+     * Caminho para os dados de entidades do jogo.
+     */
     public static final String DADOS_ENTIDADES = DADOS + "entidades" + File.separator;
     
     /**

@@ -74,6 +74,9 @@ public class KeyInput extends KeyAdapter {
         }
     }
     
+    /**
+     * Limpa todos as teclas pressionadas pelo jogador.
+     */
     public void limpaMetodos() {
         pressedKeys.clear();
     }

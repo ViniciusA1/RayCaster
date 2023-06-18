@@ -30,7 +30,15 @@ public class LabelAnimado extends JLabel {
      * Enum que representa os tipos de animação disponíveis.
      */
     public enum Animacao {
+
+        /**
+         * Animação do tipo "float"
+         */
         FLOAT,
+
+        /**
+         * Animação do tipo "fade"
+         */
         FADE
     }
 

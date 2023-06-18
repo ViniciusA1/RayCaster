@@ -36,6 +36,11 @@ public class ArquivoUtils {
      */
     public final static String FORMATO_DADOS = ".properties";
     
+    /**
+     * Construtor privado para evitar instanciação.
+     */
+    private ArquivoUtils() {}
+    
     
     /**
      * Classe que herda de Properties e sobrescreve seu método de busca em arquivo.
