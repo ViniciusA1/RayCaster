@@ -12,7 +12,7 @@
             <properties>
                 <exec.vmArgs></exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.appArgs></exec.appArgs>
+                <exec.appArgs>-doclet com.aurigalogic.doclet.AurigaDoclet -docletpath ~/Downloads/AurigaDoclet-0.1b/aurigadoclet/bin/AurigaDoclet.jar</exec.appArgs>
                 <exec.mainClass>com.raycaster.engine.RayCaster</exec.mainClass>
                 <exec.executable>java</exec.executable>
                 <exec.workingdir></exec.workingdir>
@@ -30,7 +30,7 @@
             <properties>
                 <exec.vmArgs>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.appArgs></exec.appArgs>
+                <exec.appArgs>-doclet com.aurigalogic.doclet.AurigaDoclet -docletpath ~/Downloads/AurigaDoclet-0.1b/aurigadoclet/bin/AurigaDoclet.jar</exec.appArgs>
                 <exec.mainClass>com.raycaster.engine.RayCaster</exec.mainClass>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
@@ -51,7 +51,7 @@
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.mainClass>com.raycaster.engine.RayCaster</exec.mainClass>
                 <exec.executable>java</exec.executable>
-                <exec.appArgs></exec.appArgs>
+                <exec.appArgs>-doclet com.aurigalogic.doclet.AurigaDoclet -docletpath ~/Downloads/AurigaDoclet-0.1b/aurigadoclet/bin/AurigaDoclet.jar</exec.appArgs>
                 <exec.workingdir></exec.workingdir>
             </properties>
         </action>
