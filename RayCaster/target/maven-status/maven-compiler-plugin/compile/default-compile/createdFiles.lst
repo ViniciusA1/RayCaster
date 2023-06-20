@@ -1,7 +1,6 @@
 com/raycaster/entidades/Player.class
 com/raycaster/interfaces/LabelAnimado$Animacao.class
 com/raycaster/interfaces/LayoutHUD.class
-com/raycaster/interfaces/MenuInicial$3.class
 com/raycaster/interfaces/MapEditorMenu$1ListPanel$SelectionHandler.class
 com/raycaster/interfaces/AnimacaoPlayer.class
 com/raycaster/interfaces/IntFilter.class
@@ -21,7 +20,6 @@ com/raycaster/engine/Textura.class
 com/raycaster/interfaces/LayoutInformacao.class
 com/raycaster/entidades/Inventario.class
 com/raycaster/itens/ArmaLonga.class
-com/raycaster/interfaces/MenuInicial$4.class
 com/raycaster/engine/RayCaster.class
 com/raycaster/engine/KeyInput.class
 com/raycaster/itens/ArmaCurta.class
@@ -33,7 +31,6 @@ com/raycaster/interfaces/LabelAnimado.class
 com/raycaster/interfaces/MenuInicial.class
 com/raycaster/interfaces/MenuPause$1.class
 com/raycaster/interfaces/MenuInicial$1.class
-com/raycaster/interfaces/MenuInicial$5.class
 com/raycaster/engine/ArquivoUtils.class
 com/raycaster/interfaces/MapEditorMenu$2.class
 com/raycaster/interfaces/MapEditorMenu$event.class
