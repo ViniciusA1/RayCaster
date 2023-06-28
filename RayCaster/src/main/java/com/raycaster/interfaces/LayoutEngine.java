@@ -93,8 +93,8 @@ public class LayoutEngine implements LayoutManager {
         int hudWidth = parentSize.width - insets.left - insets.right;
         int hudHeight = parentSize.height / 8;
 
-        int animacaoWidth = parentSize.width / 2;
-        int animacaoHeight = parentSize.height / 2;
+        int animacaoWidth = parentSize.width;
+        int animacaoHeight = parentSize.height;
 
         int miraWidth = parentSize.width / 45;
         int miraHeight = parentSize.width / 45;
@@ -105,8 +105,8 @@ public class LayoutEngine implements LayoutManager {
         int hudX = insets.left;
         int hudY = parentSize.height - insets.bottom - hudHeight;
 
-        int animacaoX = parentSize.width - insets.right - animacaoWidth;
-        int animacaoY = parentSize.height - insets.bottom - animacaoHeight;
+        int animacaoX = insets.right;
+        int animacaoY = insets.bottom;
 
         int miraX = (parentSize.width - insets.left - insets.right - miraWidth) / 2;
         int miraY = (parentSize.height - insets.top - insets.bottom - miraHeight) / 2;

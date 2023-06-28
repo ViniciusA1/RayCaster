@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -74,8 +76,12 @@ public class EfeitosSonoros {
         if(somDesejado.isRunning()) {
             somDesejado.stop();
         }
-
-        somDesejado.setFramePosition(0);
-        somDesejado.start();
+        
+        Thread threadSom = new Thread(() -> {
+            somDesejado.setFramePosition(0);
+            somDesejado.start();
+        });
+        
+        threadSom.start();
     }
 }

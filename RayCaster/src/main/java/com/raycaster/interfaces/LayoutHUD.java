@@ -12,7 +12,7 @@ import java.awt.LayoutManager;
  * @author Bruno Zara
  */
 public class LayoutHUD implements LayoutManager {
-    private Font fontePersonalizada;
+    private final Font fontePersonalizada;
     
     /**
      * Construtor do layout da HUD.

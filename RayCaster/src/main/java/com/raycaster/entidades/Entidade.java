@@ -134,8 +134,8 @@ public abstract class Entidade {
         int endX = (int) Math.ceil(entidadeX + tamanho);
         int endY = (int) Math.ceil(entidadeY + tamanho);
 
-        for (int x = startX; x < endX; x++) {
-            for (int y = startY; y < endY; y++) {
+        for (int x = startX; x < endX; x += tamanho) {
+            for (int y = startY; y < endY; y += tamanho) {
                 if (mapaAtual.checaColisao(x, y)) {
                     return;
                 }
