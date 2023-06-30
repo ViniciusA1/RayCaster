@@ -1,6 +1,5 @@
 package com.raycaster.interfaces;
 
-import com.raycaster.engine.Diretorio;
 import com.raycaster.engine.EfeitosSonoros;
 import com.raycaster.engine.Estado;
 import java.awt.AWTKeyStroke;
@@ -14,7 +13,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.util.EnumSet;
 import java.util.HashSet;
 import javax.swing.AbstractAction;
@@ -25,6 +23,7 @@ import javax.swing.KeyStroke;
 /**
  * Classe que contém os métodos e atributos do botão customizado feito para o
  * jogo.
+ *
  * @author Vinicius Augusto
  * @author Bruno Zara
  */
@@ -32,11 +31,21 @@ public class BotaoCustom extends JButton {
 
     private static final Color COR_FOCO = Color.RED;
     private static final Color COR_ORIGINAL = Color.WHITE;
-    
-    private EfeitosSonoros sons;
+
+    private static EfeitosSonoros sons;
+
+    static {
+        EnumSet<Estado> estados = EnumSet.noneOf(Estado.class);
+
+        estados.add(Estado.USANDO);
+        estados.add(Estado.SACANDO);
+
+        sons = new EfeitosSonoros("botao", estados);
+    }
 
     /**
      * Construtor principal do botão, recebe o texto a ser exibido.
+     *
      * @param texto Texto exibido no botão
      */
     public BotaoCustom(String texto) {
@@ -51,19 +60,13 @@ public class BotaoCustom extends JButton {
 
         this.addFocusListener(new FocusListener());
         this.addMouseListener(new MouseListener());
-        
-        EnumSet<Estado> estados = EnumSet.noneOf(Estado.class);
-        
-        estados.add(Estado.USANDO);
-        estados.add(Estado.SACANDO);
-        
-        sons = new EfeitosSonoros("botao", estados);
 
         focusKeybinding();
     }
 
     /**
      * Construtor auxiliar do botão, recebe também uma fonte customizada.
+     *
      * @param texto Texto exibido no botão
      * @param fonteCustomizada Fonte customizada do botão
      */
@@ -72,16 +75,17 @@ public class BotaoCustom extends JButton {
 
         this.setFont(fonteCustomizada);
     }
-    
+
     /**
      * Construtor auxiliar do botão, recebe também uma "action".
+     *
      * @param texto Texto exibido no botão
      * @param fonteCustomizada Fonte customizada do botão
      * @param action Ação específica do botão
      */
     public BotaoCustom(String texto, Font fonteCustomizada, Runnable action) {
         this(texto, fonteCustomizada);
-        
+
         actionKeybinding(action);
     }
 
@@ -101,9 +105,10 @@ public class BotaoCustom extends JButton {
 
         setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, fowardKeys);
     }
-    
+
     /**
      * Seta o action listener e a tecla de ação.
+     *
      * @param action Ação vinculada ao botão
      */
     private void actionKeybinding(Runnable action) {
@@ -114,9 +119,9 @@ public class BotaoCustom extends JButton {
                 action.run();
             }
         };
-        
+
         addActionListener(ouvinte);
-        
+
         KeyStroke enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
 
         getInputMap(JComponent.WHEN_FOCUSED).put(enterKeyStroke, "enter");
@@ -138,7 +143,7 @@ public class BotaoCustom extends JButton {
         public void focusGained(FocusEvent e) {
             setFont(getFont().deriveFont(Font.BOLD));
             setForeground(COR_FOCO);
-            
+
             sons.emiteSom(Estado.SACANDO);
         }
 
@@ -159,7 +164,7 @@ public class BotaoCustom extends JButton {
             requestFocus();
             setFont(getFont().deriveFont(Font.BOLD));
             setForeground(COR_FOCO);
-            
+
             sons.emiteSom(Estado.SACANDO);
         }
 

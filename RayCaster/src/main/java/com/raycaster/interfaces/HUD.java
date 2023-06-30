@@ -90,9 +90,7 @@ public class HUD extends JPanel {
      */
     public void atualizaItem() {
         textoMunicao.setText(Integer.toString(jogador.getQtdConsumivel()));
-        barraMunicao.setValue(jogador.getConsumivelMax());
-        
-        System.out.println(jogador.getConsumivelMax());
+        barraMunicao.setValue(jogador.getConsumivelMax());        
     }
     
     public void atualizaComponentes() {
@@ -117,6 +115,7 @@ public class HUD extends JPanel {
 
         atualizaComponentes();
         
-        g.drawImage(sprite.get(0).getImage(), 0, 0, this.getWidth(), this.getHeight(), this);
+        g.drawImage(sprite.get(0).getImage(), 0, 
+                0, this.getWidth(), this.getHeight(), this);
     }
 }

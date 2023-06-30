@@ -1,6 +1,7 @@
 com/raycaster/entidades/Player.class
 com/raycaster/interfaces/LabelAnimado$Animacao.class
 com/raycaster/interfaces/LayoutHUD.class
+com/raycaster/interfaces/MenuInicial$3.class
 com/raycaster/interfaces/MapEditorMenu$1ListPanel$SelectionHandler.class
 com/raycaster/interfaces/AnimacaoPlayer.class
 com/raycaster/interfaces/IntFilter.class
@@ -39,11 +40,14 @@ com/raycaster/interfaces/MapEditorMenu$1ListPanel$ListRenderer.class
 com/raycaster/interfaces/MenuInicial$2.class
 com/raycaster/interfaces/MapEditorMenu.class
 com/raycaster/interfaces/LabelAnimado$1.class
+com/raycaster/interfaces/Painel.class
 com/raycaster/interfaces/BotaoCustom$MouseListener.class
 com/raycaster/engine/Diretorio.class
 com/raycaster/interfaces/PainelInformacao.class
 com/raycaster/entidades/Entidade.class
 com/raycaster/engine/Engine$DesligaSom.class
 com/raycaster/interfaces/LayoutEngine.class
+com/raycaster/interfaces/InterfaceManager.class
 com/raycaster/mapa/Mapa.class
+com/raycaster/entidades/Inimigo.class
 com/raycaster/engine/Estado.class

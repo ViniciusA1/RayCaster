@@ -1,7 +1,9 @@
 package com.raycaster.interfaces;
 
 import com.raycaster.engine.Diretorio;
+import com.raycaster.engine.EfeitosSonoros;
 import com.raycaster.engine.Engine;
+import com.raycaster.engine.Estado;
 import com.raycaster.interfaces.LabelAnimado.Animacao;
 import com.raycaster.mapa.Mapa;
 import static com.raycaster.mapa.Mapa.carregarMapList;
@@ -16,12 +18,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 /**
@@ -33,8 +35,8 @@ import javax.swing.SwingUtilities;
 public class MenuInicial {
 
     private static BufferedImage imagemBackground;
-
     private static int indiceMapa;
+    private static EfeitosSonoros musicaInicial;
 
     /**
      * Método para iniciar o jogo em uma thread apropriada
@@ -55,7 +57,6 @@ public class MenuInicial {
         SwingUtilities.invokeLater(() -> {
             MenuInicial();
         });
-
     }
 
     /**
@@ -74,8 +75,34 @@ public class MenuInicial {
 
         LabelAnimado logo = new LabelAnimado("RayCaster",
                 fonte.deriveFont(Font.PLAIN, 150f), Animacao.FLOAT);
+        
+        Runnable acaoJogar = () -> {
+            frameInicial.remove(InterfaceManager.peek());
+            frameInicial.repaint();
+            frameInicial.revalidate();
+            selecionaMapa(frameInicial, fonte);
+        };
 
-        JPanel panelPrincipal = new JPanel() {
+        Runnable acaoMapa = () -> {
+            musicaInicial.stopLoop(Estado.OCIOSO);
+            MapEditorMenu.inicia(frameInicial);
+        };
+
+        Runnable acaoSair = () -> {
+            frameInicial.dispose();
+            InterfaceManager.clear();
+            musicaInicial.stopLoop(Estado.OCIOSO);
+            System.exit(0);
+        };
+
+        BotaoCustom botaoJogar = new BotaoCustom("Jogar",
+                fonte, acaoJogar);
+        BotaoCustom botaoMapa = new BotaoCustom("Editor de mapas",
+                fonte, acaoMapa);
+        BotaoCustom botaoSair = new BotaoCustom("Sair",
+                fonte, acaoSair);
+
+        Painel panelPrincipal = new Painel() {
             @Override
             public void paintComponent(Graphics g) {
                 super.paintComponents(g);
@@ -83,34 +110,28 @@ public class MenuInicial {
                 g.drawImage(imagemBackground, 0, 0,
                         getWidth(), getHeight(), this);
             }
+            
+            @Override
+            public void entrar() {
+                super.entrar();
+                
+                SwingUtilities.invokeLater(() -> {
+                   botaoJogar.requestFocusInWindow();
+                });
+            }
         };
 
         panelPrincipal.setLayout(new BoxLayout(panelPrincipal,
                 BoxLayout.Y_AXIS));
+        
+        InterfaceManager.push(panelPrincipal);
 
-        Runnable acaoJogar = () -> {
-            panelPrincipal.removeAll();
-            panelPrincipal.repaint();
-            panelPrincipal.revalidate();
-            selecionaMapa(frameInicial, panelPrincipal, fonte);
-        };
 
-        Runnable acaoMapa = () -> {
-            frameInicial.setVisible(false);
-            MapEditorMenu.inicia(frameInicial);
-        };
-
-        Runnable acaoSair = () -> {
-            frameInicial.dispose();
-            System.exit(0);
-        };
-
-        BotaoCustom botaoJogar = new BotaoCustom("Jogar", 
-                fonte, acaoJogar);
-        BotaoCustom botaoMapa = new BotaoCustom("Editor de mapas", 
-                fonte, acaoMapa);
-        BotaoCustom botaoSair = new BotaoCustom("Sair", 
-                fonte, acaoSair);
+        if (musicaInicial == null)
+            musicaInicial = new EfeitosSonoros("menu", Estado.OCIOSO);
+        
+        musicaInicial.emiteSom(Estado.OCIOSO);
+        musicaInicial.setLoop(Estado.OCIOSO);
 
         panelPrincipal.add(logo);
         panelPrincipal.add(botaoJogar);
@@ -143,27 +164,22 @@ public class MenuInicial {
      * @param f Janela anterior que vai ser reaberta quando o jogo fechar
      */
     private static void jogar(JFrame f, Mapa map) {
-        JFrame janela = new JFrame();
-        janela.setTitle("RayCaster");
-        janela.setSize(320, 200);
-        janela.addWindowListener(new MapEditorMenu.event(f));
-        janela.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        janela.setResizable(true);
-
-        Engine game = new Engine(320, 200, janela, map);
-
-        janela.add(game);
-        janela.setLocationRelativeTo(null);
-        janela.setVisible(true);
+        musicaInicial.stopLoop(Estado.OCIOSO);
+        
+        f.remove(InterfaceManager.peek());
+        Engine game = new Engine(320, 200, f, map);
+        InterfaceManager.push(game);
+        f.add(game);
     }
 
     /**
      * Cria o menu de seleção de mapas.
+     *
      * @param frame Janela atual do jogo
      * @param panel Painel atual do jogo
      * @param font Fonte personalizada do menu
      */
-    private static void selecionaMapa(JFrame frame, JPanel panel, Font font) {
+    private static void selecionaMapa(JFrame frame, Font font) {
         ArrayList<Mapa> mapas = carregarMapList();
         indiceMapa = 0;
 
@@ -172,6 +188,38 @@ public class MenuInicial {
 
         LabelAnimado mapaAtual = new LabelAnimado(mapas.get(indiceMapa).toString(),
                 font.deriveFont(Font.PLAIN, 100f), Animacao.FADE);
+
+        EnumSet<Estado> estados = EnumSet.noneOf(Estado.class);
+
+        estados.add(Estado.USANDO);
+        estados.add(Estado.SACANDO);
+
+        EfeitosSonoros sons = new EfeitosSonoros("botao", estados);
+        
+        Painel panel = new Painel() {
+            @Override
+            public void paintComponent(Graphics g) {
+                super.paintComponents(g);
+
+                g.drawImage(imagemBackground, 0, 0,
+                        getWidth(), getHeight(), this);
+            }
+            
+            @Override
+            public void entrar() {
+                super.entrar();
+                
+                if(!musicaInicial.isRunning(Estado.OCIOSO)) {
+                    musicaInicial.emiteSom(Estado.OCIOSO);
+                    musicaInicial.setLoop(Estado.OCIOSO);
+                }
+            }
+        };
+
+        panel.setLayout(new BoxLayout(panel,
+                BoxLayout.Y_AXIS));
+        
+        InterfaceManager.push(panel);
 
         panel.addKeyListener(new KeyAdapter() {
 
@@ -183,27 +231,34 @@ public class MenuInicial {
                     case KeyEvent.VK_UP, KeyEvent.VK_W -> {
                         indiceMapa = (indiceMapa - 1 + mapas.size()) % mapas.size();
                         mapaAtual.setText(mapas.get(indiceMapa).toString());
+                        sons.emiteSom(Estado.SACANDO);
                     }
                     case KeyEvent.VK_DOWN, KeyEvent.VK_S -> {
                         indiceMapa = (indiceMapa + 1) % mapas.size();
                         mapaAtual.setText(mapas.get(indiceMapa).toString());
+                        sons.emiteSom(Estado.SACANDO);
                     }
-                    case KeyEvent.VK_ENTER ->
+                    case KeyEvent.VK_ENTER -> {
+                        sons.emiteSom(Estado.USANDO);
                         jogar(frame, mapas.get(indiceMapa));
+                    }
                 }
             }
         });
+        
+        Runnable acaoVoltar = () -> {
+            frame.remove(panel);
+            InterfaceManager.pop();
+            Painel novoPainel = InterfaceManager.peek();
+            frame.add(novoPainel);
+            frame.repaint();
+            frame.revalidate();
+            
+            novoPainel.requestFocus();
+        };
 
-        BotaoCustom botaoVoltar = new BotaoCustom("Voltar", font);
-
-        botaoVoltar.addActionListener((ActionEvent) -> {
-            panel.removeAll();
-            frame.dispose();
-            MenuInicial();
-        });
-
-        panel.setFocusable(true);
-        panel.requestFocus();
+        BotaoCustom botaoVoltar = new BotaoCustom("Voltar", 
+                font, acaoVoltar);
 
         textoMapa.setAlignmentX(CENTER_ALIGNMENT);
         mapaAtual.setAlignmentX(CENTER_ALIGNMENT);
@@ -213,6 +268,12 @@ public class MenuInicial {
         panel.add(mapaAtual);
         panel.add(Box.createVerticalStrut(50));
         panel.add(botaoVoltar);
+        
+        frame.add(panel);
+        frame.revalidate();
+        
+        panel.setFocusable(true);
+        panel.requestFocus();
     }
 
     /**

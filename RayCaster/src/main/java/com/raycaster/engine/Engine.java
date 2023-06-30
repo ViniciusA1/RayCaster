@@ -5,6 +5,8 @@ import com.raycaster.interfaces.LayoutEngine;
 import com.raycaster.interfaces.AnimacaoPlayer;
 import com.raycaster.interfaces.HUD;
 import com.raycaster.entidades.Player;
+import com.raycaster.interfaces.InterfaceManager;
+import com.raycaster.interfaces.Painel;
 import com.raycaster.interfaces.PainelInformacao;
 import com.raycaster.interfaces.PainelMira;
 import com.raycaster.itens.Arma;
@@ -27,13 +29,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 /**
@@ -42,7 +39,7 @@ import javax.swing.Timer;
  * @author Vinicius Augusto
  * @author Bruno Zara
  */
-public class Engine extends JPanel implements ActionListener {
+public class Engine extends Painel implements ActionListener {
 
     private int screenWidth;
     private int screenHeight;
@@ -63,7 +60,7 @@ public class Engine extends JPanel implements ActionListener {
     private MouseInput mouseHandler;
     
     private List<Textura> texturas;
-    private Clip musicaBackground;
+    private EfeitosSonoros musicaBackground;
     private final JFrame janela;
 
     private Font fontePersonalizada;
@@ -177,6 +174,7 @@ public class Engine extends JPanel implements ActionListener {
         addMouseListener(mouseHandler);
         addMouseMotionListener(mouseHandler);
         setFocusable(true);
+        requestFocus();
     }
 
     /**
@@ -213,29 +211,11 @@ public class Engine extends JPanel implements ActionListener {
      * Carrega a música principal do jogo que ficará em loop durante a execução.
      */
     private void initMusica() {
-        File arquivoAudio = new File(Diretorio.SONS + "background.wav");
-        AudioInputStream audioStream;
-
-        try {
-            audioStream = AudioSystem.getAudioInputStream(arquivoAudio);
-        } catch (UnsupportedAudioFileException | IOException ex) {
-            return;
-        }
-
-        try {
-            musicaBackground = AudioSystem.getClip();
-        } catch (LineUnavailableException ex) {
-            return;
-        }
-
-        try {
-            musicaBackground.open(audioStream);
-        } catch (LineUnavailableException | IOException ex) {
-            return;
-        }
-
-        musicaBackground.start();
-        musicaBackground.loop(Clip.LOOP_CONTINUOUSLY);
+        musicaBackground = new EfeitosSonoros("mapa" + File.separator + 
+                mapaAtual.toString(), Estado.OCIOSO);
+        
+        musicaBackground.emiteSom(Estado.OCIOSO);
+        musicaBackground.setLoop(Estado.OCIOSO);
 
         janela.addWindowListener(new DesligaSom(musicaBackground));
     }
@@ -612,7 +592,6 @@ public class Engine extends JPanel implements ActionListener {
         }
 
         gameTimer.stop();
-        musicaBackground.stop();
 
         BufferedImage imagemBackground = new BufferedImage(this.getWidth(),
                 this.getHeight(), BufferedImage.TYPE_INT_RGB);
@@ -624,46 +603,57 @@ public class Engine extends JPanel implements ActionListener {
 
         janela.remove(this);
 
-        MenuPause menu = new MenuPause(this, fontePersonalizada, imagemBackground);
-        //menu.setFocusable(true);
-        menu.requestFocus();
-        menu.setVisible(true);
+        MenuPause menu = new MenuPause(janela, fontePersonalizada, imagemBackground);
         menu.setBackground(Color.DARK_GRAY);
+        InterfaceManager.push(menu);
 
         janela.add(menu);
         janela.revalidate();
         janela.repaint();
+        
+        menu.requestFocus();
     }
-
-    /**
-     * "Despausa" o jogo quando o usuário desejar.
-     * @param menu Menu de pause que foi criado anteriormente
-     */
-    public void voltaJogo(MenuPause menu) {
-        if (gameTimer.isRunning()) {
-            return;
-        }
-
-        keyHandler.limpaMetodos();
-
-        gameTimer.start();
-        musicaBackground.start();
-        musicaBackground.loop(Clip.LOOP_CONTINUOUSLY);
-
-        janela.remove(menu);
-        janela.add(this);
-
-        this.requestFocus();
-
-        janela.revalidate();
+    
+    @Override
+    public void entrar() {
+        super.entrar();
+        
         janela.repaint();
+        janela.revalidate();
+        
+        if(!gameTimer.isRunning()) {
+            gameTimer.start();
+        }
+        
+        keyHandler.limpaMetodos();
+        
+        SwingUtilities.invokeLater(() -> {
+            this.requestFocusInWindow();
+        });
+    }
+    
+    @Override
+    public void sair() {
+       super.sair();
+       
+       janela.repaint();
+       janela.revalidate();
+       
+       gameTimer.stop();
+       
+       musicaBackground.close();
     }
 
     /**
      * Fecha as janelas e paineis dependentes da engine.
      */
     public void fechaJogo() {
-        janela.dispose();
+        janela.remove(InterfaceManager.peek());
+        InterfaceManager.pop();
+        InterfaceManager.pop();
+        janela.add(InterfaceManager.peek());
+        janela.repaint();
+        janela.revalidate();
     }
 
     /**
@@ -672,16 +662,16 @@ public class Engine extends JPanel implements ActionListener {
      */
     private static class DesligaSom extends WindowAdapter {
 
-        Clip som;
+        EfeitosSonoros som;
 
-        public DesligaSom(Clip som) {
+        public DesligaSom(EfeitosSonoros som) {
             this.som = som;
         }
 
         @Override
         public void windowOpened(WindowEvent e) {
             if (som != null) {
-                som.start();
+                som.emiteSom(Estado.OCIOSO);
             }
         }
 
@@ -690,7 +680,7 @@ public class Engine extends JPanel implements ActionListener {
             if (som == null) {
                 System.exit(0);
             }
-            som.stop();
+            som.stopLoop(Estado.OCIOSO);
         }
     }
 }

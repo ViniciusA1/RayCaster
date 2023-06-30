@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -22,6 +20,15 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 public class EfeitosSonoros {
 
     private final Map<Estado, Clip> sons;
+    private static Clip somAtual;
+    private static Thread thread;
+    
+    static {
+        thread = new Thread(() -> {
+            somAtual.setFramePosition(0);
+            somAtual.start();
+        });
+    }
 
     /**
      * Construtor da classe que recebe o nome do objeto e um conjunto de seus
@@ -32,6 +39,13 @@ public class EfeitosSonoros {
      */
     public EfeitosSonoros(String nome, EnumSet<Estado> possiveisEstados) {
         sons = new HashMap<>();
+        carregarSons(nome, possiveisEstados);
+    }
+    
+    public EfeitosSonoros(String nome, Estado estadoUnico) {
+        sons = new HashMap<>();
+        EnumSet<Estado> possiveisEstados = EnumSet.noneOf(Estado.class);
+        possiveisEstados.add(estadoUnico);
         carregarSons(nome, possiveisEstados);
     }
 
@@ -68,20 +82,46 @@ public class EfeitosSonoros {
      * @param estadoAtual Estado recebido pelo método
      */
     public synchronized void emiteSom(Estado estadoAtual) {
-        Clip somDesejado = sons.get(estadoAtual);
+        somAtual = sons.get(estadoAtual);
 
-        if (somDesejado == null)
+        if (somAtual == null)
             return;
         
-        if(somDesejado.isRunning()) {
-            somDesejado.stop();
+        if(somAtual.isRunning()) {
+            somAtual.stop();
         }
         
-        Thread threadSom = new Thread(() -> {
-            somDesejado.setFramePosition(0);
-            somDesejado.start();
-        });
+        thread.run();
+    }
+    
+    public void setLoop(Estado estadoSom) {
+        somAtual = sons.get(estadoSom);
         
-        threadSom.start();
+        if(somAtual == null)
+            return;
+        
+        somAtual.loop(Clip.LOOP_CONTINUOUSLY);
+    }
+    
+    public void stopLoop(Estado estadoSom) {
+        somAtual = sons.get(estadoSom);
+        
+        if(somAtual == null)
+            return;
+        
+        somAtual.stop();
+    }
+    
+    public void close() {
+        for(Clip clipAux : sons.values()) {
+            clipAux.stop();
+            clipAux.close();
+        }
+        
+        sons.clear();
+    }
+    
+    public boolean isRunning(Estado estadoSom) {
+        return sons.get(estadoSom).isRunning();
     }
 }

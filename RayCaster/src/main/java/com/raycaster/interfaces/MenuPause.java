@@ -11,7 +11,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
+import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
@@ -21,9 +21,9 @@ import javax.swing.SwingUtilities;
  * @author Vinicius Augusto
  * @author Bruno Zara
  */
-public class MenuPause extends JPanel {
+public class MenuPause extends Painel {
 
-    private final Engine painelPrincipal;
+    private final JFrame janela;
 
     private LabelAnimado textoPause;
     private BotaoCustom botaoVoltar;
@@ -35,12 +35,12 @@ public class MenuPause extends JPanel {
      * Construtor principal do menu, recebe os elementos necessários para sua
      * criação.
      *
-     * @param painelPrincipal Painel principal que será sobrescrito
+     * @param janela
      * @param fontePersonalizada Fonte personalizada utilizada
      * @param imagemBackground Imagem que servirá de background
      */
-    public MenuPause(Engine painelPrincipal, Font fontePersonalizada, Image imagemBackground) {
-        this.painelPrincipal = painelPrincipal;
+    public MenuPause(JFrame janela, Font fontePersonalizada, Image imagemBackground) {
+        this.janela = janela;
         this.imagemBackground = imagemBackground;
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -60,7 +60,7 @@ public class MenuPause extends JPanel {
                 fonte.deriveFont(Font.PLAIN, 150f), Animacao.FLOAT);
 
         botaoVoltar = new BotaoCustom("Voltar", fonte, () -> voltar());
-        botaoSair = new BotaoCustom("Sair", fonte, () -> sair());
+        botaoSair = new BotaoCustom("Sair", fonte, () -> sairJogo());
 
         textoPause.setAlignmentX(CENTER_ALIGNMENT);
 
@@ -109,13 +109,26 @@ public class MenuPause extends JPanel {
      * Volta para o painel anterior.
      */
     public void voltar() {
-        painelPrincipal.voltaJogo(this);
+        janela.remove(InterfaceManager.peek());
+        InterfaceManager.pop();
+        janela.add(InterfaceManager.peek());
     }
 
     /**
      * Sai do jogo completamente.
      */
-    public void sair() {
-        painelPrincipal.fechaJogo();
+    public void sairJogo() {
+        super.sair();
+        voltar();
+        janela.remove(InterfaceManager.peek());
+        InterfaceManager.pop();
+        
+        Painel novoPainel = InterfaceManager.peek();
+        
+        janela.add(novoPainel);
+        janela.repaint();
+        janela.revalidate();
+        
+        novoPainel.requestFocus();
     }
 }
