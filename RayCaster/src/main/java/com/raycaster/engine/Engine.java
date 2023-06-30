@@ -156,8 +156,8 @@ public class Engine extends JPanel implements ActionListener {
         painelInfo = new PainelInformacao(fontePersonalizada);
 
         this.add(hudJogador, "hud");
-        this.add(painelAnimacao, "animacao");
         this.add(painelMira, "mira");
+        this.add(painelAnimacao, "animacao");
         this.add(painelInfo, "info");
 
         jogador.setPainelAnimacao(painelAnimacao);
@@ -591,8 +591,16 @@ public class Engine extends JPanel implements ActionListener {
             frameCounter = 0;
             tempoFrame = tempoAtual;
         }
+        
+        double prevX = jogador.getX();
+        double prevY = jogador.getY();
 
         keyHandler.executaMetodo();
+        
+        double fator = Math.abs((Math.abs(jogador.getX() - prevX) + 
+                                 Math.abs(jogador.getY() - prevY)) / 2) * 8;
+        
+        jogador.setPitch(fator * deltaTime, (getHeight() + getWidth()) / 50);
     }
 
     /**

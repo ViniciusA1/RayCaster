@@ -57,7 +57,7 @@ public class EfeitosSonoros {
                 clip.open(audioInputStream);
                 sons.put(estadoAux, clip);
             } catch (IOException | LineUnavailableException | UnsupportedAudioFileException e) {
-                System.err.println("O estado " + nomeEstado + " não está atribuido ao item " + nome);
+                System.err.println(e.getMessage());
             }
         }
     }

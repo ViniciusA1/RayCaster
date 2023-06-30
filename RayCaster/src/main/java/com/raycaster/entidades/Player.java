@@ -111,6 +111,11 @@ public class Player extends Entidade {
     public double getPitch() {
         return pitch;
     }
+    
+    public void setPitch(double fator, double tamanhoTela) {
+        pitchAcumulado += fator;
+        pitch = tamanhoTela * Math.sin(pitchAcumulado);
+    }
 
     /**
      * Disponibiliza o item atual do jogador para código externo.
@@ -135,9 +140,6 @@ public class Player extends Entidade {
 
         double dy = sinal * getVelocidade()
                 * Math.sin(angulo + anguloRelativo) * deltaTime;
-
-        pitchAcumulado += 5 * deltaTime;
-        pitch = 16 * Math.sin(pitchAcumulado);
 
         trataColisao(mapaAtual, dx, 0);
         trataColisao(mapaAtual, 0, dy);
@@ -242,9 +244,17 @@ public class Player extends Entidade {
      */
     public int getQtdConsumivel() {
         if (itemAtual == null) {
-            return -1;
+            return 0;
         }
 
         return itemAtual.getAtributoConsumivel();
+    }
+    
+    public int getConsumivelMax() {
+        if(itemAtual == null) {
+            return 0;
+        }
+        
+        return itemAtual.getConsumivelMax();
     }
 }

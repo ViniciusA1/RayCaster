@@ -1,5 +1,8 @@
 package com.raycaster.interfaces;
 
+import com.raycaster.engine.Diretorio;
+import com.raycaster.engine.EfeitosSonoros;
+import com.raycaster.engine.Estado;
 import java.awt.AWTKeyStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -11,6 +14,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.util.EnumSet;
 import java.util.HashSet;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -27,6 +32,8 @@ public class BotaoCustom extends JButton {
 
     private static final Color COR_FOCO = Color.RED;
     private static final Color COR_ORIGINAL = Color.WHITE;
+    
+    private EfeitosSonoros sons;
 
     /**
      * Construtor principal do botão, recebe o texto a ser exibido.
@@ -44,6 +51,13 @@ public class BotaoCustom extends JButton {
 
         this.addFocusListener(new FocusListener());
         this.addMouseListener(new MouseListener());
+        
+        EnumSet<Estado> estados = EnumSet.noneOf(Estado.class);
+        
+        estados.add(Estado.USANDO);
+        estados.add(Estado.SACANDO);
+        
+        sons = new EfeitosSonoros("botao", estados);
 
         focusKeybinding();
     }
@@ -96,6 +110,7 @@ public class BotaoCustom extends JButton {
         ActionListener ouvinte = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                sons.emiteSom(Estado.USANDO);
                 action.run();
             }
         };
@@ -108,6 +123,7 @@ public class BotaoCustom extends JButton {
         getActionMap().put("enter", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                sons.emiteSom(Estado.USANDO);
                 action.run();
             }
         });
@@ -122,6 +138,8 @@ public class BotaoCustom extends JButton {
         public void focusGained(FocusEvent e) {
             setFont(getFont().deriveFont(Font.BOLD));
             setForeground(COR_FOCO);
+            
+            sons.emiteSom(Estado.SACANDO);
         }
 
         @Override
@@ -141,6 +159,8 @@ public class BotaoCustom extends JButton {
             requestFocus();
             setFont(getFont().deriveFont(Font.BOLD));
             setForeground(COR_FOCO);
+            
+            sons.emiteSom(Estado.SACANDO);
         }
 
         @Override

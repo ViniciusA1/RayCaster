@@ -73,7 +73,7 @@ public class AnimacaoPlayer extends JPanel {
 
         g.drawImage(imagemAtual.getImage(),
                 (widthX / 2) + (int) jogador.getPitch(),
-                (heightY / 2) + (int) jogador.getPitch(),
+                (heightY / 2) + (int) -((Math.pow(jogador.getPitch(), 2)) / 40),
                 widthX, heightY, frameAtual * comprimento,
                 0, (frameAtual + 1) * comprimento, altura, null);
 

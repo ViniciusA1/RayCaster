@@ -43,6 +43,15 @@ public class ArmaLonga extends Arma {
     }
     
     /**
+     * Devolve o máximo de um atributo consumível da arma.
+     * @return Retorna o máximo do atributo
+     */
+    @Override
+    public int getConsumivelMax() {
+        return (int) (((double) municaoAtual / municaoMaxima) * 100.0);
+    }
+    
+    /**
      * Verifica se a arma está apta a ser utilizada.
      * @return Retorna true ou false para a verificação
      */

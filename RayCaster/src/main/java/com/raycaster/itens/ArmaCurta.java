@@ -48,6 +48,15 @@ public class ArmaCurta extends Arma {
     public int getAtributoConsumivel() {
         return durabilidadeAtual;
     }
+    
+    /**
+     * Devolve o máximo do atributo consumível da arma.
+     * @return Retorna o máximo valor do atributo
+     */
+    @Override
+    public int getConsumivelMax() {
+        return (int) (((double) durabilidadeAtual / durabilidadeMaxima) * 100.0);
+    }
 
     /**
      * Devolve a "taxa de quebra" vinculada à arma.

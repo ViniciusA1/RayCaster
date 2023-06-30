@@ -128,4 +128,10 @@ public abstract class Item {
      * @return Retorna o atributo consumível
      */
     public abstract int getAtributoConsumivel();
+    
+    /**
+     * Busca e retorna o valor máximo do atributo consumível do item.
+     * @return Retorna o valor máximo do atributo consumível
+     */
+    public abstract int getConsumivelMax();
 }

@@ -10,6 +10,7 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 
 /**
  * Classe que contém os atributos e métodos da HUD principal do jogador.
@@ -22,6 +23,8 @@ public class HUD extends JPanel {
     private final Player jogador;
     private JLabel textoVida;
     private JLabel textoMunicao;
+    private JProgressBar barraVida;
+    private JProgressBar barraMunicao;
 
     /**
      * Construtor da classe que recebe a referência do jogador ao qual a HUD está
@@ -31,6 +34,7 @@ public class HUD extends JPanel {
      */
     public HUD(Player jogador, Font fontePersonalizada) {
         setLayout(new LayoutHUD(fontePersonalizada));
+        setOpaque(false);
         sprite = new ArrayList<>();
         this.jogador = jogador;
 
@@ -42,14 +46,26 @@ public class HUD extends JPanel {
      * Carrega todos os componentes relacionados a HUD.
      */
     private void carregaComponentes() {
-        textoVida = new JLabel(Double.toString(jogador.getVidaAtual()));
-        textoVida.setForeground(Color.WHITE);
+        Color cor = new Color(255, 0, 0);
         
-        textoMunicao = new JLabel(Integer.toString(jogador.getQtdConsumivel()));
-        textoMunicao.setForeground(Color.WHITE);
+        textoVida = new JLabel();
+        textoVida.setForeground(cor);
         
+        barraVida = new JProgressBar(JProgressBar.VERTICAL, 0, 100);
+        barraVida.setForeground(cor);
+        
+        textoMunicao = new JLabel();
+        textoMunicao.setForeground(cor);
+        
+        barraMunicao = new JProgressBar(JProgressBar.VERTICAL, 0, 100);
+        barraMunicao.setForeground(cor);
+        
+        add(barraMunicao);
         add(textoMunicao);
+        add(barraVida);
         add(textoVida);
+        
+        atualizaComponentes();
     }
 
     /**
@@ -74,6 +90,21 @@ public class HUD extends JPanel {
      */
     public void atualizaItem() {
         textoMunicao.setText(Integer.toString(jogador.getQtdConsumivel()));
+        barraMunicao.setValue(jogador.getConsumivelMax());
+        
+        System.out.println(jogador.getConsumivelMax());
+    }
+    
+    public void atualizaComponentes() {
+        atualizaItem();
+        
+        textoVida.setText(Double.toString(jogador.getVidaAtual()));
+        barraVida.setValue(converteNumero(jogador.getVidaAtual(), 
+                jogador.getVidaMaxima()));
+    }
+    
+    private int converteNumero(double atual, double max) {
+        return (int) (atual / max) * 100;
     }
 
     /**
@@ -84,8 +115,8 @@ public class HUD extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        textoVida.setText(Double.toString(jogador.getVidaAtual()));
-        textoMunicao.setText(Integer.toString(jogador.getQtdConsumivel()));
+        atualizaComponentes();
+        
         g.drawImage(sprite.get(0).getImage(), 0, 0, this.getWidth(), this.getHeight(), this);
     }
 }

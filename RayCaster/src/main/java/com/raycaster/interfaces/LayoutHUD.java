@@ -66,11 +66,11 @@ public class LayoutHUD implements LayoutManager {
         int width = parent.getWidth();
         int height = parent.getHeight();
 
-        Font fonte = fontePersonalizada.deriveFont(Font.BOLD, (width / 2 + height) / 10);
+        Font fonte = fontePersonalizada.deriveFont(Font.BOLD, (width / 2 + height) / 12);
 
         Component[] componentes = parent.getComponents();
 
-        int spacing = width / 8;
+        int spacing = width / 7;
 
         int startX = width / 10;
         int y = (height - fonte.getSize()) / 2;
