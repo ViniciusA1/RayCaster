@@ -639,9 +639,11 @@ public class Engine extends Painel implements ActionListener {
        janela.repaint();
        janela.revalidate();
        
-       gameTimer.stop();
+       if(gameTimer.isRunning())
+            musicaBackground.close();
        
-       musicaBackground.close();
+       gameTimer.stop();
+      
     }
 
     /**
