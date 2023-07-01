@@ -64,4 +64,12 @@ public class Inventario<T extends Item> {
         if(novosObjetos.size() <= tamanhoMaximo)
             objetos = novosObjetos;
     }
+    
+    public void close() {
+        for(T objetoAux : objetos) {
+            objetoAux.close();
+        }
+        
+        objetos.clear();
+    }
 }

@@ -3,14 +3,17 @@ package com.raycaster.engine;
 import com.raycaster.entidades.Entidade;
 import com.raycaster.entidades.Player;
 import com.raycaster.itens.*;
+import com.raycaster.mapa.Mapa;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Scanner;
 import javax.swing.ImageIcon;
 
 /**
@@ -72,9 +75,11 @@ public class ArquivoUtils {
         StripProperties propriedades = new StripProperties();
 
         nomeArquivo += FORMATO_DADOS;
+        
+        FileInputStream streamTemporario;
 
         try {
-            FileInputStream streamTemporario = new FileInputStream(nomeArquivo);
+            streamTemporario = new FileInputStream(nomeArquivo);
             propriedades.load(streamTemporario);
             streamTemporario.close();
         } catch (IOException e) {
@@ -100,6 +105,20 @@ public class ArquivoUtils {
         }
 
         return new ImageIcon(nomeImagem);
+    }
+    
+    public static List<String> leMapas() {
+        List<String> mapas = new ArrayList<>();
+        File pastaMapas = new File("maps");
+        
+        File[] arquivoMapas = pastaMapas.listFiles();
+        for(File aux: arquivoMapas){
+            if(!aux.isDirectory()){
+                mapas.add(aux.getName().replaceAll("\\.txt$", ""));
+            }
+        }
+        
+        return mapas;
     }
 
     /**

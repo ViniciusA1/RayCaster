@@ -144,6 +144,11 @@ public class Player extends Entidade {
         trataColisao(mapaAtual, dx, 0);
         trataColisao(mapaAtual, 0, dy);
     }
+    
+    public void emitePassos() {
+        if(!som.isRunning(Estado.OCIOSO))
+            som.emiteSom(Estado.OCIOSO);
+    }
 
     /**
      * Rotaciona o player em torno do seu angulo.
@@ -205,8 +210,14 @@ public class Player extends Entidade {
         long tempoAtual = System.currentTimeMillis();
 
         if (estadoAtual != Estado.OCIOSO
-                || tempoAtual - tempoAnterior <= itemAtual.getCooldown()
-                || !itemAtual.isUsavel()) {
+                || tempoAtual - tempoAnterior <= itemAtual.getCooldown()) {
+            return;
+        }
+        
+        if(!itemAtual.isUsavel()) {
+            if(itemAtual.getConsumivelMax() > 0)
+                recarregaItem();
+            
             return;
         }
 
@@ -256,5 +267,11 @@ public class Player extends Entidade {
         }
         
         return itemAtual.getConsumivelMax();
+    }
+    
+    public void close() {
+        som.close();
+        
+        mochila.close();
     }
 }

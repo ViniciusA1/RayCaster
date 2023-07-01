@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -25,6 +27,12 @@ public class EfeitosSonoros {
     
     static {
         thread = new Thread(() -> {
+            try {
+                Thread.sleep(0, 1);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+            
             somAtual.setFramePosition(0);
             somAtual.start();
         });
@@ -70,6 +78,8 @@ public class EfeitosSonoros {
 
                 clip.open(audioInputStream);
                 sons.put(estadoAux, clip);
+                
+                audioInputStream.close();
             } catch (IOException | LineUnavailableException | UnsupportedAudioFileException e) {
                 System.err.println(e.getMessage());
             }
@@ -117,6 +127,8 @@ public class EfeitosSonoros {
             clipAux.stop();
             clipAux.close();
         }
+        
+        somAtual = null;
         
         sons.clear();
     }

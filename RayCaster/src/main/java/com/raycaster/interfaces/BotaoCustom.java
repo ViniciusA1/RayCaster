@@ -32,7 +32,10 @@ public class BotaoCustom extends JButton {
     private static final Color COR_FOCO = Color.RED;
     private static final Color COR_ORIGINAL = Color.WHITE;
 
-    private static EfeitosSonoros sons;
+    private static final EfeitosSonoros sons;
+    
+    /*private static final FocusListener focusListener;
+    private static final MouseListener mouseListener;*/
 
     static {
         EnumSet<Estado> estados = EnumSet.noneOf(Estado.class);
@@ -132,6 +135,10 @@ public class BotaoCustom extends JButton {
                 action.run();
             }
         });
+    }
+    
+    public void close() {
+        sons.close();
     }
 
     /**

@@ -11,7 +11,11 @@ public abstract class Painel extends JPanel {
         setVisible(true);
     }
     
-    public void sair() {
+    public void sairPop() {
+        setVisible(false);
+    }
+    
+    public void sairPush() {
         setVisible(false);
     }
 }

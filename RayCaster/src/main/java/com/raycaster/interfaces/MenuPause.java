@@ -1,6 +1,5 @@
 package com.raycaster.interfaces;
 
-import com.raycaster.engine.Engine;
 import com.raycaster.interfaces.LabelAnimado.Animacao;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -27,9 +26,12 @@ public class MenuPause extends Painel {
 
     private LabelAnimado textoPause;
     private BotaoCustom botaoVoltar;
+    private BotaoCustom botaoConfig;
     private BotaoCustom botaoSair;
+    
+    private MenuConfig menuConfiguracao;
 
-    private final Image imagemBackground;
+    private Image imagemBackground;
 
     /**
      * Construtor principal do menu, recebe os elementos necessários para sua
@@ -37,15 +39,18 @@ public class MenuPause extends Painel {
      *
      * @param janela
      * @param fontePersonalizada Fonte personalizada utilizada
-     * @param imagemBackground Imagem que servirá de background
      */
-    public MenuPause(JFrame janela, Font fontePersonalizada, Image imagemBackground) {
+    public MenuPause(JFrame janela, Font fontePersonalizada) {
         this.janela = janela;
-        this.imagemBackground = imagemBackground;
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         carregaComponentes(fontePersonalizada);
+    }
+    
+    public void setImagem(Image imagemBackground) {
+        this.imagemBackground = imagemBackground;
+        menuConfiguracao.setImagem(imagemBackground);
     }
 
     /**
@@ -57,22 +62,23 @@ public class MenuPause extends Painel {
         fonte = fonte.deriveFont(Font.PLAIN, 100f);
 
         textoPause = new LabelAnimado("Pausado",
-                fonte.deriveFont(Font.PLAIN, 150f), Animacao.FLOAT);
+                fonte.deriveFont(Font.BOLD, 150f), Animacao.FLOAT);
 
         botaoVoltar = new BotaoCustom("Voltar", fonte, () -> voltar());
+        botaoConfig = new BotaoCustom("Configuração", fonte, () -> configurar());
         botaoSair = new BotaoCustom("Sair", fonte, () -> sairJogo());
 
         textoPause.setAlignmentX(CENTER_ALIGNMENT);
 
         this.add(textoPause);
         this.add(botaoVoltar);
+        this.add(botaoConfig);
         this.add(botaoSair);
         
         adicionarAtalho();
-
-        SwingUtilities.invokeLater(() -> {
-            botaoVoltar.requestFocusInWindow();
-        });
+        
+        menuConfiguracao = new MenuConfig(janela, 
+                imagemBackground, fonte);
     }
 
     /**
@@ -104,6 +110,15 @@ public class MenuPause extends Painel {
         g.drawImage(imagemBackground, 0, 0,
                 this.getWidth(), this.getHeight(), this);
     }
+    
+    @Override
+    public void entrar() {
+        super.entrar();
+        
+        SwingUtilities.invokeLater(() -> {
+            botaoVoltar.requestFocusInWindow();
+        });
+    }
 
     /**
      * Volta para o painel anterior.
@@ -113,12 +128,20 @@ public class MenuPause extends Painel {
         InterfaceManager.pop();
         janela.add(InterfaceManager.peek());
     }
+    
+    public void configurar() {
+        janela.remove(this);
+        InterfaceManager.push(menuConfiguracao);
+        janela.add(menuConfiguracao);
+        janela.repaint();
+        janela.revalidate();
+    }
 
     /**
      * Sai do jogo completamente.
      */
     public void sairJogo() {
-        super.sair();
+        super.sairPop();
         voltar();
         janela.remove(InterfaceManager.peek());
         InterfaceManager.pop();

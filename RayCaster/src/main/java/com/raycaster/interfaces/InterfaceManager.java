@@ -15,7 +15,7 @@ public class InterfaceManager {
     
     public static void push(Painel novoPainel) {
         if(!pilha.isEmpty()) {
-            pilha.peek().sair();
+            pilha.peek().sairPush();
         }
         
         pilha.push(novoPainel);
@@ -24,7 +24,7 @@ public class InterfaceManager {
     
     public static void pop() {
         if(!pilha.isEmpty()) {
-            pilha.peek().sair();
+            pilha.peek().sairPop();
             pilha.pop();
         }
         

@@ -154,7 +154,7 @@ public class Mapa{
      * @return uma intancia do Mapa encontrado ou null caso não encrente mapa com esse nome
      */
     public static Mapa carregaMapa(String nomeMapa) {
-        File arquivoMapa = new File("maps" + File.separator + nomeMapa);
+        File arquivoMapa = new File("maps" + File.separator + nomeMapa + ".txt");
         Scanner leitor;
         
         try {
@@ -275,7 +275,7 @@ public class Mapa{
         
         
         return mapas;
-    } 
+    }
     
     
     /**

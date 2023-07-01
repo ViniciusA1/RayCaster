@@ -60,9 +60,9 @@ public class HUD extends JPanel {
         barraMunicao = new JProgressBar(JProgressBar.VERTICAL, 0, 100);
         barraMunicao.setForeground(cor);
         
-        add(barraMunicao);
+        //add(barraMunicao);
         add(textoMunicao);
-        add(barraVida);
+        //add(barraVida);
         add(textoVida);
         
         atualizaComponentes();

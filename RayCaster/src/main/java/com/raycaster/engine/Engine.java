@@ -52,6 +52,8 @@ public class Engine extends Painel implements ActionListener {
     private int frameCounter;
 
     private PainelInformacao painelInfo;
+    private MenuPause menuPause;
+    private long pauseCooldown;
 
     private Player jogador;
     private Mapa mapaAtual;
@@ -114,7 +116,6 @@ public class Engine extends Painel implements ActionListener {
      * Carrega e inicia o mapa inicial que será jogado.
      */
     private void initMapa() {
-//        mapaAtual = new Mapa("lobby.txt", 20);
         mapaAtual.carregar();
     }
 
@@ -151,6 +152,7 @@ public class Engine extends Painel implements ActionListener {
         AnimacaoPlayer painelAnimacao = new AnimacaoPlayer(jogador);
         PainelMira painelMira = new PainelMira();
         painelInfo = new PainelInformacao(fontePersonalizada);
+        menuPause = new MenuPause(janela, fontePersonalizada);
 
         this.add(hudJogador, "hud");
         this.add(painelMira, "mira");
@@ -204,6 +206,9 @@ public class Engine extends Painel implements ActionListener {
 
         keyHandler.adicionaKey(KeyEvent.VK_2, ()
                 -> jogador.sacaItem(1));
+        
+        keyHandler.adicionaKey(KeyEvent.VK_3, ()
+                -> jogador.sacaItem(2));
 
     }
 
@@ -577,8 +582,13 @@ public class Engine extends Painel implements ActionListener {
 
         keyHandler.executaMetodo();
         
-        double fator = Math.abs((Math.abs(jogador.getX() - prevX) + 
-                                 Math.abs(jogador.getY() - prevY)) / 2) * 8;
+        prevX = Math.abs(jogador.getX() - prevX);
+        prevY = Math.abs(jogador.getY() - prevY);
+        
+        if(prevX > 0 || prevY > 0)
+            jogador.emitePassos();
+        
+        double fator = Math.abs((prevX + prevY) / 2) * 8;
         
         jogador.setPitch(fator * deltaTime, (getHeight() + getWidth()) / 50);
     }
@@ -587,7 +597,7 @@ public class Engine extends Painel implements ActionListener {
      * Pausa o jogo quando o usuário desejar.
      */
     private void pausaJogo() {
-        if (!gameTimer.isRunning()) {
+        if (System.currentTimeMillis() - pauseCooldown < 1000) {
             return;
         }
 
@@ -600,18 +610,18 @@ public class Engine extends Painel implements ActionListener {
         this.paint(render);
 
         render.dispose();
+        
+        menuPause.setImagem(imagemBackground);
 
         janela.remove(this);
+        
+        InterfaceManager.push(menuPause);
 
-        MenuPause menu = new MenuPause(janela, fontePersonalizada, imagemBackground);
-        menu.setBackground(Color.DARK_GRAY);
-        InterfaceManager.push(menu);
-
-        janela.add(menu);
+        janela.add(menuPause);
         janela.revalidate();
         janela.repaint();
         
-        menu.requestFocus();
+        menuPause.requestFocus();
     }
     
     @Override
@@ -627,23 +637,24 @@ public class Engine extends Painel implements ActionListener {
         
         keyHandler.limpaMetodos();
         
+        pauseCooldown = System.currentTimeMillis();
+        
         SwingUtilities.invokeLater(() -> {
             this.requestFocusInWindow();
         });
     }
     
     @Override
-    public void sair() {
-       super.sair();
+    public void sairPop() {
+       super.sairPop();
        
        janela.repaint();
        janela.revalidate();
-       
-       if(gameTimer.isRunning())
-            musicaBackground.close();
+
+       musicaBackground.close();
+       jogador.close();
        
        gameTimer.stop();
-      
     }
 
     /**

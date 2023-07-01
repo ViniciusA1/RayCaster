@@ -1,12 +1,12 @@
 package com.raycaster.interfaces;
 
+import com.raycaster.engine.ArquivoUtils;
 import com.raycaster.engine.Diretorio;
 import com.raycaster.engine.EfeitosSonoros;
 import com.raycaster.engine.Engine;
 import com.raycaster.engine.Estado;
 import com.raycaster.interfaces.LabelAnimado.Animacao;
 import com.raycaster.mapa.Mapa;
-import static com.raycaster.mapa.Mapa.carregarMapList;
 import static java.awt.Component.CENTER_ALIGNMENT;
 import java.awt.Font;
 import java.awt.FontFormatException;
@@ -17,8 +17,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -74,7 +74,11 @@ public class MenuInicial {
         Font fonte = carregaFonte().deriveFont(Font.PLAIN, 100f);
 
         LabelAnimado logo = new LabelAnimado("RayCaster",
-                fonte.deriveFont(Font.PLAIN, 150f), Animacao.FLOAT);
+                fonte.deriveFont(Font.BOLD, 150f), Animacao.FLOAT);
+        
+        musicaInicial = new EfeitosSonoros("menu", Estado.OCIOSO);
+        musicaInicial.emiteSom(Estado.OCIOSO);
+        musicaInicial.setLoop(Estado.OCIOSO);
         
         Runnable acaoJogar = () -> {
             frameInicial.remove(InterfaceManager.peek());
@@ -86,6 +90,13 @@ public class MenuInicial {
         Runnable acaoMapa = () -> {
             musicaInicial.stopLoop(Estado.OCIOSO);
             MapEditorMenu.inicia(frameInicial);
+        };
+        
+        Runnable acaoConfig = () -> {
+            frameInicial.remove(InterfaceManager.peek());
+            frameInicial.repaint();
+            frameInicial.revalidate();
+            configuraJogo(frameInicial, fonte);
         };
 
         Runnable acaoSair = () -> {
@@ -99,6 +110,8 @@ public class MenuInicial {
                 fonte, acaoJogar);
         BotaoCustom botaoMapa = new BotaoCustom("Editor de mapas",
                 fonte, acaoMapa);
+        BotaoCustom botaoConfig = new BotaoCustom("Configuração", 
+                fonte, acaoConfig);
         BotaoCustom botaoSair = new BotaoCustom("Sair",
                 fonte, acaoSair);
 
@@ -115,6 +128,11 @@ public class MenuInicial {
             public void entrar() {
                 super.entrar();
                 
+                if(!musicaInicial.isRunning(Estado.OCIOSO)) {
+                    musicaInicial.emiteSom(Estado.OCIOSO);
+                    musicaInicial.setLoop(Estado.OCIOSO);
+                }
+                
                 SwingUtilities.invokeLater(() -> {
                    botaoJogar.requestFocusInWindow();
                 });
@@ -126,16 +144,10 @@ public class MenuInicial {
         
         InterfaceManager.push(panelPrincipal);
 
-
-        if (musicaInicial == null)
-            musicaInicial = new EfeitosSonoros("menu", Estado.OCIOSO);
-        
-        musicaInicial.emiteSom(Estado.OCIOSO);
-        musicaInicial.setLoop(Estado.OCIOSO);
-
         panelPrincipal.add(logo);
         panelPrincipal.add(botaoJogar);
         panelPrincipal.add(botaoMapa);
+        panelPrincipal.add(botaoConfig);
         panelPrincipal.add(botaoSair);
 
         frameInicial.add(panelPrincipal);
@@ -171,6 +183,18 @@ public class MenuInicial {
         InterfaceManager.push(game);
         f.add(game);
     }
+    
+    private static void configuraJogo(JFrame frame, Font fonte) {
+        MenuConfig menuConfiguracao = new MenuConfig(frame, 
+                imagemBackground, fonte);
+        
+        InterfaceManager.push(menuConfiguracao);
+        
+        frame.add(menuConfiguracao);
+        frame.repaint();
+        frame.revalidate();
+        menuConfiguracao.requestFocus();
+    }
 
     /**
      * Cria o menu de seleção de mapas.
@@ -180,13 +204,13 @@ public class MenuInicial {
      * @param font Fonte personalizada do menu
      */
     private static void selecionaMapa(JFrame frame, Font font) {
-        ArrayList<Mapa> mapas = carregarMapList();
+        List<String> mapas = ArquivoUtils.leMapas();
         indiceMapa = 0;
 
         LabelAnimado textoMapa = new LabelAnimado("Selecione um mapa",
-                font.deriveFont(Font.PLAIN, 150f), Animacao.FLOAT);
+                font.deriveFont(Font.BOLD, 150f), Animacao.FLOAT);
 
-        LabelAnimado mapaAtual = new LabelAnimado(mapas.get(indiceMapa).toString(),
+        LabelAnimado mapaAtual = new LabelAnimado(mapas.get(indiceMapa),
                 font.deriveFont(Font.PLAIN, 100f), Animacao.FADE);
 
         EnumSet<Estado> estados = EnumSet.noneOf(Estado.class);
@@ -214,6 +238,13 @@ public class MenuInicial {
                     musicaInicial.setLoop(Estado.OCIOSO);
                 }
             }
+            
+            @Override
+            public void sairPop() {
+                super.sairPop();
+                
+                sons.close();
+            }
         };
 
         panel.setLayout(new BoxLayout(panel,
@@ -230,17 +261,17 @@ public class MenuInicial {
                 switch (keyCode) {
                     case KeyEvent.VK_UP, KeyEvent.VK_W -> {
                         indiceMapa = (indiceMapa - 1 + mapas.size()) % mapas.size();
-                        mapaAtual.setText(mapas.get(indiceMapa).toString());
+                        mapaAtual.setText(mapas.get(indiceMapa));
                         sons.emiteSom(Estado.SACANDO);
                     }
                     case KeyEvent.VK_DOWN, KeyEvent.VK_S -> {
                         indiceMapa = (indiceMapa + 1) % mapas.size();
-                        mapaAtual.setText(mapas.get(indiceMapa).toString());
+                        mapaAtual.setText(mapas.get(indiceMapa));
                         sons.emiteSom(Estado.SACANDO);
                     }
                     case KeyEvent.VK_ENTER -> {
                         sons.emiteSom(Estado.USANDO);
-                        jogar(frame, mapas.get(indiceMapa));
+                        jogar(frame, Mapa.carregaMapa(mapas.get(indiceMapa)));
                     }
                 }
             }

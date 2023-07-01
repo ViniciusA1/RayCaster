@@ -101,6 +101,11 @@ public abstract class Item {
         return possiveisEstados.contains(estadoRecebido);
     }
     
+    public void close() {
+        mapaAnimacao.clear();
+        sons.close();
+    }
+    
     /**
      * Verifica se o item está ou não apto ao uso.
      * @return Retorna verdadeiro ou falso para a verificação
