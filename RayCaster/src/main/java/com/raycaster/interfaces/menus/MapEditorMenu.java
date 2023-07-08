@@ -1,10 +1,11 @@
-package com.raycaster.interfaces;
+package com.raycaster.interfaces.menus;
 
 
 import com.raycaster.engine.Diretorio;
 import com.raycaster.engine.Engine;
 import com.raycaster.engine.Textura;
-import static com.raycaster.interfaces.MenuInicial.lerImagem;
+import com.raycaster.interfaces.componentes.IntFilter;
+import static com.raycaster.interfaces.menus.MenuInicial.lerImagem;
 import com.raycaster.mapa.Mapa;
 import java.awt.Color;
 import java.awt.Component;

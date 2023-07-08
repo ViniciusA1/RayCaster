@@ -2,7 +2,7 @@ package com.raycaster.itens;
 
 import com.raycaster.engine.Animacao;
 import com.raycaster.engine.Diretorio;
-import com.raycaster.engine.EfeitosSonoros;
+import com.raycaster.engine.sons.EfeitoSonoro;
 import com.raycaster.engine.Estado;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -19,7 +19,7 @@ public abstract class Item {
     private long cooldown;
     private EnumSet<Estado> possiveisEstados;
     private Map<Estado, Animacao> mapaAnimacao;
-    private EfeitosSonoros sons;
+    private EfeitoSonoro sons;
 
     /**
      * Construtor da classe que recebe os atributos necessários para criação do
@@ -33,7 +33,7 @@ public abstract class Item {
         this.cooldown = cooldown;
         this.possiveisEstados = possiveisEstados;
         
-        sons = new EfeitosSonoros(nome, possiveisEstados);
+        sons = new EfeitoSonoro(nome, possiveisEstados);
         mapaAnimacao = new HashMap<>();
         carregaAnimacoes();
     }
@@ -89,7 +89,7 @@ public abstract class Item {
      * @param estadoDesejado Estado associado ao som que deve ser reproduzido
      */
     public void reproduzSom(Estado estadoDesejado) {
-        sons.emiteSom(estadoDesejado);
+        sons.playSom(estadoDesejado);
     }
     
     /**

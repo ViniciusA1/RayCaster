@@ -1,4 +1,4 @@
-package com.raycaster.interfaces;
+package com.raycaster.interfaces.layouts;
 
 import java.awt.Component;
 import java.awt.Container;

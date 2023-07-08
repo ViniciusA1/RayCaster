@@ -1,4 +1,4 @@
-package com.raycaster.interfaces;
+package com.raycaster.interfaces.componentes;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -21,8 +21,8 @@ public class LabelAnimado extends JLabel {
     private int direcao;
     private int posicaoY;
 
-    private float alpha;
-    private float delta;
+    private int alpha;
+    private int delta;
     
     private Runnable ajuste;
     
@@ -100,14 +100,18 @@ public class LabelAnimado extends JLabel {
                 timerAnimacao = new Timer(60, e -> animacaoFloat());
             }
             case FADE -> {
-                alpha = 0f;
-                delta = 0.01f;
+                alpha = 0;
+                delta = 1;
                 ajuste = this::ajusteFade;
                 timerAnimacao = new Timer(10, e -> animacaoFade());
             }
         }
 
         timerAnimacao.start();
+    }
+    
+    public void setColor(Color cor) {
+        this.setForeground(cor);
     }
 
     /**
@@ -154,11 +158,11 @@ public class LabelAnimado extends JLabel {
      */
     private void animacaoFade() {
         alpha += delta;
-        if (alpha >= 1f) {
-            alpha = 1f;
+        if (alpha >= 255) {
+            alpha = 255;
             delta = -delta;
-        } else if (alpha <= 0f) {
-            alpha = 0f;
+        } else if (alpha <= 0) {
+            alpha = 0;
             delta = -delta;
         }
 
@@ -169,13 +173,17 @@ public class LabelAnimado extends JLabel {
      * Determina o ajuste final da animação de "fade" do label.
      */
     private void ajusteFade() {
-        setForeground(new Color(1f, 0f, 0f, alpha));
+        Color corAtual = this.getForeground();
+        this.setForeground(new Color(corAtual.getRed(), 
+                corAtual.getBlue(), corAtual.getGreen(), alpha));
     }
-
-    /**
-     * Encerra o label e seu timer.
-     */
-    public void close() {
+    
+    public void stopAnimacao() {
         timerAnimacao.stop();
+        alpha = 255;
+    }
+    
+    public void startAnimacao() {
+        timerAnimacao.restart();
     }
 }

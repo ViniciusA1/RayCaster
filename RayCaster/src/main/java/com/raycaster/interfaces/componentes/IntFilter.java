@@ -1,4 +1,4 @@
-package com.raycaster.interfaces;
+package com.raycaster.interfaces.componentes;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;

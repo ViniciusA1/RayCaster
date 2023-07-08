@@ -1,10 +1,10 @@
 package com.raycaster.entidades;
 
-import com.raycaster.interfaces.AnimacaoPlayer;
+import com.raycaster.interfaces.paineis.AnimacaoPlayer;
 import com.raycaster.itens.ArmaLonga;
-import com.raycaster.engine.EfeitosSonoros;
+import com.raycaster.engine.sons.EfeitoSonoro;
 import com.raycaster.engine.Estado;
-import com.raycaster.interfaces.HUD;
+import com.raycaster.interfaces.paineis.HUD;
 import com.raycaster.itens.Item;
 import com.raycaster.mapa.Mapa;
 import com.raycaster.itens.Arma;
@@ -29,7 +29,7 @@ public class Player extends Entidade {
     private AnimacaoPlayer painelAnimacao;
     private HUD hudJogador;
     private Estado estadoAtual;
-    private EfeitosSonoros som;
+    private EfeitoSonoro som;
 
     /**
      * Construtor principal do jogador, recebe os atributos necessitados pela
@@ -55,7 +55,7 @@ public class Player extends Entidade {
         FOV = Math.toRadians(fov);
         mochila = new Inventario<>();
         estadoAtual = Estado.OCIOSO;
-        som = new EfeitosSonoros("player", possiveisEstados);
+        som = new EfeitoSonoro("player", possiveisEstados);
     }
 
     /**
@@ -147,7 +147,7 @@ public class Player extends Entidade {
     
     public void emitePassos() {
         if(!som.isRunning(Estado.OCIOSO))
-            som.emiteSom(Estado.OCIOSO);
+            som.playSom(Estado.OCIOSO);
     }
 
     /**
@@ -197,7 +197,7 @@ public class Player extends Entidade {
         painelAnimacao.setAnimacao(itemAtual.getAnimacao(estadoAtual));
 
         estadoAtual = Estado.SACANDO;
-        som.emiteSom(estadoAtual);
+        som.playSom(estadoAtual);
     }
 
     /**

@@ -1,6 +1,6 @@
-package com.raycaster.interfaces;
+package com.raycaster.interfaces.componentes;
 
-import com.raycaster.engine.EfeitosSonoros;
+import com.raycaster.engine.sons.EfeitoSonoro;
 import com.raycaster.engine.Estado;
 import java.awt.AWTKeyStroke;
 import java.awt.Color;
@@ -16,6 +16,7 @@ import java.awt.event.MouseEvent;
 import java.util.EnumSet;
 import java.util.HashSet;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
@@ -32,7 +33,7 @@ public class BotaoCustom extends JButton {
     private static final Color COR_FOCO = Color.RED;
     private static final Color COR_ORIGINAL = Color.WHITE;
 
-    private static final EfeitosSonoros sons;
+    private static final EfeitoSonoro sons;
     
     /*private static final FocusListener focusListener;
     private static final MouseListener mouseListener;*/
@@ -43,7 +44,7 @@ public class BotaoCustom extends JButton {
         estados.add(Estado.USANDO);
         estados.add(Estado.SACANDO);
 
-        sons = new EfeitosSonoros("botao", estados);
+        sons = new EfeitoSonoro("botao", estados);
     }
 
     /**
@@ -91,6 +92,15 @@ public class BotaoCustom extends JButton {
 
         actionKeybinding(action);
     }
+    
+    public BotaoCustom(String texto, Font fonteCustomizada, Runnable action, 
+            boolean isVoltar) 
+    {
+        this(texto, fonteCustomizada, action);
+        
+        if(isVoltar)
+            atalhoVoltar(action);
+    }
 
     /**
      * Seta as keybindings padrão do botão.
@@ -108,6 +118,21 @@ public class BotaoCustom extends JButton {
 
         setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, fowardKeys);
     }
+    
+    private void atalhoVoltar(Runnable acao) {
+        Action voltarAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                acao.run();
+            }
+        };
+
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 
+                        0), "voltarAction");
+        
+        getActionMap().put("voltarAction", voltarAction);
+    }
 
     /**
      * Seta o action listener e a tecla de ação.
@@ -118,7 +143,7 @@ public class BotaoCustom extends JButton {
         ActionListener ouvinte = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sons.emiteSom(Estado.USANDO);
+                sons.playSom(Estado.USANDO);
                 action.run();
             }
         };
@@ -131,7 +156,7 @@ public class BotaoCustom extends JButton {
         getActionMap().put("enter", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sons.emiteSom(Estado.USANDO);
+                sons.playSom(Estado.USANDO);
                 action.run();
             }
         });
@@ -151,7 +176,7 @@ public class BotaoCustom extends JButton {
             setFont(getFont().deriveFont(Font.BOLD));
             setForeground(COR_FOCO);
 
-            sons.emiteSom(Estado.SACANDO);
+            sons.playSom(Estado.SACANDO);
         }
 
         @Override
@@ -172,7 +197,7 @@ public class BotaoCustom extends JButton {
             setFont(getFont().deriveFont(Font.BOLD));
             setForeground(COR_FOCO);
 
-            sons.emiteSom(Estado.SACANDO);
+            sons.playSom(Estado.SACANDO);
         }
 
         @Override

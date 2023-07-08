@@ -1,6 +1,6 @@
 package com.raycaster.engine;
 
-import com.raycaster.interfaces.MenuInicial;
+import com.raycaster.interfaces.menus.MenuInicial;
 
 /**
  * Classe que guarda o método principal do programa.

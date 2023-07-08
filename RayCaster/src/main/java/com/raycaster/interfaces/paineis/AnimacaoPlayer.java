@@ -1,4 +1,4 @@
-package com.raycaster.interfaces;
+package com.raycaster.interfaces.paineis;
 
 import com.raycaster.engine.Estado;
 import com.raycaster.itens.Item;

@@ -1,17 +1,17 @@
 package com.raycaster.engine;
 
-import com.raycaster.interfaces.MenuPause;
-import com.raycaster.interfaces.LayoutEngine;
-import com.raycaster.interfaces.AnimacaoPlayer;
-import com.raycaster.interfaces.HUD;
+import com.raycaster.engine.sons.Musica;
+import com.raycaster.interfaces.menus.MenuPause;
+import com.raycaster.interfaces.layouts.LayoutEngine;
+import com.raycaster.interfaces.paineis.AnimacaoPlayer;
+import com.raycaster.interfaces.paineis.HUD;
 import com.raycaster.entidades.Player;
-import com.raycaster.interfaces.InterfaceManager;
-import com.raycaster.interfaces.Painel;
-import com.raycaster.interfaces.PainelInformacao;
-import com.raycaster.interfaces.PainelMira;
+import com.raycaster.interfaces.paineis.InterfaceManager;
+import com.raycaster.interfaces.paineis.Painel;
+import com.raycaster.interfaces.paineis.PainelInformacao;
+import com.raycaster.interfaces.paineis.PainelMira;
 import com.raycaster.itens.Arma;
 import com.raycaster.mapa.Mapa;
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.FontFormatException;
@@ -23,8 +23,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +48,7 @@ public class Engine extends Painel implements ActionListener {
     private double deltaTime;
     private long tempoFrame;
     private int frameCounter;
+    private BufferedImage frame;
 
     private PainelInformacao painelInfo;
     private MenuPause menuPause;
@@ -62,7 +61,7 @@ public class Engine extends Painel implements ActionListener {
     private MouseInput mouseHandler;
     
     private List<Textura> texturas;
-    private EfeitosSonoros musicaBackground;
+    private Musica musicaBackground;
     private final JFrame janela;
 
     private Font fontePersonalizada;
@@ -216,13 +215,10 @@ public class Engine extends Painel implements ActionListener {
      * Carrega a música principal do jogo que ficará em loop durante a execução.
      */
     private void initMusica() {
-        musicaBackground = new EfeitosSonoros("mapa" + File.separator + 
+        musicaBackground = new Musica("mapa" + File.separator + 
                 mapaAtual.toString(), Estado.OCIOSO);
         
-        musicaBackground.emiteSom(Estado.OCIOSO);
-        musicaBackground.setLoop(Estado.OCIOSO);
-
-        janela.addWindowListener(new DesligaSom(musicaBackground));
+        musicaBackground.playSom(Estado.OCIOSO);
     }
     
     /**
@@ -432,7 +428,7 @@ public class Engine extends Painel implements ActionListener {
         }
 
         // Usa as cores RGB acumuladas no frameBuffer para criar uma imagem e renderiza-la
-        BufferedImage frame = new BufferedImage(screenWidth, screenHeight,
+        frame = new BufferedImage(screenWidth, screenHeight,
                 BufferedImage.TYPE_INT_RGB);
 
         // "Seta" os valores das cores do frame
@@ -602,54 +598,29 @@ public class Engine extends Painel implements ActionListener {
         }
 
         gameTimer.stop();
-
-        BufferedImage imagemBackground = new BufferedImage(this.getWidth(),
-                this.getHeight(), BufferedImage.TYPE_INT_RGB);
-
-        Graphics2D render = imagemBackground.createGraphics();
-        this.paint(render);
-
-        render.dispose();
         
-        menuPause.setImagem(imagemBackground);
-
-        janela.remove(this);
+        menuPause.setImagem(frame);
         
-        InterfaceManager.push(menuPause);
-
-        janela.add(menuPause);
-        janela.revalidate();
-        janela.repaint();
-        
-        menuPause.requestFocus();
+        InterfaceManager.push(janela, menuPause);
     }
     
     @Override
     public void entrar() {
         super.entrar();
         
-        janela.repaint();
-        janela.revalidate();
-        
         if(!gameTimer.isRunning()) {
             gameTimer.start();
         }
         
         keyHandler.limpaMetodos();
+        mouseHandler.centralizaCursor(janela);
         
         pauseCooldown = System.currentTimeMillis();
-        
-        SwingUtilities.invokeLater(() -> {
-            this.requestFocusInWindow();
-        });
     }
     
     @Override
     public void sairPop() {
        super.sairPop();
-       
-       janela.repaint();
-       janela.revalidate();
 
        musicaBackground.close();
        jogador.close();
@@ -657,43 +628,4 @@ public class Engine extends Painel implements ActionListener {
        gameTimer.stop();
     }
 
-    /**
-     * Fecha as janelas e paineis dependentes da engine.
-     */
-    public void fechaJogo() {
-        janela.remove(InterfaceManager.peek());
-        InterfaceManager.pop();
-        InterfaceManager.pop();
-        janela.add(InterfaceManager.peek());
-        janela.repaint();
-        janela.revalidate();
-    }
-
-    /**
-     * Classe que ouve uma série de eventos da janela para encerrar o som do
-     * jogo.
-     */
-    private static class DesligaSom extends WindowAdapter {
-
-        EfeitosSonoros som;
-
-        public DesligaSom(EfeitosSonoros som) {
-            this.som = som;
-        }
-
-        @Override
-        public void windowOpened(WindowEvent e) {
-            if (som != null) {
-                som.emiteSom(Estado.OCIOSO);
-            }
-        }
-
-        @Override
-        public void windowClosed(WindowEvent e) {
-            if (som == null) {
-                System.exit(0);
-            }
-            som.stopLoop(Estado.OCIOSO);
-        }
-    }
 }

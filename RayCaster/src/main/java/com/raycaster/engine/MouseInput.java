@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Robot;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.JFrame;
 
 /**
  * Classe que guarda os métodos e atributos do controlador geral dos eventos de
@@ -72,16 +73,14 @@ public class MouseInput extends MouseAdapter {
         int dx = e.getXOnScreen() - centroX;
         
         jogador.rotaciona(dx * sensibilidade);
-        centralizaCursor(e);
+        centralizaCursor(e.getComponent());
     }
     
     /**
      * Centraliza o cursor no meio da janela (baseado em sistema).
-     * @param evento Evento gerado pelo mouse
+     * @param janela Janela a qual o mouse está associada
      */
-    public void centralizaCursor(MouseEvent evento) {
-        Component janela = evento.getComponent();
-        
+    public void centralizaCursor(Component janela) {
         centroX = janela.getLocationOnScreen().x + janela.getWidth() / 2;
         centroY = janela.getLocationOnScreen().y + janela.getHeight() / 2;
         

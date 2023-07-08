@@ -1,5 +1,6 @@
-package com.raycaster.interfaces;
+package com.raycaster.interfaces.paineis;
 
+import com.raycaster.interfaces.layouts.LayoutInformacao;
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.JLabel;

@@ -1,4 +1,4 @@
-package com.raycaster.interfaces;
+package com.raycaster.interfaces.paineis;
 
 import com.raycaster.engine.ArquivoUtils;
 import com.raycaster.engine.Diretorio;

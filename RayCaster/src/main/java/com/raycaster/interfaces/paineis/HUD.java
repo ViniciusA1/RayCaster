@@ -1,5 +1,6 @@
-package com.raycaster.interfaces;
+package com.raycaster.interfaces.paineis;
 
+import com.raycaster.interfaces.layouts.LayoutHUD;
 import com.raycaster.engine.Diretorio;
 import com.raycaster.entidades.Player;
 import java.awt.Color;

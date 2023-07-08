@@ -1,11 +1,17 @@
-package com.raycaster.interfaces;
+package com.raycaster.interfaces.menus;
 
 import com.raycaster.engine.ArquivoUtils;
 import com.raycaster.engine.Diretorio;
-import com.raycaster.engine.EfeitosSonoros;
+import com.raycaster.engine.sons.EfeitoSonoro;
 import com.raycaster.engine.Engine;
 import com.raycaster.engine.Estado;
-import com.raycaster.interfaces.LabelAnimado.Animacao;
+import com.raycaster.engine.sons.Musica;
+import com.raycaster.engine.sons.SomManager;
+import com.raycaster.interfaces.componentes.BotaoCustom;
+import com.raycaster.interfaces.paineis.InterfaceManager;
+import com.raycaster.interfaces.componentes.LabelAnimado;
+import com.raycaster.interfaces.componentes.LabelAnimado.Animacao;
+import com.raycaster.interfaces.paineis.Painel;
 import com.raycaster.mapa.Mapa;
 import static java.awt.Component.CENTER_ALIGNMENT;
 import java.awt.Font;
@@ -36,7 +42,7 @@ public class MenuInicial {
 
     private static BufferedImage imagemBackground;
     private static int indiceMapa;
-    private static EfeitosSonoros musicaInicial;
+    private static Musica musicaInicial;
 
     /**
      * Método para iniciar o jogo em uma thread apropriada
@@ -71,38 +77,31 @@ public class MenuInicial {
         frameInicial.setLocationRelativeTo(null);
         frameInicial.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        Font fonte = carregaFonte().deriveFont(Font.PLAIN, 100f);
+        Font fonte = carregaFonte().deriveFont(Font.PLAIN, 80f);
 
         LabelAnimado logo = new LabelAnimado("RayCaster",
                 fonte.deriveFont(Font.BOLD, 150f), Animacao.FLOAT);
         
-        musicaInicial = new EfeitosSonoros("menu", Estado.OCIOSO);
-        musicaInicial.emiteSom(Estado.OCIOSO);
-        musicaInicial.setLoop(Estado.OCIOSO);
+        musicaInicial = new Musica("menu", Estado.OCIOSO);
+        musicaInicial.playSom(Estado.OCIOSO);
         
         Runnable acaoJogar = () -> {
-            frameInicial.remove(InterfaceManager.peek());
-            frameInicial.repaint();
-            frameInicial.revalidate();
             selecionaMapa(frameInicial, fonte);
         };
 
         Runnable acaoMapa = () -> {
-            musicaInicial.stopLoop(Estado.OCIOSO);
+            musicaInicial.stopSom(Estado.OCIOSO);
             MapEditorMenu.inicia(frameInicial);
         };
         
         Runnable acaoConfig = () -> {
-            frameInicial.remove(InterfaceManager.peek());
-            frameInicial.repaint();
-            frameInicial.revalidate();
             configuraJogo(frameInicial, fonte);
         };
 
         Runnable acaoSair = () -> {
             frameInicial.dispose();
             InterfaceManager.clear();
-            musicaInicial.stopLoop(Estado.OCIOSO);
+            musicaInicial.stopSom(Estado.OCIOSO);
             System.exit(0);
         };
 
@@ -129,8 +128,7 @@ public class MenuInicial {
                 super.entrar();
                 
                 if(!musicaInicial.isRunning(Estado.OCIOSO)) {
-                    musicaInicial.emiteSom(Estado.OCIOSO);
-                    musicaInicial.setLoop(Estado.OCIOSO);
+                    musicaInicial.playSom(Estado.OCIOSO);
                 }
                 
                 SwingUtilities.invokeLater(() -> {
@@ -141,16 +139,15 @@ public class MenuInicial {
 
         panelPrincipal.setLayout(new BoxLayout(panelPrincipal,
                 BoxLayout.Y_AXIS));
-        
-        InterfaceManager.push(panelPrincipal);
 
         panelPrincipal.add(logo);
         panelPrincipal.add(botaoJogar);
         panelPrincipal.add(botaoMapa);
         panelPrincipal.add(botaoConfig);
         panelPrincipal.add(botaoSair);
+        
+        InterfaceManager.push(frameInicial, panelPrincipal);
 
-        frameInicial.add(panelPrincipal);
         frameInicial.setVisible(true);
     }
 
@@ -176,24 +173,17 @@ public class MenuInicial {
      * @param f Janela anterior que vai ser reaberta quando o jogo fechar
      */
     private static void jogar(JFrame f, Mapa map) {
-        musicaInicial.stopLoop(Estado.OCIOSO);
+        musicaInicial.stopSom(Estado.OCIOSO);
         
-        f.remove(InterfaceManager.peek());
         Engine game = new Engine(320, 200, f, map);
-        InterfaceManager.push(game);
-        f.add(game);
+        InterfaceManager.push(f, game);
     }
     
     private static void configuraJogo(JFrame frame, Font fonte) {
         MenuConfig menuConfiguracao = new MenuConfig(frame, 
                 imagemBackground, fonte);
         
-        InterfaceManager.push(menuConfiguracao);
-        
-        frame.add(menuConfiguracao);
-        frame.repaint();
-        frame.revalidate();
-        menuConfiguracao.requestFocus();
+        InterfaceManager.push(frame, menuConfiguracao);
     }
 
     /**
@@ -208,7 +198,7 @@ public class MenuInicial {
         indiceMapa = 0;
 
         LabelAnimado textoMapa = new LabelAnimado("Selecione um mapa",
-                font.deriveFont(Font.BOLD, 150f), Animacao.FLOAT);
+                font.deriveFont(Font.PLAIN, 150f), Animacao.FLOAT);
 
         LabelAnimado mapaAtual = new LabelAnimado(mapas.get(indiceMapa),
                 font.deriveFont(Font.PLAIN, 100f), Animacao.FADE);
@@ -218,7 +208,7 @@ public class MenuInicial {
         estados.add(Estado.USANDO);
         estados.add(Estado.SACANDO);
 
-        EfeitosSonoros sons = new EfeitosSonoros("botao", estados);
+        EfeitoSonoro sons = new EfeitoSonoro("botao", estados);
         
         Painel panel = new Painel() {
             @Override
@@ -234,8 +224,8 @@ public class MenuInicial {
                 super.entrar();
                 
                 if(!musicaInicial.isRunning(Estado.OCIOSO)) {
-                    musicaInicial.emiteSom(Estado.OCIOSO);
-                    musicaInicial.setLoop(Estado.OCIOSO);
+                    musicaInicial.playSom(Estado.OCIOSO);
+                    musicaInicial.playSom(Estado.OCIOSO);
                 }
             }
             
@@ -249,8 +239,6 @@ public class MenuInicial {
 
         panel.setLayout(new BoxLayout(panel,
                 BoxLayout.Y_AXIS));
-        
-        InterfaceManager.push(panel);
 
         panel.addKeyListener(new KeyAdapter() {
 
@@ -262,15 +250,15 @@ public class MenuInicial {
                     case KeyEvent.VK_UP, KeyEvent.VK_W -> {
                         indiceMapa = (indiceMapa - 1 + mapas.size()) % mapas.size();
                         mapaAtual.setText(mapas.get(indiceMapa));
-                        sons.emiteSom(Estado.SACANDO);
+                        sons.playSom(Estado.SACANDO);
                     }
                     case KeyEvent.VK_DOWN, KeyEvent.VK_S -> {
                         indiceMapa = (indiceMapa + 1) % mapas.size();
                         mapaAtual.setText(mapas.get(indiceMapa));
-                        sons.emiteSom(Estado.SACANDO);
+                        sons.playSom(Estado.SACANDO);
                     }
                     case KeyEvent.VK_ENTER -> {
-                        sons.emiteSom(Estado.USANDO);
+                        sons.playSom(Estado.USANDO);
                         jogar(frame, Mapa.carregaMapa(mapas.get(indiceMapa)));
                     }
                 }
@@ -278,33 +266,22 @@ public class MenuInicial {
         });
         
         Runnable acaoVoltar = () -> {
-            frame.remove(panel);
             InterfaceManager.pop();
-            Painel novoPainel = InterfaceManager.peek();
-            frame.add(novoPainel);
-            frame.repaint();
-            frame.revalidate();
-            
-            novoPainel.requestFocus();
         };
 
         BotaoCustom botaoVoltar = new BotaoCustom("Voltar", 
-                font, acaoVoltar);
+                font, acaoVoltar, true);
 
         textoMapa.setAlignmentX(CENTER_ALIGNMENT);
         mapaAtual.setAlignmentX(CENTER_ALIGNMENT);
 
         panel.add(textoMapa);
-        panel.add(Box.createVerticalStrut(100));
+        panel.add(Box.createVerticalGlue());
         panel.add(mapaAtual);
-        panel.add(Box.createVerticalStrut(50));
+        panel.add(Box.createVerticalGlue());
         panel.add(botaoVoltar);
         
-        frame.add(panel);
-        frame.revalidate();
-        
-        panel.setFocusable(true);
-        panel.requestFocus();
+        InterfaceManager.push(frame, panel);
     }
 
     /**

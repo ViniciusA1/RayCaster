@@ -1,17 +1,15 @@
-package com.raycaster.interfaces;
+package com.raycaster.interfaces.menus;
 
-import com.raycaster.interfaces.LabelAnimado.Animacao;
+import com.raycaster.interfaces.componentes.BotaoCustom;
+import com.raycaster.interfaces.paineis.InterfaceManager;
+import com.raycaster.interfaces.componentes.LabelAnimado;
+import com.raycaster.interfaces.componentes.LabelAnimado.Animacao;
+import com.raycaster.interfaces.paineis.Painel;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BoxLayout;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 /**
@@ -62,11 +60,15 @@ public class MenuPause extends Painel {
         fonte = fonte.deriveFont(Font.PLAIN, 100f);
 
         textoPause = new LabelAnimado("Pausado",
-                fonte.deriveFont(Font.BOLD, 150f), Animacao.FLOAT);
+                fonte.deriveFont(Font.BOLD, 150f), 
+                Animacao.FLOAT);
 
-        botaoVoltar = new BotaoCustom("Voltar", fonte, () -> voltar());
-        botaoConfig = new BotaoCustom("Configuração", fonte, () -> configurar());
-        botaoSair = new BotaoCustom("Sair", fonte, () -> sairJogo());
+        botaoVoltar = new BotaoCustom("Voltar", fonte, 
+                () -> voltar(), true);
+        botaoConfig = new BotaoCustom("Configuração", fonte, 
+                () -> configurar());
+        botaoSair = new BotaoCustom("Sair", fonte, 
+                () -> sairJogo());
 
         textoPause.setAlignmentX(CENTER_ALIGNMENT);
 
@@ -75,28 +77,8 @@ public class MenuPause extends Painel {
         this.add(botaoConfig);
         this.add(botaoSair);
         
-        adicionarAtalho();
-        
         menuConfiguracao = new MenuConfig(janela, 
                 imagemBackground, fonte);
-    }
-
-    /**
-     * Adiciona atalhos para acesso dos botões.
-     */
-    private void adicionarAtalho() {
-        Action voltarAction = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                voltar();
-            }
-        };
-
-        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 
-                        0), "voltarAction");
-        
-        getActionMap().put("voltarAction", voltarAction);
     }
 
     /**
@@ -124,17 +106,11 @@ public class MenuPause extends Painel {
      * Volta para o painel anterior.
      */
     public void voltar() {
-        janela.remove(InterfaceManager.peek());
         InterfaceManager.pop();
-        janela.add(InterfaceManager.peek());
     }
     
     public void configurar() {
-        janela.remove(this);
-        InterfaceManager.push(menuConfiguracao);
-        janela.add(menuConfiguracao);
-        janela.repaint();
-        janela.revalidate();
+        InterfaceManager.push(janela, menuConfiguracao);
     }
 
     /**
@@ -143,15 +119,6 @@ public class MenuPause extends Painel {
     public void sairJogo() {
         super.sairPop();
         voltar();
-        janela.remove(InterfaceManager.peek());
         InterfaceManager.pop();
-        
-        Painel novoPainel = InterfaceManager.peek();
-        
-        janela.add(novoPainel);
-        janela.repaint();
-        janela.revalidate();
-        
-        novoPainel.requestFocus();
     }
 }
