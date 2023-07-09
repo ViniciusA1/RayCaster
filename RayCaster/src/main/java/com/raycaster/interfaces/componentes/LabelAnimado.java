@@ -1,9 +1,12 @@
 package com.raycaster.interfaces.componentes;
 
+import com.raycaster.engine.Estado;
+import com.raycaster.interfaces.paineis.InterfaceManager;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
 import javax.swing.JLabel;
 import javax.swing.Timer;
 
@@ -14,7 +17,7 @@ import javax.swing.Timer;
  * @author Vinicius Augusto
  * @author Bruno Zara
  */
-public class LabelAnimado extends JLabel {
+public class LabelAnimado extends JLabel implements Interagivel {
 
     private Timer timerAnimacao;
 
@@ -25,6 +28,9 @@ public class LabelAnimado extends JLabel {
     private int delta;
     
     private Runnable ajuste;
+    
+    private String[] textos;
+    private int idAtual;
     
     /**
      * Enum que representa os tipos de animação disponíveis.
@@ -70,6 +76,15 @@ public class LabelAnimado extends JLabel {
 
         this.setFont(fonteCustomizada);
     }
+    
+    public LabelAnimado(String[] textos, int primeiroId, 
+            Font fonteCustomizada, Animacao tipo) {
+        
+        this(textos[primeiroId], fonteCustomizada, tipo);
+        
+        this.textos = textos;
+        this.idAtual = primeiroId;
+    }
 
     /**
      * Construtor auxiliar do label, recebe também uma cor personalizada para o
@@ -106,12 +121,28 @@ public class LabelAnimado extends JLabel {
                 timerAnimacao = new Timer(10, e -> animacaoFade());
             }
         }
-
-        timerAnimacao.start();
+        
+        setFocusable(false);
+        startAnimacao();
+    }
+    
+    @Override
+    public void setFocusable(boolean isFocusable) {
+        super.setFocusable(isFocusable);
+        
+        if(isFocusable) {
+            startAnimacao();
+        } else {
+            stopAnimacao();
+        }
     }
     
     public void setColor(Color cor) {
         this.setForeground(cor);
+    }
+    
+    public int getIdAtual() {
+        return idAtual;
     }
 
     /**
@@ -181,9 +212,29 @@ public class LabelAnimado extends JLabel {
     public void stopAnimacao() {
         timerAnimacao.stop();
         alpha = 255;
+        this.setForeground(Color.WHITE);
     }
     
     public void startAnimacao() {
         timerAnimacao.restart();
+        this.setForeground(Color.RED);
+    }
+    
+        @Override
+    public void interacaoTeclado(KeyEvent evento) {
+        int keyCode = evento.getKeyCode();
+
+        switch (keyCode) {
+            case KeyEvent.VK_RIGHT, KeyEvent.VK_D -> {
+                idAtual = (idAtual + 1) % textos.length;
+                setText(textos[idAtual]);
+                InterfaceManager.playSom(Estado.SACANDO);
+            }
+            case KeyEvent.VK_LEFT, KeyEvent.VK_A -> {
+                idAtual = (idAtual + textos.length - 1) % textos.length;
+                setText(textos[idAtual]);
+                InterfaceManager.playSom(Estado.SACANDO);
+            }
+        }
     }
 }

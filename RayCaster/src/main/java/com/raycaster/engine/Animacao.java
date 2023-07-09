@@ -1,5 +1,7 @@
 package com.raycaster.engine;
 
+import com.raycaster.engine.arquivos.Diretorio;
+import com.raycaster.engine.arquivos.ArquivoUtils;
 import java.util.Properties;
 import javax.swing.ImageIcon;
 

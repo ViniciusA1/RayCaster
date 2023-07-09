@@ -26,10 +26,21 @@ public class MenuPause extends Painel {
     private BotaoCustom botaoVoltar;
     private BotaoCustom botaoConfig;
     private BotaoCustom botaoSair;
-    
+
     private MenuConfig menuConfiguracao;
 
     private Image imagemBackground;
+
+    public MenuPause(JFrame janela, Font fontePersonalizada,
+            MenuConfig menuConfiguracao) {
+
+        this.janela = janela;
+        this.menuConfiguracao = menuConfiguracao;
+
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+        carregaComponentes(fontePersonalizada);
+    }
 
     /**
      * Construtor principal do menu, recebe os elementos necessários para sua
@@ -39,13 +50,12 @@ public class MenuPause extends Painel {
      * @param fontePersonalizada Fonte personalizada utilizada
      */
     public MenuPause(JFrame janela, Font fontePersonalizada) {
-        this.janela = janela;
+        this(janela, fontePersonalizada, null);
 
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-        carregaComponentes(fontePersonalizada);
+        menuConfiguracao = new MenuConfig(janela,
+                imagemBackground, fontePersonalizada);
     }
-    
+
     public void setImagem(Image imagemBackground) {
         this.imagemBackground = imagemBackground;
         menuConfiguracao.setImagem(imagemBackground);
@@ -60,14 +70,14 @@ public class MenuPause extends Painel {
         fonte = fonte.deriveFont(Font.PLAIN, 100f);
 
         textoPause = new LabelAnimado("Pausado",
-                fonte.deriveFont(Font.BOLD, 150f), 
+                fonte.deriveFont(Font.BOLD, 150f),
                 Animacao.FLOAT);
 
-        botaoVoltar = new BotaoCustom("Voltar", fonte, 
+        botaoVoltar = new BotaoCustom("Voltar", fonte,
                 () -> voltar(), true);
-        botaoConfig = new BotaoCustom("Configuração", fonte, 
+        botaoConfig = new BotaoCustom("Configuração", fonte,
                 () -> configurar());
-        botaoSair = new BotaoCustom("Sair", fonte, 
+        botaoSair = new BotaoCustom("Sair", fonte,
                 () -> sairJogo());
 
         textoPause.setAlignmentX(CENTER_ALIGNMENT);
@@ -76,13 +86,11 @@ public class MenuPause extends Painel {
         this.add(botaoVoltar);
         this.add(botaoConfig);
         this.add(botaoSair);
-        
-        menuConfiguracao = new MenuConfig(janela, 
-                imagemBackground, fonte);
     }
 
     /**
      * Renderiza os componentes do menu.
+     *
      * @param g Componente gráfico
      */
     @Override
@@ -92,23 +100,16 @@ public class MenuPause extends Painel {
         g.drawImage(imagemBackground, 0, 0,
                 this.getWidth(), this.getHeight(), this);
     }
-    
+
     @Override
     public void entrar() {
         super.entrar();
-        
+
         SwingUtilities.invokeLater(() -> {
             botaoVoltar.requestFocusInWindow();
         });
     }
 
-    /**
-     * Volta para o painel anterior.
-     */
-    public void voltar() {
-        InterfaceManager.pop();
-    }
-    
     public void configurar() {
         InterfaceManager.push(janela, menuConfiguracao);
     }

@@ -1,5 +1,6 @@
-package com.raycaster.engine;
+package com.raycaster.engine.arquivos;
 
+import com.raycaster.engine.Estado;
 import java.io.File;
 
 /**
@@ -34,6 +35,8 @@ public class Diretorio {
      */
     public static final String SPRITE_ITENS = MODELOS + "itens" + File.separator;
     
+    public static final String ICONES = MODELOS + "icones" + File.separator;
+    
     /**
      * Caminho para os modelos de parede do jogo.
      */
@@ -48,6 +51,8 @@ public class Diretorio {
      * Caminho para os dados de entidades do jogo.
      */
     public static final String DADOS_ENTIDADES = DADOS + "entidades" + File.separator;
+    
+    public static final String DADOS_ENGINE = DADOS + "engine" + File.separator;
     
     /**
      * Construtor privado para evitar instâncias da classe.

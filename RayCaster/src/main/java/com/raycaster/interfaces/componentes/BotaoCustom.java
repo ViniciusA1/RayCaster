@@ -1,7 +1,7 @@
 package com.raycaster.interfaces.componentes;
 
-import com.raycaster.engine.sons.EfeitoSonoro;
 import com.raycaster.engine.Estado;
+import com.raycaster.interfaces.paineis.InterfaceManager;
 import java.awt.AWTKeyStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -13,7 +13,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.EnumSet;
 import java.util.HashSet;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -32,20 +31,6 @@ public class BotaoCustom extends JButton {
 
     private static final Color COR_FOCO = Color.RED;
     private static final Color COR_ORIGINAL = Color.WHITE;
-
-    private static final EfeitoSonoro sons;
-    
-    /*private static final FocusListener focusListener;
-    private static final MouseListener mouseListener;*/
-
-    static {
-        EnumSet<Estado> estados = EnumSet.noneOf(Estado.class);
-
-        estados.add(Estado.USANDO);
-        estados.add(Estado.SACANDO);
-
-        sons = new EfeitoSonoro("botao", estados);
-    }
 
     /**
      * Construtor principal do botão, recebe o texto a ser exibido.
@@ -140,12 +125,9 @@ public class BotaoCustom extends JButton {
      * @param action Ação vinculada ao botão
      */
     private void actionKeybinding(Runnable action) {
-        ActionListener ouvinte = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                sons.playSom(Estado.USANDO);
-                action.run();
-            }
+        ActionListener ouvinte = (ActionEvent e) -> {
+            InterfaceManager.playSom(Estado.USANDO);
+            action.run();
         };
 
         addActionListener(ouvinte);
@@ -156,14 +138,10 @@ public class BotaoCustom extends JButton {
         getActionMap().put("enter", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sons.playSom(Estado.USANDO);
+                InterfaceManager.playSom(Estado.USANDO);
                 action.run();
             }
         });
-    }
-    
-    public void close() {
-        sons.close();
     }
 
     /**
@@ -176,7 +154,7 @@ public class BotaoCustom extends JButton {
             setFont(getFont().deriveFont(Font.BOLD));
             setForeground(COR_FOCO);
 
-            sons.playSom(Estado.SACANDO);
+            InterfaceManager.playSom(Estado.SACANDO);
         }
 
         @Override
@@ -193,15 +171,21 @@ public class BotaoCustom extends JButton {
 
         @Override
         public void mouseEntered(MouseEvent e) {
+            if(!isEnabled())
+                return;
+            
             requestFocus();
             setFont(getFont().deriveFont(Font.BOLD));
             setForeground(COR_FOCO);
 
-            sons.playSom(Estado.SACANDO);
+            InterfaceManager.playSom(Estado.SACANDO);
         }
 
         @Override
         public void mouseExited(MouseEvent e) {
+            if(!isEnabled())
+                return;
+            
             setFont(getFont().deriveFont(Font.PLAIN));
             setForeground(COR_ORIGINAL);
         }

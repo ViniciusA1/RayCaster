@@ -1,7 +1,7 @@
 package com.raycaster.engine.sons;
 
-import com.raycaster.engine.ArquivoUtils;
-import com.raycaster.engine.Diretorio;
+import com.raycaster.engine.arquivos.ArquivoUtils;
+import com.raycaster.engine.arquivos.Diretorio;
 import com.raycaster.engine.Estado;
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
@@ -75,6 +76,13 @@ public abstract class Som {
     
     public final Map<Estado, Clip> getSom() {
         return sons;
+    }
+    
+    public final void setVolume(float novoVolume) {
+        for(Clip clipAux : sons.values()) {
+            FloatControl controle = (FloatControl) clipAux.getControl(FloatControl.Type.MASTER_GAIN);
+            controle.setValue(novoVolume);
+        }
     }
 
     public void close() {

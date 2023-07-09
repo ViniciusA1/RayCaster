@@ -1,7 +1,9 @@
 package com.raycaster.interfaces.paineis;
 
-import com.raycaster.interfaces.componentes.BotaoCustom;
-import java.awt.Font;
+import com.raycaster.engine.Estado;
+import com.raycaster.engine.sons.EfeitoSonoro;
+import com.raycaster.engine.sons.SomManager;
+import java.util.EnumSet;
 import java.util.Stack;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -13,9 +15,19 @@ import javax.swing.SwingUtilities;
 public class InterfaceManager {
 
     private static Stack<Painel> pilha;
+    
+    private final static EfeitoSonoro somInterface;
 
     static {
         pilha = new Stack<>();
+        
+        EnumSet<Estado> estados = EnumSet.noneOf(Estado.class);
+
+        estados.add(Estado.USANDO);
+        estados.add(Estado.SACANDO);
+
+        somInterface = new EfeitoSonoro("interface", estados);
+        SomManager.addSom(somInterface);
     }
 
     public static void push(JFrame janela, Painel novoPainel) {
@@ -66,5 +78,9 @@ public class InterfaceManager {
 
     public static void clear() {
         pilha.clear();
+    }
+    
+    public static void playSom(Estado tipoSom) {
+        somInterface.playSom(tipoSom);
     }
 }

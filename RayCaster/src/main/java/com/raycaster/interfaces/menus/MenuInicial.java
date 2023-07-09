@@ -1,12 +1,10 @@
 package com.raycaster.interfaces.menus;
 
-import com.raycaster.engine.ArquivoUtils;
-import com.raycaster.engine.Diretorio;
-import com.raycaster.engine.sons.EfeitoSonoro;
+import com.raycaster.engine.arquivos.ArquivoUtils;
+import com.raycaster.engine.arquivos.Diretorio;
 import com.raycaster.engine.Engine;
 import com.raycaster.engine.Estado;
 import com.raycaster.engine.sons.Musica;
-import com.raycaster.engine.sons.SomManager;
 import com.raycaster.interfaces.componentes.BotaoCustom;
 import com.raycaster.interfaces.paineis.InterfaceManager;
 import com.raycaster.interfaces.componentes.LabelAnimado;
@@ -23,7 +21,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.Box;
@@ -41,8 +38,9 @@ import javax.swing.SwingUtilities;
 public class MenuInicial {
 
     private static BufferedImage imagemBackground;
-    private static int indiceMapa;
     private static Musica musicaInicial;
+    
+    private static MenuConfig menuConfig;
 
     /**
      * Método para iniciar o jogo em uma thread apropriada
@@ -95,7 +93,7 @@ public class MenuInicial {
         };
         
         Runnable acaoConfig = () -> {
-            configuraJogo(frameInicial, fonte);
+            configuraJogo(frameInicial);
         };
 
         Runnable acaoSair = () -> {
@@ -149,6 +147,9 @@ public class MenuInicial {
         InterfaceManager.push(frameInicial, panelPrincipal);
 
         frameInicial.setVisible(true);
+        
+        menuConfig = new MenuConfig(frameInicial, 
+                imagemBackground, fonte);
     }
 
     /**
@@ -172,18 +173,15 @@ public class MenuInicial {
      *
      * @param f Janela anterior que vai ser reaberta quando o jogo fechar
      */
-    private static void jogar(JFrame f, Mapa map) {
+    private static void jogar(JFrame frame, Mapa map) {
         musicaInicial.stopSom(Estado.OCIOSO);
         
-        Engine game = new Engine(320, 200, f, map);
-        InterfaceManager.push(f, game);
+        Engine game = new Engine(frame, map, menuConfig);
+        InterfaceManager.push(frame, game);
     }
     
-    private static void configuraJogo(JFrame frame, Font fonte) {
-        MenuConfig menuConfiguracao = new MenuConfig(frame, 
-                imagemBackground, fonte);
-        
-        InterfaceManager.push(frame, menuConfiguracao);
+    private static void configuraJogo(JFrame frame) {
+        InterfaceManager.push(frame, menuConfig);
     }
 
     /**
@@ -195,20 +193,14 @@ public class MenuInicial {
      */
     private static void selecionaMapa(JFrame frame, Font font) {
         List<String> mapas = ArquivoUtils.leMapas();
-        indiceMapa = 0;
 
         LabelAnimado textoMapa = new LabelAnimado("Selecione um mapa",
-                font.deriveFont(Font.PLAIN, 150f), Animacao.FLOAT);
+                font.deriveFont(Font.PLAIN, 150f), 
+                Animacao.FLOAT);
 
-        LabelAnimado mapaAtual = new LabelAnimado(mapas.get(indiceMapa),
-                font.deriveFont(Font.PLAIN, 100f), Animacao.FADE);
-
-        EnumSet<Estado> estados = EnumSet.noneOf(Estado.class);
-
-        estados.add(Estado.USANDO);
-        estados.add(Estado.SACANDO);
-
-        EfeitoSonoro sons = new EfeitoSonoro("botao", estados);
+        LabelAnimado mapaAtual = new LabelAnimado(mapas.toArray(new String[0]), 
+                0, font.deriveFont(Font.PLAIN, 100f), 
+                Animacao.FADE);
         
         Painel panel = new Painel() {
             @Override
@@ -228,13 +220,6 @@ public class MenuInicial {
                     musicaInicial.playSom(Estado.OCIOSO);
                 }
             }
-            
-            @Override
-            public void sairPop() {
-                super.sairPop();
-                
-                sons.close();
-            }
         };
 
         panel.setLayout(new BoxLayout(panel,
@@ -243,25 +228,15 @@ public class MenuInicial {
         panel.addKeyListener(new KeyAdapter() {
 
             @Override
-            public void keyPressed(KeyEvent event) {
-                int keyCode = event.getKeyCode();
-
-                switch (keyCode) {
-                    case KeyEvent.VK_UP, KeyEvent.VK_W -> {
-                        indiceMapa = (indiceMapa - 1 + mapas.size()) % mapas.size();
-                        mapaAtual.setText(mapas.get(indiceMapa));
-                        sons.playSom(Estado.SACANDO);
-                    }
-                    case KeyEvent.VK_DOWN, KeyEvent.VK_S -> {
-                        indiceMapa = (indiceMapa + 1) % mapas.size();
-                        mapaAtual.setText(mapas.get(indiceMapa));
-                        sons.playSom(Estado.SACANDO);
-                    }
-                    case KeyEvent.VK_ENTER -> {
-                        sons.playSom(Estado.USANDO);
-                        jogar(frame, Mapa.carregaMapa(mapas.get(indiceMapa)));
-                    }
+            public void keyPressed(KeyEvent event) {                
+                if(event.getKeyCode() == KeyEvent.VK_ENTER) {
+                    InterfaceManager.playSom(Estado.USANDO);
+                    
+                    jogar(frame, Mapa.carregaMapa(mapas.
+                            get(mapaAtual.getIdAtual())));
                 }
+                
+                mapaAtual.interacaoTeclado(event);
             }
         });
         

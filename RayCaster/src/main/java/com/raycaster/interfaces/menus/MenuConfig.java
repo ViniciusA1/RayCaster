@@ -1,13 +1,15 @@
 package com.raycaster.interfaces.menus;
 
+import com.raycaster.engine.arquivos.ArquivoUtils;
+import com.raycaster.engine.arquivos.Diretorio;
+import com.raycaster.engine.Engine;
 import com.raycaster.interfaces.componentes.BotaoCustom;
 import com.raycaster.interfaces.paineis.InterfaceManager;
 import com.raycaster.interfaces.componentes.LabelAnimado;
 import com.raycaster.interfaces.componentes.LabelAnimado.Animacao;
-import com.raycaster.interfaces.paineis.Painel;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Image;
+import java.util.Properties;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -17,10 +19,14 @@ import javax.swing.SwingUtilities;
  *
  * @author vinicius
  */
-public class MenuConfig extends Painel {
+public class MenuConfig extends AbstractMenuConfig {
+
+    private static final Properties dadosConfig;
 
     private final JFrame frame;
-    
+
+    private Engine engine;
+
     private MenuConfigVideo video;
     private MenuConfigAudio audio;
     private MenuConfigControle controle;
@@ -33,57 +39,82 @@ public class MenuConfig extends Painel {
 
     private BotaoCustom botaoVoltar;
 
-    private Image background;
+    static {
+        dadosConfig = ArquivoUtils.
+                lePropriedade(Diretorio.DADOS_ENGINE + "config");
+    }
 
     public MenuConfig(JFrame frame, Image background, Font fonte) {
+        super(background);
+
         this.frame = frame;
-        this.background = background;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         carregaComponentes(fonte);
     }
 
+    public int getComprimento() {
+        return video.getComprimento();
+    }
+
+    public int getAltura() {
+        return video.getAltura();
+    }
+
+    public void setEngine(Engine novoJogo) {
+        this.engine = novoJogo;
+    }
+
+    @Override
     public void setImagem(Image background) {
-        this.background = background;
-        
-        video.setImage(background);
-        audio.setImage(background);
-        //controle.setImage(background);
+        super.setImagem(background);
+
+        video.setImagem(background);
+        audio.setImagem(background);
+        controle.setImagem(background);
     }
 
     private void carregaComponentes(Font fonte) {
         Font configFonte = fonte.deriveFont(Font.PLAIN, 60f);
-        
+
         Font labelFonte = fonte.deriveFont(Font.BOLD, 150f);
 
         labelConfig = new LabelAnimado("Configuração",
                 labelFonte, Animacao.FLOAT);
-        
-        botaoVideo = new BotaoCustom("Vídeo", 
+
+        botaoVideo = new BotaoCustom("Vídeo",
                 configFonte, () -> video());
-        botaoAudio = new BotaoCustom("Áudio", 
+        botaoAudio = new BotaoCustom("Áudio",
                 configFonte, () -> audio());
-        botaoControle = new BotaoCustom("Controle", 
+        botaoControle = new BotaoCustom("Controle",
                 configFonte, () -> controle());
         botaoVoltar = new BotaoCustom("Voltar",
                 configFonte, () -> voltar(), true);
 
         add(labelConfig);
-        
+
         add(Box.createVerticalGlue());
 
         add(botaoVideo);
         add(botaoAudio);
         add(botaoControle);
-        
+
         add(Box.createVerticalGlue());
 
         add(botaoVoltar);
         
-        video = new MenuConfigVideo(configFonte, labelFonte, background);
-        audio = new MenuConfigAudio(configFonte, labelFonte, background);
-        controle = new MenuConfigControle(configFonte, labelFonte, background);
+        String resolucaoInicial = dadosConfig.getProperty("width") + 
+                "x" + dadosConfig.getProperty("height");
+        boolean isFullScreen = Boolean.parseBoolean(dadosConfig.
+                getProperty("fullScreen"));
+
+        video = new MenuConfigVideo(resolucaoInicial, isFullScreen, 
+                configFonte, labelFonte, getImagem());
+        audio = new MenuConfigAudio(configFonte, labelFonte,
+                getImagem());
+        controle = new MenuConfigControle(configFonte, labelFonte,
+                getImagem());
     }
 
     private void video() {
@@ -99,20 +130,29 @@ public class MenuConfig extends Painel {
     }
 
     @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponents(g);
-        super.paintComponent(g);
-
-        g.drawImage(background, 0, 0, getWidth(),
-                getHeight(), this);
-    }
-
-    @Override
     public void entrar() {
         super.entrar();
 
         SwingUtilities.invokeLater(() -> {
             botaoVideo.requestFocusInWindow();
         });
+    }
+
+    @Override
+    public void sairPop() {
+        super.sairPop();
+
+        dadosConfig.setProperty("width", video.getComprimento() + "");
+        dadosConfig.setProperty("height", video.getAltura() + "");
+        dadosConfig.setProperty("fullScreen", video.getFullScreen() + "");
+        dadosConfig.setProperty("musica", audio.getMusica() + "");
+        dadosConfig.setProperty("sfx", audio.getSfx() + "");
+
+        if (engine != null) {
+            engine.setResolucao(video.getComprimento(),
+                    video.getAltura());
+        }
+
+        ArquivoUtils.salvaPropriedade(dadosConfig);
     }
 }

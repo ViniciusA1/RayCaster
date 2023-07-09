@@ -1,7 +1,7 @@
 package com.raycaster.itens;
 
 import com.raycaster.engine.Animacao;
-import com.raycaster.engine.Diretorio;
+import com.raycaster.engine.arquivos.Diretorio;
 import com.raycaster.engine.sons.EfeitoSonoro;
 import com.raycaster.engine.Estado;
 import java.util.EnumSet;

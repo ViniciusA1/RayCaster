@@ -1,12 +1,11 @@
 package com.raycaster.interfaces.menus;
 
+import com.raycaster.interfaces.componentes.BarraProgresso;
 import com.raycaster.interfaces.componentes.BotaoCustom;
 import com.raycaster.interfaces.componentes.LabelAnimado;
 import com.raycaster.interfaces.componentes.LabelAnimado.Animacao;
 import com.raycaster.interfaces.layouts.LayoutConfig;
-import com.raycaster.interfaces.paineis.Painel;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Image;
 import javax.swing.SwingUtilities;
 
@@ -14,24 +13,21 @@ import javax.swing.SwingUtilities;
  *
  * @author vinicius
  */
-public class MenuConfigControle extends Painel {
+public class MenuConfigControle extends AbstractMenuConfig {
     
     private LabelAnimado labelControle;
+    
+    private BotaoCustom botaoSensibilidade;
+    private BarraProgresso barraSensibilidade;
+    
     private BotaoCustom botaoVoltar;
     
-    private Image background;
-    
-    public MenuConfigControle(Font configFonte, Font labelFonte, 
-            Image background) {
-        this.background = background;
+    public MenuConfigControle(Font configFonte, Font labelFonte, Image background) {
+        super(background);
         
         setLayout(new LayoutConfig());
         
         carregaComponentes(configFonte, labelFonte);
-    }
-    
-    public void setImage(Image background) {
-        this.background = background;
     }
     
     private void carregaComponentes(Font configFonte, Font labelFonte) {
@@ -39,20 +35,17 @@ public class MenuConfigControle extends Painel {
         labelControle = new LabelAnimado("Controle", 
                 labelFonte, Animacao.FLOAT);
         
+        botaoSensibilidade = new BotaoCustom("Sensibilidade", configFonte);
+        
+        barraSensibilidade = new BarraProgresso(0, 100, configFonte);
+        
         botaoVoltar = new BotaoCustom("Voltar", 
                 configFonte, () -> voltar(), true);
         
         add(labelControle);
+        add(botaoSensibilidade);
+        add(barraSensibilidade);
         add(botaoVoltar);
-    }
-    
-    @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponents(g);
-        super.paintComponent(g);
-
-        g.drawImage(background, 0, 0, getWidth(),
-                getHeight(), this);
     }
     
     @Override
@@ -60,7 +53,7 @@ public class MenuConfigControle extends Painel {
         super.entrar();
         
         SwingUtilities.invokeLater(() -> {
-            labelControle.requestFocusInWindow();
+            botaoSensibilidade.requestFocusInWindow();
         });
     }
 }

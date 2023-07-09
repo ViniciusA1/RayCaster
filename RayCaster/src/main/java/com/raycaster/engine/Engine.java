@@ -1,11 +1,14 @@
 package com.raycaster.engine;
 
+import com.raycaster.engine.arquivos.Diretorio;
+import com.raycaster.engine.arquivos.ArquivoUtils;
 import com.raycaster.engine.sons.Musica;
 import com.raycaster.interfaces.menus.MenuPause;
 import com.raycaster.interfaces.layouts.LayoutEngine;
 import com.raycaster.interfaces.paineis.AnimacaoPlayer;
 import com.raycaster.interfaces.paineis.HUD;
 import com.raycaster.entidades.Player;
+import com.raycaster.interfaces.menus.MenuConfig;
 import com.raycaster.interfaces.paineis.InterfaceManager;
 import com.raycaster.interfaces.paineis.Painel;
 import com.raycaster.interfaces.paineis.PainelInformacao;
@@ -28,7 +31,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 /**
@@ -56,10 +58,10 @@ public class Engine extends Painel implements ActionListener {
 
     private Player jogador;
     private Mapa mapaAtual;
-    
+
     private KeyInput keyHandler;
     private MouseInput mouseHandler;
-    
+
     private List<Textura> texturas;
     private Musica musicaBackground;
     private final JFrame janela;
@@ -69,30 +71,28 @@ public class Engine extends Painel implements ActionListener {
     /**
      * Construtor da engine, recebe o tamanho horizontal e vertical da JFrame
      *
-     * @param width Comprimento horizontal da tela
-     * @param height Comprimento vertical da tela
      * @param janela a janela a que esse componente esta associado
      * @param map Mapa que será jogado
+     * @param menuConfig Menu de configurações do jogo
      */
-    public Engine(int width, int height, JFrame janela, Mapa map) {
+    public Engine(JFrame janela, Mapa map, MenuConfig menuConfig) {
         this.fpsMaximo = 60;
-        this.screenWidth = width;
-        this.screenHeight = height;
         this.janela = janela;
         this.mapaAtual = map;
         this.texturas = Textura.carregaTexturas(new File(Diretorio.TEXTURA_PAREDE));
 
         setLayout(new LayoutEngine());
 
-        start();
+        start(menuConfig);
     }
 
     /**
      * Seta uma nova resolução para a tela do jogo.
-     * @param screenWidth Nova largura da tela
-     * @param screenHeight Nova altura da tela
+     *
+     * @param screenWidth
+     * @param screenHeight
      */
-    public void setResolution(int screenWidth, int screenHeight) {
+    public void setResolucao(int screenWidth, int screenHeight) {
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
     }
@@ -100,11 +100,11 @@ public class Engine extends Painel implements ActionListener {
     /**
      * Aplica e inicia todas as configurações principais da engine.
      */
-    private void start() {
+    private void start(MenuConfig menuConfig) {
         initMapa();
         initPlayer();
         initArmas();
-        initPanels();
+        initPanels(menuConfig);
         initHandlers();
         initMusica();
         initCursor();
@@ -144,14 +144,20 @@ public class Engine extends Painel implements ActionListener {
     /**
      * Inicia todos os painéis do jogo que dependem da engine.
      */
-    private void initPanels() {
+    private void initPanels(MenuConfig menuConfig) {
         carregaFonte();
 
         HUD hudJogador = new HUD(jogador, fontePersonalizada);
         AnimacaoPlayer painelAnimacao = new AnimacaoPlayer(jogador);
         PainelMira painelMira = new PainelMira();
         painelInfo = new PainelInformacao(fontePersonalizada);
-        menuPause = new MenuPause(janela, fontePersonalizada);
+        menuPause = new MenuPause(janela, fontePersonalizada,
+                menuConfig);
+
+        setResolucao(menuConfig.getComprimento(),
+                menuConfig.getAltura());
+        
+        menuConfig.setEngine(this);
 
         this.add(hudJogador, "hud");
         this.add(painelMira, "mira");
@@ -205,7 +211,7 @@ public class Engine extends Painel implements ActionListener {
 
         keyHandler.adicionaKey(KeyEvent.VK_2, ()
                 -> jogador.sacaItem(1));
-        
+
         keyHandler.adicionaKey(KeyEvent.VK_3, ()
                 -> jogador.sacaItem(2));
 
@@ -215,24 +221,24 @@ public class Engine extends Painel implements ActionListener {
      * Carrega a música principal do jogo que ficará em loop durante a execução.
      */
     private void initMusica() {
-        musicaBackground = new Musica("mapa" + File.separator + 
-                mapaAtual.toString(), Estado.OCIOSO);
-        
+        musicaBackground = new Musica("mapa" + File.separator
+                + mapaAtual.toString(), Estado.OCIOSO);
+
         musicaBackground.playSom(Estado.OCIOSO);
     }
-    
+
     /**
      * Inicializa a imagem do cursor padrão.
      */
     private void initCursor() {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        
+
         Image imagemCursor = toolkit.createImage("");
-        Point pontoCursor = new Point(0,0);
-        
+        Point pontoCursor = new Point(0, 0);
+
         Cursor cursorTransparente = toolkit.createCustomCursor(
                 imagemCursor, pontoCursor, "transparente");
-        
+
         this.setCursor(cursorTransparente);
     }
 
@@ -418,9 +424,9 @@ public class Engine extends Painel implements ActionListener {
             // Percorre todo os pixels da coluna atribuindo a cor da textura a eles
             for (int y = comecoParede; y < fimParede; y++) {
                 int texturaY = (int) posicaoTextura & (tamanhoTextura - 1);
-                
+
                 posicaoTextura += variacao;
-                
+
                 int corPixel = texturas.get(idTextura).getPixel(tamanhoTextura * texturaY + texturaX);
 
                 frameBuffer[y * screenWidth + i] = transformaCor(corPixel, fatorFOG);
@@ -563,7 +569,6 @@ public class Engine extends Painel implements ActionListener {
 
         double deltaFrame = (tempoAtual - tempoFrame) / 1000.0;
         deltaTime = (tempoAtual - tempoAnterior) / 1000.0;
-        tempoAnterior = tempoAtual;
 
         frameCounter++;
 
@@ -572,21 +577,24 @@ public class Engine extends Painel implements ActionListener {
             frameCounter = 0;
             tempoFrame = tempoAtual;
         }
-        
+
         double prevX = jogador.getX();
         double prevY = jogador.getY();
 
         keyHandler.executaMetodo();
-        
+
         prevX = Math.abs(jogador.getX() - prevX);
         prevY = Math.abs(jogador.getY() - prevY);
-        
-        if(prevX > 0 || prevY > 0)
+
+        if (prevX > 0 || prevY > 0) {
             jogador.emitePassos();
-        
+        }
+
         double fator = Math.abs((prevX + prevY) / 2) * 8;
-        
+
         jogador.setPitch(fator * deltaTime, (getHeight() + getWidth()) / 50);
+        
+        tempoAnterior = tempoAtual;
     }
 
     /**
@@ -598,34 +606,34 @@ public class Engine extends Painel implements ActionListener {
         }
 
         gameTimer.stop();
-        
+
         menuPause.setImagem(frame);
-        
+
         InterfaceManager.push(janela, menuPause);
     }
-    
+
     @Override
     public void entrar() {
         super.entrar();
-        
-        if(!gameTimer.isRunning()) {
+
+        if (!gameTimer.isRunning()) {
             gameTimer.start();
         }
-        
+
         keyHandler.limpaMetodos();
         mouseHandler.centralizaCursor(janela);
-        
+
         pauseCooldown = System.currentTimeMillis();
     }
-    
+
     @Override
     public void sairPop() {
-       super.sairPop();
+        super.sairPop();
 
-       musicaBackground.close();
-       jogador.close();
-       
-       gameTimer.stop();
+        musicaBackground.close();
+        jogador.close();
+
+        gameTimer.stop();
     }
 
 }

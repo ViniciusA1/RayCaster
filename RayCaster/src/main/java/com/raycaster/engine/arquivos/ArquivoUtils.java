@@ -1,24 +1,29 @@
-package com.raycaster.engine;
+package com.raycaster.engine.arquivos;
 
+import com.raycaster.engine.Estado;
 import com.raycaster.entidades.Entidade;
 import com.raycaster.entidades.Player;
 import com.raycaster.itens.*;
-import com.raycaster.mapa.Mapa;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 /**
- * Classe que guarda os atributos e métodos estáticos para manipulação de arquivos
- * (carregamento e leitura).
+ * Classe que guarda os atributos e métodos estáticos para manipulação de
+ * arquivos (carregamento e leitura).
+ *
  * @author Vinicius Augusto
  * @author Bruno Zara
  */
@@ -31,51 +36,31 @@ public class ArquivoUtils {
 
     /**
      * Formato de sons utilizado no programa.
-     */ 
+     */
     public final static String FORMATO_SOM = ".wav";
 
     /**
      * Formato de arquivos de dados utilizados no programa.
      */
     public final static String FORMATO_DADOS = ".properties";
-    
+
     /**
      * Construtor privado para evitar instanciação.
      */
-    private ArquivoUtils() {}
-    
-    
-    /**
-     * Classe que herda de Properties e sobrescreve seu método de busca em arquivo.
-     */
-    private static class StripProperties extends Properties {
-        
-        /**
-         * Retorna uma string com o valor da propriedade já formatado com o "strip".
-         * @param key Chave para busca do valor
-         * @return Retorna a string gerada
-         */
-        @Override
-        public String getProperty(String key) {
-            String valor = super.getProperty(key);
-            
-            if (valor != null)
-                valor = valor.strip();
-            
-            return valor;
-        }
+    private ArquivoUtils() {
     }
 
     /**
      * Lê e carrega um arquivo de propriedades.
+     *
      * @param nomeArquivo Nome do arquivo que deve ser carregado
      * @return Retorna o arquivo carregado
      */
     public static Properties lePropriedade(String nomeArquivo) {
-        StripProperties propriedades = new StripProperties();
-
         nomeArquivo += FORMATO_DADOS;
         
+        StripProperties propriedades = new StripProperties(nomeArquivo);
+
         FileInputStream streamTemporario;
 
         try {
@@ -90,8 +75,24 @@ public class ArquivoUtils {
         return propriedades;
     }
 
+    public static void salvaPropriedade(Properties propriedade) {
+        OutputStream outputStream;
+        
+        try {
+            StripProperties propertie = (StripProperties) propriedade;
+            outputStream = new FileOutputStream(propertie.getPath());
+            propertie.store(outputStream, null);
+            outputStream.close();
+        } catch (FileNotFoundException ex) {
+            System.out.println("Erro! " + ex.getMessage());
+        } catch (IOException ex) {
+            System.out.println("Erro!" + ex.getMessage());
+        }
+    }
+
     /**
      * Lê e carrega uma imagem.
+     *
      * @param nomeImagem Nome da imagem a ser carregada
      * @return Retorna a imagem carregada
      */
@@ -101,28 +102,34 @@ public class ArquivoUtils {
         File arquivoImagem = new File(nomeImagem);
 
         if (!arquivoImagem.exists()) {
+            JOptionPane.showMessageDialog(null,
+                    "Arquivo " + nomeImagem + " não existe!",
+                    "Erro ao carregar imagem",
+                    JOptionPane.ERROR_MESSAGE);
+
             return null;
         }
 
         return new ImageIcon(nomeImagem);
     }
-    
+
     public static List<String> leMapas() {
         List<String> mapas = new ArrayList<>();
         File pastaMapas = new File("maps");
-        
+
         File[] arquivoMapas = pastaMapas.listFiles();
-        for(File aux: arquivoMapas){
-            if(!aux.isDirectory()){
+        for (File aux : arquivoMapas) {
+            if (!aux.isDirectory()) {
                 mapas.add(aux.getName().replaceAll("\\.txt$", ""));
             }
         }
-        
+
         return mapas;
     }
 
     /**
      * Lê e carrega uma lista de objetos genéricos.
+     *
      * @param <T> Tipo do objeto a ser carregado
      * @param nomeArquivo Nome do arquivo contendo os dados do objeto
      * @param classeObjeto Classe a qual o objeto pertence
@@ -143,14 +150,16 @@ public class ArquivoUtils {
 
         while ((tipo = dado.getProperty("type" + id)) != null) {
             T objetoLido = null;
-            
-            if(Item.class.isAssignableFrom(classeObjeto))
-                objetoLido = (T) criaItem(dado, tipo, id);
-            else if(Entidade.class.isAssignableFrom(classeObjeto))
-                objetoLido = (T) criaEntidade(dado, tipo, id);
 
-            if (objetoLido != null)
+            if (Item.class.isAssignableFrom(classeObjeto)) {
+                objetoLido = (T) criaItem(dado, tipo, id);
+            } else if (Entidade.class.isAssignableFrom(classeObjeto)) {
+                objetoLido = (T) criaEntidade(dado, tipo, id);
+            }
+
+            if (objetoLido != null) {
                 listaItens.add(objetoLido);
+            }
 
             id++;
         }
@@ -160,6 +169,7 @@ public class ArquivoUtils {
 
     /**
      * Lê dados de um item e cria-o.
+     *
      * @param <T> Tipo do item a ser criado
      * @param dado Arquivo de propriedades que contém os dados
      * @param tipo Tipo do item
@@ -171,11 +181,11 @@ public class ArquivoUtils {
 
         String nome = dado.getProperty("nome" + id);
         long cooldown = Long.parseLong(dado.getProperty("cooldown" + id));
-        
+
         String[] estados = dado.getProperty("estados" + id).split(",");
         EnumSet<Estado> possiveisEstados = EnumSet.noneOf(Estado.class);
-        
-        for(String estadoAux : estados) {
+
+        for (String estadoAux : estados) {
             Estado novoEstado = Estado.valueOf(estadoAux.strip());
             possiveisEstados.add(novoEstado);
         }
@@ -186,7 +196,7 @@ public class ArquivoUtils {
                 int pente = Integer.parseInt(dado.getProperty("tamanhoPente" + id));
                 double dano = Double.parseDouble(dado.getProperty("dano" + id));
 
-                itemCriado = (T) new ArmaLonga(nome, municao, 
+                itemCriado = (T) new ArmaLonga(nome, municao,
                         pente, possiveisEstados, cooldown, dano);
             }
             case "ArmaCurta" -> {
@@ -203,9 +213,10 @@ public class ArquivoUtils {
 
         return itemCriado;
     }
-    
+
     /**
      * Lê dados de uma entidade e cria-a.
+     *
      * @param <T> Tipo da entidade a ser criada
      * @param dado Arquivo de propriedades contendo os dados da entidade
      * @param tipo Tipo da entidade
@@ -214,28 +225,29 @@ public class ArquivoUtils {
      */
     private static <T extends Entidade> T criaEntidade(Properties dado, String tipo, int id) {
         T entidadeCriada;
-        
-        double vidaMaxima = Double.parseDouble(dado.getProperty("vidaMaxima" + id)); 
+
+        double vidaMaxima = Double.parseDouble(dado.getProperty("vidaMaxima" + id));
         double largura = Double.parseDouble(dado.getProperty("largura" + id));
-        double velocidade = Double.parseDouble(dado.getProperty("velocidade" + id)); 
+        double velocidade = Double.parseDouble(dado.getProperty("velocidade" + id));
         double FOG = Double.parseDouble(dado.getProperty("FOG" + id));
-        
+
         String[] estados = dado.getProperty("estados" + id).split(",");
         EnumSet<Estado> possiveisEstados = EnumSet.noneOf(Estado.class);
-        
-        for(String estadoAux : estados) {
+
+        for (String estadoAux : estados) {
             Estado novoEstado = Estado.valueOf(estadoAux.strip());
             possiveisEstados.add(novoEstado);
         }
-        
-        switch(tipo) {
+
+        switch (tipo) {
             case "Player" -> {
                 int fov = Integer.parseInt(dado.getProperty("fov" + id));
                 entidadeCriada = (T) new Player(vidaMaxima, 0, 0, largura, velocidade, fov, FOG, possiveisEstados);
             }
-            default -> entidadeCriada = null;
+            default ->
+                entidadeCriada = null;
         }
-        
+
         return entidadeCriada;
     }
 }

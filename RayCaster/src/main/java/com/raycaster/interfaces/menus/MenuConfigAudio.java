@@ -1,44 +1,45 @@
 package com.raycaster.interfaces.menus;
 
+import com.raycaster.engine.sons.SomManager;
+import com.raycaster.interfaces.componentes.BarraProgresso;
 import com.raycaster.interfaces.componentes.BotaoCustom;
 import com.raycaster.interfaces.componentes.LabelAnimado;
 import com.raycaster.interfaces.componentes.LabelAnimado.Animacao;
 import com.raycaster.interfaces.layouts.LayoutConfig;
-import com.raycaster.interfaces.paineis.Painel;
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Image;
-import javax.swing.BorderFactory;
-import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
 
 /**
  *
  * @author vinicius
  */
-public class MenuConfigAudio extends Painel {
+public class MenuConfigAudio extends AbstractMenuConfig {
+    
     private LabelAnimado labelAudio;
+    
     private BotaoCustom botaoMusica;
-    private JProgressBar barraMusica;
+    private BarraProgresso barraMusica;
+    
     private BotaoCustom botaoSfx;
-    private JProgressBar barraSfx;
+    private BarraProgresso barraSfx;
+    
     private BotaoCustom botaoVoltar;
     
-    private Image background;
-    
     public MenuConfigAudio(Font configFonte, Font labelFonte, Image background) {
-        this.background = background;
+        super(background);
         
         setLayout(new LayoutConfig());
         
         carregaComponentes(configFonte, labelFonte);
     }
     
-    public void setImage(Image background) {
-        this.background = background;
+    public int getMusica() {
+        return barraMusica.getValue();
+    }
+    
+    public int getSfx() {
+        return barraSfx.getValue();
     }
     
     private void carregaComponentes(Font configFonte, Font labelFonte) {
@@ -47,23 +48,20 @@ public class MenuConfigAudio extends Painel {
         
         botaoVoltar = new BotaoCustom("Voltar", configFonte,
                 () -> voltar(), true);
+
+        botaoMusica = new BotaoCustom("Música", 
+                configFonte, () -> acaoMusica());
         
-        Border borda = BorderFactory.createLineBorder(Color.DARK_GRAY,
-                15, true);
+        barraMusica = new BarraProgresso(0, 100, () -> alteraMusica(), 
+                configFonte);
+        barraMusica.setValue(SomManager.getVolumeMusica());
 
-        botaoMusica = new BotaoCustom("Música", configFonte);
-        barraMusica = new JProgressBar(0, 100);
-        barraMusica.setPreferredSize(new Dimension(200, 50));
-        barraMusica.setOpaque(false);
-        barraMusica.setForeground(Color.RED);
-        barraMusica.setBorder(borda);
-
-        botaoSfx = new BotaoCustom("SFX", configFonte);
-        barraSfx = new JProgressBar(0, 100);
-        barraSfx.setPreferredSize(new Dimension(200, 50));
-        barraSfx.setOpaque(false);
-        barraSfx.setForeground(Color.RED);
-        barraSfx.setBorder(borda);
+        botaoSfx = new BotaoCustom("SFX", 
+                configFonte, () -> acaoSfx());
+        
+        barraSfx = new BarraProgresso(0, 100, () -> alteraSfx(),
+                configFonte);
+        barraSfx.setValue(SomManager.getVolumeSfx());
         
         add(labelAudio);
         add(botaoMusica);
@@ -73,13 +71,24 @@ public class MenuConfigAudio extends Painel {
         add(botaoVoltar);
     }
     
-    @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponents(g);
-        super.paintComponent(g);
-
-        g.drawImage(background, 0, 0, getWidth(),
-                getHeight(), this);
+    private void acaoMusica() {
+        setFoco(getComponentZOrder(barraMusica));
+    }
+    
+    private void alteraMusica() {
+        int novoVolume = barraMusica.getValue();
+        
+        SomManager.ajustaMusica(novoVolume);
+    }
+    
+    private void acaoSfx() {
+        setFoco(getComponentZOrder(barraSfx));
+    }
+    
+    private void alteraSfx() {
+        int novoVolume = barraSfx.getValue();
+        
+        SomManager.ajustaSfx(novoVolume);
     }
     
     @Override
@@ -89,5 +98,12 @@ public class MenuConfigAudio extends Painel {
         SwingUtilities.invokeLater(() -> {
             botaoMusica.requestFocusInWindow();
         });
+    }
+    
+    @Override
+    public void voltar() {
+        super.voltar();
+        
+        retornaFoco();
     }
 }

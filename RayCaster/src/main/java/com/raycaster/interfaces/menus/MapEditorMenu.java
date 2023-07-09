@@ -1,7 +1,7 @@
 package com.raycaster.interfaces.menus;
 
 
-import com.raycaster.engine.Diretorio;
+import com.raycaster.engine.arquivos.Diretorio;
 import com.raycaster.engine.Engine;
 import com.raycaster.engine.Textura;
 import com.raycaster.interfaces.componentes.IntFilter;
@@ -427,7 +427,7 @@ public class MapEditorMenu {
         playButton.addActionListener((e)->{
             JFrame jj = new JFrame("RayCaster");
             jj.setSize(800, 600);
-            Engine jogo = new Engine(800, 600, jj, mapa[0]);
+            Engine jogo = new Engine(jj, mapa[0]);
             jj.add(jogo);
             jj.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             jj.setLocationRelativeTo(null);

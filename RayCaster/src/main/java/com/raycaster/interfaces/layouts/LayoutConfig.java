@@ -35,7 +35,7 @@ public class LayoutConfig implements LayoutManager {
             int parentWidth = parent.getWidth();
             int parentHeight = parent.getHeight();
             
-            int gapHorizontal, alturaAnterior = 0;
+            int gapHorizontal, alturaAnterior = 0, divisaoHorizontal;
             
             Component component = parent.getComponent(0);
             
@@ -44,8 +44,10 @@ public class LayoutConfig implements LayoutManager {
             
             component.setLocation(x, y);
             
-            gapHorizontal = (parentWidth / 2) - 
-                    parent.getComponent(1).getPreferredSize().width;
+            divisaoHorizontal = (parentWidth / 8);
+            
+            gapHorizontal = (parentWidth / 2) -
+                    parent.getComponent(1).getPreferredSize().width - divisaoHorizontal;
             
             x = gapHorizontal;
             y += component.getSize().height;
@@ -62,7 +64,7 @@ public class LayoutConfig implements LayoutManager {
                     x = gapHorizontal;
                     y += Math.max(component.getSize().height, alturaAnterior);
                 } else {
-                    x += component.getSize().width;
+                    x = (parentWidth / 2) + divisaoHorizontal;
                     alturaAnterior = component.getSize().height;
                 }
             }

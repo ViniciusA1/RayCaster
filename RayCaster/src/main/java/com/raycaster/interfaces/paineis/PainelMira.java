@@ -1,7 +1,7 @@
 package com.raycaster.interfaces.paineis;
 
-import com.raycaster.engine.ArquivoUtils;
-import com.raycaster.engine.Diretorio;
+import com.raycaster.engine.arquivos.ArquivoUtils;
+import com.raycaster.engine.arquivos.Diretorio;
 import java.awt.Graphics;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
