@@ -1,6 +1,8 @@
 package com.raycaster.itens;
 
 import com.raycaster.engine.Estado;
+import com.raycaster.entidades.Entidade;
+import com.raycaster.mapa.Mapa;
 import java.util.EnumSet;
 
 /**
@@ -23,11 +25,12 @@ public class ArmaCurta extends Arma {
      * @param possiveisEstados Possíveis estados da arma
      * @param cooldown "Cooldown" de uso da arma
      * @param dano Dano máximo da arma
+     * @param range
      */
     public ArmaCurta(String nome, int durabilidadeMaxima, EnumSet<Estado> possiveisEstados,
-            long cooldown, double dano) {
+            long cooldown, double dano, double range) {
 
-        super(nome, cooldown, possiveisEstados, dano);
+        super(nome, cooldown, possiveisEstados, dano, range);
         this.durabilidadeMaxima = durabilidadeMaxima;
         this.durabilidadeAtual = durabilidadeMaxima;
     }
@@ -79,8 +82,16 @@ public class ArmaCurta extends Arma {
      * Usa a arma de acordo com sua durabilidade atual.
      */
     @Override
-    public void usar() {
+    public void usar(Entidade usuario, Mapa mapaAtual) {
+        int hit = verificaHit(usuario, mapaAtual);
+        
+        if(hit >= 0)
+            return;
+        
         durabilidadeAtual -= TAXA_QUEBRA;
+        
+        Entidade sofreDano = mapaAtual.getEntidade(-hit - 2);
+        sofreDano.recebeDano(mapaAtual, getDano());
     }
 
     /**

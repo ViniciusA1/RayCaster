@@ -1,8 +1,9 @@
-package com.raycaster.engine.arquivos;
+package com.raycaster.utils;
 
 import com.raycaster.engine.Estado;
 import com.raycaster.entidades.Entidade;
-import com.raycaster.entidades.Player;
+import com.raycaster.entidades.inimigos.Atirador;
+import com.raycaster.entidades.jogadores.Player;
 import com.raycaster.itens.*;
 
 import java.io.File;
@@ -15,8 +16,6 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
@@ -195,16 +194,18 @@ public class ArquivoUtils {
                 int municao = Integer.parseInt(dado.getProperty("municaoMaxima" + id));
                 int pente = Integer.parseInt(dado.getProperty("tamanhoPente" + id));
                 double dano = Double.parseDouble(dado.getProperty("dano" + id));
+                double range = Double.parseDouble(dado.getProperty("range" + id));
 
                 itemCriado = (T) new ArmaLonga(nome, municao,
-                        pente, possiveisEstados, cooldown, dano);
+                        pente, possiveisEstados, cooldown, dano, range);
             }
             case "ArmaCurta" -> {
                 int durabilidade = Integer.parseInt(dado.getProperty("durabilidadeMaxima" + id));
                 double dano = Double.parseDouble(dado.getProperty("dano" + id));
+                double range = Double.parseDouble(dado.getProperty("range" + id));
 
                 itemCriado = (T) new ArmaCurta(nome, durabilidade,
-                        possiveisEstados, cooldown, dano);
+                        possiveisEstados, cooldown, dano, range);
             }
             default -> {
                 return null;
@@ -226,6 +227,7 @@ public class ArquivoUtils {
     private static <T extends Entidade> T criaEntidade(Properties dado, String tipo, int id) {
         T entidadeCriada;
 
+        String nome = dado.getProperty("nome" + id);
         double vidaMaxima = Double.parseDouble(dado.getProperty("vidaMaxima" + id));
         double largura = Double.parseDouble(dado.getProperty("largura" + id));
         double velocidade = Double.parseDouble(dado.getProperty("velocidade" + id));
@@ -242,7 +244,12 @@ public class ArquivoUtils {
         switch (tipo) {
             case "Player" -> {
                 int fov = Integer.parseInt(dado.getProperty("fov" + id));
-                entidadeCriada = (T) new Player(vidaMaxima, 0, 0, largura, velocidade, fov, FOG, possiveisEstados);
+                entidadeCriada = (T) new Player(nome, vidaMaxima, 0, 0, 
+                        largura, velocidade, fov, FOG, possiveisEstados);
+            }
+            case "Atirador" -> {
+                entidadeCriada = (T) new Atirador(nome, vidaMaxima, largura, velocidade, 
+                        FOG, possiveisEstados);
             }
             default ->
                 entidadeCriada = null;

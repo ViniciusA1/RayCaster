@@ -24,7 +24,7 @@ public class InterfaceManager {
         EnumSet<Estado> estados = EnumSet.noneOf(Estado.class);
 
         estados.add(Estado.USANDO);
-        estados.add(Estado.SACANDO);
+        estados.add(Estado.TROCANDO);
 
         somInterface = new EfeitoSonoro("interface", estados);
         SomManager.addSom(somInterface);

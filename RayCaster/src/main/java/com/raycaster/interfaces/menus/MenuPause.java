@@ -69,15 +69,15 @@ public class MenuPause extends Painel {
     private void carregaComponentes(Font fonte) {
         fonte = fonte.deriveFont(Font.PLAIN, 100f);
 
-        textoPause = new LabelAnimado("Pausado",
+        textoPause = new LabelAnimado("Paused",
                 fonte.deriveFont(Font.BOLD, 150f),
                 Animacao.FLOAT);
 
-        botaoVoltar = new BotaoCustom("Voltar", fonte,
+        botaoVoltar = new BotaoCustom("Resume", fonte,
                 () -> voltar(), true);
-        botaoConfig = new BotaoCustom("Configuração", fonte,
+        botaoConfig = new BotaoCustom("Settings", fonte,
                 () -> configurar());
-        botaoSair = new BotaoCustom("Sair", fonte,
+        botaoSair = new BotaoCustom("Exit game", fonte,
                 () -> sairJogo());
 
         textoPause.setAlignmentX(CENTER_ALIGNMENT);

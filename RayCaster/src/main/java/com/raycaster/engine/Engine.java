@@ -1,13 +1,13 @@
 package com.raycaster.engine;
 
-import com.raycaster.engine.arquivos.Diretorio;
-import com.raycaster.engine.arquivos.ArquivoUtils;
+import com.raycaster.utils.Diretorio;
+import com.raycaster.utils.ArquivoUtils;
 import com.raycaster.engine.sons.Musica;
 import com.raycaster.interfaces.menus.MenuPause;
 import com.raycaster.interfaces.layouts.LayoutEngine;
-import com.raycaster.interfaces.paineis.AnimacaoPlayer;
+import com.raycaster.interfaces.paineis.AnimacaoItem;
 import com.raycaster.interfaces.paineis.HUD;
-import com.raycaster.entidades.Player;
+import com.raycaster.entidades.jogadores.Player;
 import com.raycaster.interfaces.menus.MenuConfig;
 import com.raycaster.interfaces.paineis.InterfaceManager;
 import com.raycaster.interfaces.paineis.Painel;
@@ -29,8 +29,11 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 /**
@@ -126,9 +129,8 @@ public class Engine extends Painel implements ActionListener {
                 Player.class);
 
         jogador = jogadores.get(0);
-
-        jogador.moveX(mapaAtual.getBlockSpawnX());
-        jogador.moveY(mapaAtual.getBlockSpawnY());
+        jogador.setMapa(mapaAtual);
+        jogador.novaCelula(mapaAtual);
     }
 
     /**
@@ -148,7 +150,7 @@ public class Engine extends Painel implements ActionListener {
         carregaFonte();
 
         HUD hudJogador = new HUD(jogador, fontePersonalizada);
-        AnimacaoPlayer painelAnimacao = new AnimacaoPlayer(jogador);
+        AnimacaoItem painelAnimacao = new AnimacaoItem(jogador);
         PainelMira painelMira = new PainelMira();
         painelInfo = new PainelInformacao(fontePersonalizada);
         menuPause = new MenuPause(janela, fontePersonalizada,
@@ -156,7 +158,7 @@ public class Engine extends Painel implements ActionListener {
 
         setResolucao(menuConfig.getComprimento(),
                 menuConfig.getAltura());
-        
+
         menuConfig.setEngine(this);
 
         this.add(hudJogador, "hud");
@@ -166,7 +168,7 @@ public class Engine extends Painel implements ActionListener {
 
         jogador.setPainelAnimacao(painelAnimacao);
         jogador.setHUD(hudJogador);
-        jogador.sacaItem(0);
+        jogador.setItem(0);
     }
 
     /**
@@ -181,7 +183,10 @@ public class Engine extends Painel implements ActionListener {
         addMouseListener(mouseHandler);
         addMouseMotionListener(mouseHandler);
         setFocusable(true);
-        requestFocus();
+        
+        SwingUtilities.invokeLater(() -> {
+            this.requestFocusInWindow();
+        });
     }
 
     /**
@@ -280,17 +285,19 @@ public class Engine extends Painel implements ActionListener {
         double playerY = jogador.getY();
         double playerFOV = jogador.getFOV();
 
-        // Distancia de visão máxima permitida pelo jogo
-        double distanciaMaxima = jogador.getFOG();
-
         // Guarda o tamanho dos blocos do mapa
         int tamanhoBloco = mapaAtual.getTamanhoBloco();
+
+        // Distancia de visão máxima permitida pelo jogo
+        double distanciaMaxima = jogador.getFOG() * (tamanhoBloco / 32);
 
         // Fator que representa qual lado da parede foi atingido (vertical ou horizontal)
         int eixo;
 
         // Protótipo de "framebuffer" utilizado para acelerar a renderização
         int[] frameBuffer = new int[screenHeight * screenWidth];
+
+        double[] zBuffer = new double[screenWidth];
 
         // Classe filha de Graphics que inclui métodos adicionais para gráficos 2D
         Graphics2D render2D = (Graphics2D) g;
@@ -358,7 +365,7 @@ public class Engine extends Painel implements ActionListener {
                 }
 
                 // Checa a colisão do raio com a parede
-                if (mapaAtual.checaColisao(posX, posY)) {
+                if (mapaAtual.checaColisaoParede(posX, posY)) {
                     break;
                 }
             }
@@ -379,6 +386,8 @@ public class Engine extends Painel implements ActionListener {
             paredeX /= tamanhoBloco;
             paredeX -= Math.floor(paredeX);
 
+            zBuffer[i] = distanciaFinal;
+
             // Fator de correção para o efeito fisheye (olho de peixe)
             distanciaFinal *= Math.cos(anguloRaio - playerAngulo);
 
@@ -388,6 +397,9 @@ public class Engine extends Painel implements ActionListener {
             }
 
             double fatorFOG = 1.0 - (distanciaFinal / distanciaMaxima);
+            
+            if(fatorFOG == 0)
+                continue;
 
             // Calcula os valores da altura da parede, seu começo e fim no eixo y
             int alturaParede = (int) ((tamanhoBloco / distanciaFinal) * fatorProjecao);
@@ -419,7 +431,8 @@ public class Engine extends Painel implements ActionListener {
 
             // Calcula o fator de escala que deve ser usado para andar na imagem da textura
             double variacao = 1.0 * tamanhoTextura / alturaParede;
-            double posicaoTextura = (comecoParede - screenHeight / 2 + alturaParede / 2) * variacao;
+            double posicaoTextura = (comecoParede - screenHeight / 2 + 
+                    alturaParede / 2) * variacao;
 
             // Percorre todo os pixels da coluna atribuindo a cor da textura a eles
             for (int y = comecoParede; y < fimParede; y++) {
@@ -427,12 +440,17 @@ public class Engine extends Painel implements ActionListener {
 
                 posicaoTextura += variacao;
 
-                int corPixel = texturas.get(idTextura).getPixel(tamanhoTextura * texturaY + texturaX);
+                int corPixel = texturas.get(idTextura).getPixel(
+                        tamanhoTextura * texturaY + texturaX);
 
-                frameBuffer[y * screenWidth + i] = transformaCor(corPixel, fatorFOG);
+                frameBuffer[y * screenWidth + i] = transformaCor(corPixel, 
+                        fatorFOG);
             }
         }
 
+        renderizaSprites(frameBuffer, zBuffer, playerX, playerY, 
+                playerAngulo, distanciaMaxima*distanciaMaxima);
+        
         // Usa as cores RGB acumuladas no frameBuffer para criar uma imagem e renderiza-la
         frame = new BufferedImage(screenWidth, screenHeight,
                 BufferedImage.TYPE_INT_RGB);
@@ -489,12 +507,16 @@ public class Engine extends Painel implements ActionListener {
 
             // Calcula os incrementos necessários para a posição real do
             // teto/chão em x e y
-            double incrementoX = distanciaLinha * (cosRaioMaximo - cosRaioMinimo) / screenWidth;
-            double incrementoY = distanciaLinha * (sinRaioMaximo - sinRaioMinimo) / screenWidth;
+            double incrementoX = distanciaLinha * (cosRaioMaximo - 
+                    cosRaioMinimo) / screenWidth;
+            double incrementoY = distanciaLinha * (sinRaioMaximo - 
+                    sinRaioMinimo) / screenWidth;
 
             // Posições nas coordenadas x e y da posição atual no teto e chão
-            double posX = (playerX / (tamanhoBloco * (1.5 / playerFOV))) + distanciaLinha * cosRaioMinimo;
-            double posY = (playerY / (tamanhoBloco * (1.5 / playerFOV))) + distanciaLinha * sinRaioMinimo;
+            double posX = (playerX / (tamanhoBloco * (1.5 / playerFOV))) + 
+                    distanciaLinha * cosRaioMinimo;
+            double posY = (playerY / (tamanhoBloco * (1.5 / playerFOV))) + 
+                    distanciaLinha * sinRaioMinimo;
 
             double distanciaFOG = Math.abs(distanciaLinha);
 
@@ -502,7 +524,11 @@ public class Engine extends Painel implements ActionListener {
                 distanciaFOG = playerFOG;
             }
 
-            double fatorFOG = 1 - distanciaFOG / playerFOG;
+            double fatorFOG = 1.0 - (distanciaFOG / playerFOG);
+            
+            if(fatorFOG == 0) {
+                continue;
+            }
 
             // Percorre, em cada linha, os pixels da coluna para aplicar
             // a cor da textura adequada
@@ -526,11 +552,113 @@ public class Engine extends Painel implements ActionListener {
                 int corPixel;
 
                 // Aplica as cores das texturas em ambas as figuras
-                corPixel = texturas.get(chaoID).getPixel(tamanhoTextura * texturaY + texturaX);
-                frameBuffer[y * screenWidth + x] = transformaCor(corPixel, fatorFOG);
+                corPixel = texturas.get(chaoID).getPixel(tamanhoTextura 
+                        * texturaY + texturaX);
+                frameBuffer[y * screenWidth + x] = transformaCor(corPixel, 
+                        fatorFOG);
 
-                corPixel = texturas.get(tetoID).getPixel(tamanhoTextura * texturaY + texturaX);
-                frameBuffer[(screenHeight - y - 1) * screenWidth + x] = transformaCor(corPixel, fatorFOG);
+                corPixel = texturas.get(tetoID).getPixel(tamanhoTextura * 
+                        texturaY + texturaX);
+                frameBuffer[(screenHeight - y - 1) * screenWidth + x] = 
+                        transformaCor(corPixel, fatorFOG);
+            }
+        }
+    }
+
+    private void renderizaSprites(int[] frameBuffer, double[] zBuffer, 
+            double playerX, double playerY, double playerAngulo, 
+            double distanciaMaxima) {
+        
+        int qtdSprites = mapaAtual.getQtdEntidades();
+        
+        PairSprites[] sprite = new PairSprites[qtdSprites];
+
+        for (int i = 0; i < qtdSprites; i++) {
+            double entidadeX = mapaAtual.getEntidadeX(i);
+            double entidadeY = mapaAtual.getEntidadeY(i);
+            
+            sprite[i] = new PairSprites(i, ((playerX - entidadeX) * 
+                    (playerX - entidadeX) + (playerY - entidadeY) * 
+                            (playerY - entidadeY)));
+        }
+                
+        Arrays.sort(sprite, Comparator.comparingDouble(PairSprites::
+                getDistancia).reversed());
+
+        for (int i = 0; i < qtdSprites; i++) {
+            
+            double spriteX = mapaAtual.getEntidadeX(sprite[i].ordem) - playerX;
+            double spriteY = mapaAtual.getEntidadeY(sprite[i].ordem) - playerY;
+            
+            double planeX = Math.cos(playerAngulo + jogador.getFOV());
+            double planeY = Math.sin(playerAngulo + jogador.getFOV());
+            double dirX = Math.cos(playerAngulo);
+            double dirY = Math.sin(playerAngulo);
+
+            double invDet = 1.0 / (planeX * dirY - dirX * planeY);
+
+            double transformX = invDet * (dirY * spriteX - dirX * spriteY);
+            double transformY = invDet * (-planeY * spriteX + planeX * spriteY);
+
+            int spriteScreenX = (int) ((screenWidth / 2) * 
+                    (1 + transformX / transformY));
+
+            int spriteHeight = Math.abs((int) (screenHeight * 
+                    mapaAtual.getTamanhoBloco() / (transformY)));
+            
+            int drawStartY = -spriteHeight / 2 + screenHeight / 2;
+            if (drawStartY < 0) {
+                drawStartY = 0;
+            }
+            
+            int drawEndY = spriteHeight / 2 + screenHeight / 2;
+            if (drawEndY >= screenHeight) {
+                drawEndY = screenHeight - 1;
+            }
+
+            int spriteWidth = Math.abs((int) (screenHeight * 
+                    mapaAtual.getTamanhoBloco() / (transformY)));
+            
+            int drawStartX = -spriteWidth / 2 + spriteScreenX;
+            if (drawStartX < 0) {
+                drawStartX = 0;
+            }
+            
+            int drawEndX = spriteWidth / 2 + spriteScreenX;
+            if (drawEndX >= screenWidth) {
+                drawEndX = screenWidth - 1;
+            }
+            
+            if (sprite[i].distancia > distanciaMaxima) {
+                sprite[i].distancia = distanciaMaxima;
+            }
+
+            double fatorFOG = 1.0 - (sprite[i].distancia / distanciaMaxima);
+            
+            BufferedImage imagemSprite = mapaAtual.getSpriteImagem(
+                    sprite[i].ordem);
+            
+            int texWidth = imagemSprite.getWidth();
+            int texHeight = imagemSprite.getHeight();
+
+            for (int stripe = drawStartX; stripe < drawEndX; stripe++) {
+                int texX = (int) (256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * 
+                        texWidth / spriteWidth) / 256;
+                
+                if (transformY > 0 && stripe > 0 && stripe < screenWidth &&
+                        transformY < zBuffer[stripe])
+                {
+                    for (int y = drawStartY; y < drawEndY; y++)
+                    {
+                        int d = (y) * 256 - screenHeight * 128 + spriteHeight * 128;
+                        int texY = ((d * texHeight) / spriteHeight) / 256;
+                        int color = imagemSprite.getRGB(texX, texY);
+                        
+                        if(((color >> 24) & 0xFF) >= 128)
+                            frameBuffer[y * screenWidth + stripe] = 
+                                    transformaCor(color, fatorFOG);
+                    }
+                }
             }
         }
     }
@@ -581,6 +709,9 @@ public class Engine extends Painel implements ActionListener {
         double prevX = jogador.getX();
         double prevY = jogador.getY();
 
+        mapaAtual.atualizaInimigos(jogador.getX(), 
+                jogador.getY(), deltaTime);
+        
         keyHandler.executaMetodo();
 
         prevX = Math.abs(jogador.getX() - prevX);
@@ -590,10 +721,10 @@ public class Engine extends Painel implements ActionListener {
             jogador.emitePassos();
         }
 
-        double fator = Math.abs((prevX + prevY) / 2) * 8;
+        double fator = (prevX + prevY) / 16;
 
-        jogador.setPitch(fator * deltaTime, (getHeight() + getWidth()) / 50);
-        
+        jogador.setPitch(fator, (getHeight() + getWidth()) / 50);
+
         tempoAnterior = tempoAtual;
     }
 
@@ -632,8 +763,24 @@ public class Engine extends Painel implements ActionListener {
 
         musicaBackground.close();
         jogador.close();
+        mapaAtual.liberaMapa();
 
         gameTimer.stop();
+    }
+    
+    
+    private class PairSprites {
+        int ordem;
+        double distancia;
+        
+        public PairSprites(int ordem, double distancia) {
+            this.ordem = ordem;
+            this.distancia = distancia;
+        }
+        
+        public double getDistancia() {
+            return distancia;
+        }
     }
 
 }

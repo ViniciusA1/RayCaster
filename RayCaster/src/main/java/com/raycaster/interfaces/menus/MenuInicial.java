@@ -1,7 +1,7 @@
 package com.raycaster.interfaces.menus;
 
-import com.raycaster.engine.arquivos.ArquivoUtils;
-import com.raycaster.engine.arquivos.Diretorio;
+import com.raycaster.utils.ArquivoUtils;
+import com.raycaster.utils.Diretorio;
 import com.raycaster.engine.Engine;
 import com.raycaster.engine.Estado;
 import com.raycaster.engine.sons.Musica;
@@ -68,7 +68,7 @@ public class MenuInicial {
      * inicial.
      */
     private static void MenuInicial() {
-        JFrame frameInicial = new JFrame("Menu inicial");
+        JFrame frameInicial = new JFrame("RayCaster");
 
         frameInicial.setSize(800, 600);
         frameInicial.setResizable(true);
@@ -103,13 +103,13 @@ public class MenuInicial {
             System.exit(0);
         };
 
-        BotaoCustom botaoJogar = new BotaoCustom("Jogar",
+        BotaoCustom botaoJogar = new BotaoCustom("Play",
                 fonte, acaoJogar);
-        BotaoCustom botaoMapa = new BotaoCustom("Editor de mapas",
+        BotaoCustom botaoMapa = new BotaoCustom("Map editor",
                 fonte, acaoMapa);
-        BotaoCustom botaoConfig = new BotaoCustom("Configuração", 
+        BotaoCustom botaoConfig = new BotaoCustom("Settings", 
                 fonte, acaoConfig);
-        BotaoCustom botaoSair = new BotaoCustom("Sair",
+        BotaoCustom botaoSair = new BotaoCustom("Exit",
                 fonte, acaoSair);
 
         Painel panelPrincipal = new Painel() {
@@ -146,6 +146,7 @@ public class MenuInicial {
         
         InterfaceManager.push(frameInicial, panelPrincipal);
 
+        frameInicial.setUndecorated(true);
         frameInicial.setVisible(true);
         
         menuConfig = new MenuConfig(frameInicial, 
@@ -181,6 +182,7 @@ public class MenuInicial {
     }
     
     private static void configuraJogo(JFrame frame) {
+        menuConfig.setImagem(imagemBackground);
         InterfaceManager.push(frame, menuConfig);
     }
 
@@ -194,11 +196,11 @@ public class MenuInicial {
     private static void selecionaMapa(JFrame frame, Font font) {
         List<String> mapas = ArquivoUtils.leMapas();
 
-        LabelAnimado textoMapa = new LabelAnimado("Selecione um mapa",
+        LabelAnimado textoMapa = new LabelAnimado("Map selection",
                 font.deriveFont(Font.PLAIN, 150f), 
                 Animacao.FLOAT);
 
-        LabelAnimado mapaAtual = new LabelAnimado(mapas.toArray(new String[0]), 
+        LabelAnimado mapaAtual = new LabelAnimado(mapas.toArray(String[]::new), 
                 0, font.deriveFont(Font.PLAIN, 100f), 
                 Animacao.FADE);
         
@@ -244,7 +246,7 @@ public class MenuInicial {
             InterfaceManager.pop();
         };
 
-        BotaoCustom botaoVoltar = new BotaoCustom("Voltar", 
+        BotaoCustom botaoVoltar = new BotaoCustom("Return", 
                 font, acaoVoltar, true);
 
         textoMapa.setAlignmentX(CENTER_ALIGNMENT);

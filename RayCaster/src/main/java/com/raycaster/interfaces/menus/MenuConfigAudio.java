@@ -43,13 +43,13 @@ public class MenuConfigAudio extends AbstractMenuConfig {
     }
     
     private void carregaComponentes(Font configFonte, Font labelFonte) {
-        labelAudio = new LabelAnimado("Áudio", 
+        labelAudio = new LabelAnimado("Audio", 
                 labelFonte, Animacao.FLOAT);
         
-        botaoVoltar = new BotaoCustom("Voltar", configFonte,
+        botaoVoltar = new BotaoCustom("Return", configFonte,
                 () -> voltar(), true);
 
-        botaoMusica = new BotaoCustom("Música", 
+        botaoMusica = new BotaoCustom("Music", 
                 configFonte, () -> acaoMusica());
         
         barraMusica = new BarraProgresso(0, 100, () -> alteraMusica(), 
@@ -98,12 +98,5 @@ public class MenuConfigAudio extends AbstractMenuConfig {
         SwingUtilities.invokeLater(() -> {
             botaoMusica.requestFocusInWindow();
         });
-    }
-    
-    @Override
-    public void voltar() {
-        super.voltar();
-        
-        retornaFoco();
     }
 }

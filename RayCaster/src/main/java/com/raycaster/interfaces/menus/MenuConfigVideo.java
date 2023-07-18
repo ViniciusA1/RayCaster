@@ -10,6 +10,8 @@ import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.awt.Window;
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 /**
@@ -63,13 +65,14 @@ public class MenuConfigVideo extends AbstractMenuConfig {
 
     private void carregaComponentes(String resolucaoInicial, 
             boolean isFullScreen, Font configFonte, Font labelFonte) {
-        device = GraphicsEnvironment.getLocalGraphicsEnvironment().
-                getScreenDevices()[0];
         
-        labelVideo = new LabelAnimado("Vídeo",
+        device = GraphicsEnvironment.getLocalGraphicsEnvironment().
+                getDefaultScreenDevice();
+        
+        labelVideo = new LabelAnimado("Video",
                 labelFonte, LabelAnimado.Animacao.FLOAT);
 
-        botaoResolucao = new BotaoCustom("Resolução", 
+        botaoResolucao = new BotaoCustom("Resolution", 
                 configFonte, () -> resolucao());
         
         int resolucaoId = buscaId(resolucaoInicial);
@@ -85,7 +88,7 @@ public class MenuConfigVideo extends AbstractMenuConfig {
         checkFullScreen.setPreferredSize(new Dimension(50, 50));
         fullScreen();
         
-        botaoVoltar = new BotaoCustom("Voltar", 
+        botaoVoltar = new BotaoCustom("Return", 
                 configFonte, () -> voltar(), true);
 
         labelResolucao.stopAnimacao();
@@ -117,13 +120,15 @@ public class MenuConfigVideo extends AbstractMenuConfig {
     }
     
     private void fullScreen() {
+        JFrame janela = (JFrame) SwingUtilities.
+                    getWindowAncestor(InterfaceManager.peek());
+
         if(checkFullScreen.isEnabled()) {
             device.setFullScreenWindow(null);
             checkFullScreen.setEnabled(false);
         }
         else {
-            device.setFullScreenWindow(SwingUtilities.
-                    getWindowAncestor(InterfaceManager.peek()));
+            device.setFullScreenWindow(janela);
             checkFullScreen.setEnabled(true);
         }
     }
@@ -135,12 +140,5 @@ public class MenuConfigVideo extends AbstractMenuConfig {
         SwingUtilities.invokeLater(() -> {
             botaoResolucao.requestFocusInWindow();
         });
-    }
-    
-    @Override
-    public void voltar() {
-        super.voltar();
-        
-        retornaFoco();
     }
 }

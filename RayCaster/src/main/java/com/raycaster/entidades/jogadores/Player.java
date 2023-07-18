@@ -1,9 +1,9 @@
-package com.raycaster.entidades;
+package com.raycaster.entidades.jogadores;
 
-import com.raycaster.interfaces.paineis.AnimacaoPlayer;
+import com.raycaster.interfaces.paineis.AnimacaoItem;
 import com.raycaster.itens.ArmaLonga;
-import com.raycaster.engine.sons.EfeitoSonoro;
 import com.raycaster.engine.Estado;
+import com.raycaster.entidades.Entidade;
 import com.raycaster.interfaces.paineis.HUD;
 import com.raycaster.itens.Item;
 import com.raycaster.mapa.Mapa;
@@ -19,22 +19,21 @@ import java.util.List;
  */
 public class Player extends Entidade {
 
-    private double angulo;
     private double pitch;
     private double FOV;
     private double pitchAcumulado;
     private long tempoAnterior;
+    private Mapa mapaAtual;
     private Inventario<Arma> mochila;
     private Item itemAtual;
-    private AnimacaoPlayer painelAnimacao;
+    private AnimacaoItem painelAnimacao;
     private HUD hudJogador;
-    private Estado estadoAtual;
-    private EfeitoSonoro som;
 
     /**
      * Construtor principal do jogador, recebe os atributos necessitados pela
      * classe.
      *
+     * @param nome Nome do jogador
      * @param vidaMaxima Vida máxima do jogador
      * @param x Posição inicial em x do jogador
      * @param y Posição inicial em y do jogador
@@ -44,18 +43,18 @@ public class Player extends Entidade {
      * @param FOG Distância máxima de visão do jogador
      * @param possiveisEstados Possíveis estados assumidos pelo jogador
      */
-    public Player(double vidaMaxima, double x, double y, double largura, double velocidade,
+    public Player(String nome, double vidaMaxima, double x, double y, 
+            double largura, double velocidade,
             int fov, double FOG, EnumSet<Estado> possiveisEstados) {
 
-        super(vidaMaxima, x, y, largura, velocidade, FOG, possiveisEstados);
-
-        angulo = 0;
+        super(nome, vidaMaxima, x, y, largura, velocidade, FOG, possiveisEstados);
+    
+        setID(-1);
+        
         pitch = 0;
         pitchAcumulado = 0;
         FOV = Math.toRadians(fov);
         mochila = new Inventario<>();
-        estadoAtual = Estado.OCIOSO;
-        som = new EfeitoSonoro("player", possiveisEstados);
     }
 
     /**
@@ -63,7 +62,7 @@ public class Player extends Entidade {
      *
      * @param novoPainel Novo painel de animação recebido
      */
-    public void setPainelAnimacao(AnimacaoPlayer novoPainel) {
+    public void setPainelAnimacao(AnimacaoItem novoPainel) {
         painelAnimacao = novoPainel;
     }
 
@@ -75,23 +74,12 @@ public class Player extends Entidade {
     public void setHUD(HUD hudJogador) {
         this.hudJogador = hudJogador;
     }
-
-    /**
-     * "Seta" um novo estado para o jogador.
-     *
-     * @param novoEstado Novo estado recebido
-     */
-    public void setEstado(Estado novoEstado) {
-        estadoAtual = novoEstado;
-    }
-
-    /**
-     * Disponibiliza o angulo do jogador para código externo.
-     *
-     * @return Retorna o angulo de rotação do jogador.
-     */
-    public double getAngulo() {
-        return angulo;
+    
+    public void setMapa(Mapa novoMapa) {
+        this.mapaAtual = novoMapa;
+        
+        moveX(mapaAtual.getBlockSpawnX());
+        moveY(mapaAtual.getBlockSpawnY());
     }
 
     /**
@@ -116,6 +104,11 @@ public class Player extends Entidade {
         pitchAcumulado += fator;
         pitch = tamanhoTela * Math.sin(pitchAcumulado);
     }
+    
+    public void setItem(int id) {
+        itemAtual = mochila.getObjeto(id);
+        painelAnimacao.trocaItem(itemAtual);
+    }
 
     /**
      * Disponibiliza o item atual do jogador para código externo.
@@ -136,18 +129,18 @@ public class Player extends Entidade {
      */
     public void move(double anguloRelativo, int sinal, Mapa mapaAtual, double deltaTime) {
         double dx = sinal * getVelocidade()
-                * Math.cos(angulo + anguloRelativo) * deltaTime;
+                * Math.cos(getAngulo() + anguloRelativo) * deltaTime;
 
         double dy = sinal * getVelocidade()
-                * Math.sin(angulo + anguloRelativo) * deltaTime;
+                * Math.sin(getAngulo() + anguloRelativo) * deltaTime;
 
         trataColisao(mapaAtual, dx, 0);
         trataColisao(mapaAtual, 0, dy);
     }
     
     public void emitePassos() {
-        if(!som.isRunning(Estado.OCIOSO))
-            som.playSom(Estado.OCIOSO);
+        if(!isSomRunning(Estado.ANDANDO))
+            playSom(Estado.ANDANDO);
     }
 
     /**
@@ -156,7 +149,7 @@ public class Player extends Entidade {
      * @param deltaX Variação do angulo que deve ser somada
      */
     public void rotaciona(double deltaX) {
-        angulo += deltaX;
+        setAngulo(getAngulo() + deltaX);
     }
 
     /**
@@ -183,6 +176,8 @@ public class Player extends Entidade {
      * @param index Índice do novo item
      */
     public void sacaItem(int index) {
+        Estado estadoAtual = itemAtual.getEstado();
+        
         if (estadoAtual != Estado.OCIOSO) {
             return;
         }
@@ -194,10 +189,9 @@ public class Player extends Entidade {
 
         itemAtual = novoItem;
         hudJogador.atualizaItem();
-        painelAnimacao.setAnimacao(itemAtual.getAnimacao(estadoAtual));
+        painelAnimacao.trocaItem(novoItem);
 
-        estadoAtual = Estado.SACANDO;
-        som.playSom(estadoAtual);
+        playSom(Estado.TROCANDO);
     }
 
     /**
@@ -208,6 +202,7 @@ public class Player extends Entidade {
      */
     public void usaItem(int posX, int posY) {
         long tempoAtual = System.currentTimeMillis();
+        Estado estadoAtual = itemAtual.getEstado();
 
         if (estadoAtual != Estado.OCIOSO
                 || tempoAtual - tempoAnterior <= itemAtual.getCooldown()) {
@@ -221,11 +216,11 @@ public class Player extends Entidade {
             return;
         }
 
-        itemAtual.usar();
-        estadoAtual = Estado.USANDO;
-
-        painelAnimacao.setAnimacao(itemAtual.getAnimacao(estadoAtual));
-        itemAtual.reproduzSom(estadoAtual);
+        itemAtual.setEstado(Estado.USANDO);
+        itemAtual.usar(this, mapaAtual);
+        painelAnimacao.mudaAnimacao();
+        
+        itemAtual.reproduzSom(Estado.USANDO);
 
         tempoAnterior = tempoAtual;
     }
@@ -234,6 +229,8 @@ public class Player extends Entidade {
      * Recarrega, se possível, o item atual do jogador.
      */
     public void recarregaItem() {
+        Estado estadoAtual = itemAtual.getEstado();
+        
         if (estadoAtual != Estado.OCIOSO || !itemAtual.isRecarregavel()) {
             return;
         }
@@ -241,10 +238,10 @@ public class Player extends Entidade {
         ArmaLonga arma = (ArmaLonga) itemAtual;
 
         arma.recarregar();
-        estadoAtual = Estado.RECARREGANDO;
-        painelAnimacao.setAnimacao(arma.getAnimacao(estadoAtual));
+        itemAtual.setEstado(Estado.RECARREGANDO);
+        painelAnimacao.mudaAnimacao();
 
-        itemAtual.reproduzSom(estadoAtual);
+        itemAtual.reproduzSom(Estado.RECARREGANDO);
     }
 
     /**
@@ -269,8 +266,9 @@ public class Player extends Entidade {
         return itemAtual.getConsumivelMax();
     }
     
+    @Override
     public void close() {
-        som.close();
+        super.close();
         
         mochila.close();
     }

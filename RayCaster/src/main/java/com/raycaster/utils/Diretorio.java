@@ -1,4 +1,4 @@
-package com.raycaster.engine.arquivos;
+package com.raycaster.utils;
 
 import com.raycaster.engine.Estado;
 import java.io.File;
@@ -34,6 +34,8 @@ public class Diretorio {
      * Caminho para os modelos de itens do jogo.
      */
     public static final String SPRITE_ITENS = MODELOS + "itens" + File.separator;
+    
+    public static final String SPRITE_ENTIDADES = MODELOS + "entidades" + File.separator;
     
     public static final String ICONES = MODELOS + "icones" + File.separator;
     

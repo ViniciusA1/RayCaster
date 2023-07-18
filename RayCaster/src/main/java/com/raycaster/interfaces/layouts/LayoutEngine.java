@@ -19,7 +19,6 @@ public class LayoutEngine implements LayoutManager {
     private Component animacaoPanel;
     private Component miraPanel;
     private Component infoPanel;
-    private long infoCooldown;
 
     /**
      * Adiciona um componente ao layout manager.
@@ -88,35 +87,40 @@ public class LayoutEngine implements LayoutManager {
     @Override
     public void layoutContainer(Container parent) {
         Dimension parentSize = parent.getSize();
-        Insets insets = parent.getInsets();
 
-        int hudWidth = parentSize.width - insets.left - insets.right;
+        int hudWidth = parentSize.width;
         int hudHeight = parentSize.height / 8;
 
         int animacaoWidth = parentSize.width;
         int animacaoHeight = parentSize.height;
 
-        int miraWidth = parentSize.width / 45;
-        int miraHeight = parentSize.width / 45;
+        int miraWidth = parentSize.width / 50;
+        if(miraWidth % 2 == 0)
+            miraWidth++;
         
         int infoWidth = parentSize.width / 5;
         int infoHeight = parentSize.height / 5;
 
-        int hudX = insets.left;
-        int hudY = parentSize.height - insets.bottom - hudHeight;
+        int hudX = 0;
+        int hudY = parentSize.height - hudHeight;
 
-        int animacaoX = insets.right;
-        int animacaoY = insets.bottom;
+        int animacaoX = 0;
+        int animacaoY = 0;
 
-        int miraX = (parentSize.width - insets.left - insets.right - miraWidth) / 2;
-        int miraY = (parentSize.height - insets.top - insets.bottom - miraHeight) / 2;
+        int miraX = (parentSize.width - miraWidth) / 2;
+        int miraY = (parentSize.height - miraWidth) / 2;
         
-        int infoX = insets.left;
-        int infoY = insets.top;
+        int infoX = 0;
+        int infoY = 0;
 
         hudPanel.setBounds(hudX, hudY, hudWidth, hudHeight);
-        animacaoPanel.setBounds(animacaoX, animacaoY, animacaoWidth, animacaoHeight);
-        miraPanel.setBounds(miraX, miraY, miraWidth, miraHeight);
-        infoPanel.setBounds(infoX, infoY, infoWidth, infoHeight);
+        
+        animacaoPanel.setBounds(animacaoX, animacaoY, animacaoWidth,
+                animacaoHeight);
+        
+        miraPanel.setBounds(miraX, miraY, miraWidth, 
+                miraWidth);
+        infoPanel.setBounds(infoX, infoY, infoWidth, 
+                infoHeight);
     }
 }

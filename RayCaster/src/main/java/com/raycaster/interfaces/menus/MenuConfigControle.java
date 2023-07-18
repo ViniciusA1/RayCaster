@@ -32,14 +32,14 @@ public class MenuConfigControle extends AbstractMenuConfig {
     
     private void carregaComponentes(Font configFonte, Font labelFonte) {
         
-        labelControle = new LabelAnimado("Controle", 
+        labelControle = new LabelAnimado("Control", 
                 labelFonte, Animacao.FLOAT);
         
-        botaoSensibilidade = new BotaoCustom("Sensibilidade", configFonte);
+        botaoSensibilidade = new BotaoCustom("Sensitivity", configFonte);
         
         barraSensibilidade = new BarraProgresso(0, 100, configFonte);
         
-        botaoVoltar = new BotaoCustom("Voltar", 
+        botaoVoltar = new BotaoCustom("Return", 
                 configFonte, () -> voltar(), true);
         
         add(labelControle);

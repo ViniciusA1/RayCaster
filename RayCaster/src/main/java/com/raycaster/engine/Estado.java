@@ -24,5 +24,11 @@ public enum Estado {
     /**
      * Estado de mudança de objeto.
      */
-    SACANDO
+    TROCANDO,
+    
+    ANDANDO,
+    
+    FERIDO,
+    
+    MORTO
 }

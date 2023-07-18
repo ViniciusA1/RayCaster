@@ -57,7 +57,8 @@ public abstract class AbstractMenuConfig extends Painel {
             }
         }
         
-        componenteFocado.setFocusable(true);
+        Interagivel componente = (Interagivel) componenteFocado;
+        componente.mudaFoco(true);
         
         setFocusable(true);
         addKeyListener(ouvinte);
@@ -71,13 +72,12 @@ public abstract class AbstractMenuConfig extends Painel {
         Component[] componentes = getComponents();
         
         for(Component compAux : componentes) {
-            if(compAux instanceof BotaoCustom botao) {
+            if(compAux instanceof BotaoCustom botao)
                 botao.setEnabled(true);
-            } else {
-                if(compAux.isFocusable())
-                    compAux.setFocusable(false);
-            }
         }
+        
+        Interagivel componente = (Interagivel) componenteFocado;
+        componente.mudaFoco(false);
         
         setFocusable(false);
         

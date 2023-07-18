@@ -1,4 +1,4 @@
-package com.raycaster.engine.arquivos;
+package com.raycaster.utils;
 
 import java.util.Properties;
 

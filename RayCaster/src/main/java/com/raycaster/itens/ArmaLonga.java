@@ -1,6 +1,8 @@
 package com.raycaster.itens;
 
 import com.raycaster.engine.Estado;
+import com.raycaster.entidades.Entidade;
+import com.raycaster.mapa.Mapa;
 import java.util.EnumSet;
 
 /**
@@ -23,10 +25,12 @@ public class ArmaLonga extends Arma {
      * @param possiveisEstados Possíveis estados da arma
      * @param cooldown "Cooldown" de uso da arma
      * @param dano Dano máximo da arma
+     * @param range
      */
-    public ArmaLonga(String nome, int municaoMaxima, int tamanhoPente, EnumSet<Estado> possiveisEstados, 
-            long cooldown, double dano) {
-        super(nome, cooldown, possiveisEstados, dano);
+    public ArmaLonga(String nome, int municaoMaxima, int tamanhoPente,
+            EnumSet<Estado> possiveisEstados, 
+            long cooldown, double dano, double range) {
+        super(nome, cooldown, possiveisEstados, dano, range);
         this.municaoMaxima = municaoMaxima;
         this.municaoAtual = municaoMaxima / 2;
         this.tamanhoPente = tamanhoPente;
@@ -64,8 +68,16 @@ public class ArmaLonga extends Arma {
      * Usa a arma com base na quantidade de balas restantes no pente.
      */
     @Override
-    public void usar() {
+    public void usar(Entidade usuario, Mapa mapaAtual) {
         balasNoPente--;
+        
+        int hit = verificaHit(usuario, mapaAtual);
+        
+        if(hit >= 0)
+            return;
+        
+        Entidade sofreDano = mapaAtual.getEntidade(-hit - 2);
+        sofreDano.recebeDano(mapaAtual, getDano());
     }
     
     /**

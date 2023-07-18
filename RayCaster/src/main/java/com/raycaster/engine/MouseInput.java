@@ -1,6 +1,6 @@
 package com.raycaster.engine;
 
-import com.raycaster.entidades.Player;
+import com.raycaster.entidades.jogadores.Player;
 import java.awt.AWTException;
 import java.awt.Component;
 import java.awt.Robot;

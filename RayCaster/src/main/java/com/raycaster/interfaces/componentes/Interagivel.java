@@ -7,5 +7,8 @@ import java.awt.event.KeyEvent;
  * @author vinicius
  */
 public interface Interagivel {
-    public abstract void interacaoTeclado(KeyEvent evento);
+    
+    default public void interacaoTeclado(KeyEvent evento) {}
+    
+    default public void mudaFoco(boolean tipoFoco) {}
 }

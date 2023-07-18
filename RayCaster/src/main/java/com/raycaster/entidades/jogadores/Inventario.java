@@ -1,4 +1,4 @@
-package com.raycaster.entidades;
+package com.raycaster.entidades.jogadores;
 
 import com.raycaster.itens.Item;
 import java.util.ArrayList;

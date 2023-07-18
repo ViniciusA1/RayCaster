@@ -1,9 +1,11 @@
 package com.raycaster.itens;
 
 import com.raycaster.engine.Animacao;
-import com.raycaster.engine.arquivos.Diretorio;
+import com.raycaster.utils.Diretorio;
 import com.raycaster.engine.sons.EfeitoSonoro;
 import com.raycaster.engine.Estado;
+import com.raycaster.entidades.Entidade;
+import com.raycaster.mapa.Mapa;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +20,7 @@ public abstract class Item {
     private final String nome;
     private long cooldown;
     private EnumSet<Estado> possiveisEstados;
+    private Estado estadoAtual;
     private Map<Estado, Animacao> mapaAnimacao;
     private EfeitoSonoro sons;
 
@@ -32,6 +35,7 @@ public abstract class Item {
         this.nome = nome;
         this.cooldown = cooldown;
         this.possiveisEstados = possiveisEstados;
+        this.estadoAtual = Estado.OCIOSO;
         
         sons = new EfeitoSonoro(nome, possiveisEstados);
         mapaAnimacao = new HashMap<>();
@@ -84,6 +88,18 @@ public abstract class Item {
         return mapaAnimacao.get(estadoAnimacao);
     }
     
+    public Animacao getAnimacaoAtual() {
+        return mapaAnimacao.get(estadoAtual);
+    }
+    
+    public Estado getEstado() {
+        return estadoAtual;
+    }
+    
+    public void setEstado(Estado novoEstado) {
+        this.estadoAtual = novoEstado;
+    }
+    
     /**
      * Reproduz um determinado som do item.
      * @param estadoDesejado Estado associado ao som que deve ser reproduzido
@@ -114,8 +130,10 @@ public abstract class Item {
     
     /**
      * Usa o item desejado.
+     * @param usuario
+     * @param mapaAtual
      */
-    public abstract void usar();
+    public abstract void usar(Entidade usuario, Mapa mapaAtual);
     
     /**
      * Verifica se o item está ou não apto à recarga.

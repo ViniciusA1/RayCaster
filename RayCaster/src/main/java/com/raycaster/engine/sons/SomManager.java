@@ -1,8 +1,8 @@
 package com.raycaster.engine.sons;
 
 import com.raycaster.engine.Estado;
-import com.raycaster.engine.arquivos.ArquivoUtils;
-import com.raycaster.engine.arquivos.Diretorio;
+import com.raycaster.utils.ArquivoUtils;
+import com.raycaster.utils.Diretorio;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;

@@ -1,8 +1,10 @@
 package com.raycaster.interfaces.paineis;
 
 import com.raycaster.interfaces.layouts.LayoutHUD;
-import com.raycaster.engine.arquivos.Diretorio;
-import com.raycaster.entidades.Player;
+import com.raycaster.utils.Diretorio;
+import com.raycaster.entidades.jogadores.Player;
+import com.raycaster.interfaces.componentes.LabelAnimado;
+import com.raycaster.interfaces.componentes.LabelAnimado.Animacao;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -22,8 +24,8 @@ public class HUD extends JPanel {
 
     private final List<ImageIcon> sprite;
     private final Player jogador;
-    private JLabel textoVida;
-    private JLabel textoMunicao;
+    private LabelAnimado textoVida;
+    private LabelAnimado textoMunicao;
     private JProgressBar barraVida;
     private JProgressBar barraMunicao;
 
@@ -39,24 +41,24 @@ public class HUD extends JPanel {
         sprite = new ArrayList<>();
         this.jogador = jogador;
 
-        carregaComponentes();
+        carregaComponentes(fontePersonalizada);
         carregaSprites();
     }
 
     /**
      * Carrega todos os componentes relacionados a HUD.
      */
-    private void carregaComponentes() {
+    private void carregaComponentes(Font fonte) {
         Color cor = new Color(255, 0, 0);
         
-        textoVida = new JLabel();
-        textoVida.setForeground(cor);
+        textoVida = new LabelAnimado("", fonte, 
+                Animacao.NONE);
         
         barraVida = new JProgressBar(JProgressBar.VERTICAL, 0, 100);
         barraVida.setForeground(cor);
         
-        textoMunicao = new JLabel();
-        textoMunicao.setForeground(cor);
+        textoMunicao = new LabelAnimado("", fonte, 
+                Animacao.NONE);
         
         barraMunicao = new JProgressBar(JProgressBar.VERTICAL, 0, 100);
         barraMunicao.setForeground(cor);
@@ -112,6 +114,7 @@ public class HUD extends JPanel {
      */
     @Override
     protected void paintComponent(Graphics g) {
+        super.paintComponents(g);
         super.paintComponent(g);
 
         atualizaComponentes();

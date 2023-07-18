@@ -68,7 +68,8 @@ public class BarraProgresso extends JProgressBar implements Interagivel {
         setOpaque(false);
         setForeground(Color.RED);
         setBorder(borda);
-        this.setStringPainted(true);
+        setFocusable(false);
+        setStringPainted(true);
         setUI(new BarraUI());
     }
 
@@ -88,8 +89,8 @@ public class BarraProgresso extends JProgressBar implements Interagivel {
                 if (alteracao != null) {
                     alteracao.run();
                 }
-                
-                InterfaceManager.playSom(Estado.SACANDO);
+
+                InterfaceManager.playSom(Estado.TROCANDO);
             }
             case KeyEvent.VK_LEFT, KeyEvent.VK_A -> {
                 if (valor - taxa < getMinimum()) {
@@ -101,8 +102,8 @@ public class BarraProgresso extends JProgressBar implements Interagivel {
                 if (alteracao != null) {
                     alteracao.run();
                 }
-                
-                InterfaceManager.playSom(Estado.SACANDO);
+
+                InterfaceManager.playSom(Estado.TROCANDO);
             }
         }
     }

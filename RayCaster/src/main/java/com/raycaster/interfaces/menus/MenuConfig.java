@@ -1,7 +1,7 @@
 package com.raycaster.interfaces.menus;
 
-import com.raycaster.engine.arquivos.ArquivoUtils;
-import com.raycaster.engine.arquivos.Diretorio;
+import com.raycaster.utils.ArquivoUtils;
+import com.raycaster.utils.Diretorio;
 import com.raycaster.engine.Engine;
 import com.raycaster.interfaces.componentes.BotaoCustom;
 import com.raycaster.interfaces.paineis.InterfaceManager;
@@ -80,16 +80,16 @@ public class MenuConfig extends AbstractMenuConfig {
 
         Font labelFonte = fonte.deriveFont(Font.BOLD, 150f);
 
-        labelConfig = new LabelAnimado("Configuração",
+        labelConfig = new LabelAnimado("Settings",
                 labelFonte, Animacao.FLOAT);
 
-        botaoVideo = new BotaoCustom("Vídeo",
+        botaoVideo = new BotaoCustom("Video",
                 configFonte, () -> video());
-        botaoAudio = new BotaoCustom("Áudio",
+        botaoAudio = new BotaoCustom("Audio",
                 configFonte, () -> audio());
-        botaoControle = new BotaoCustom("Controle",
+        botaoControle = new BotaoCustom("Control",
                 configFonte, () -> controle());
-        botaoVoltar = new BotaoCustom("Voltar",
+        botaoVoltar = new BotaoCustom("Return",
                 configFonte, () -> voltar(), true);
 
         add(labelConfig);
